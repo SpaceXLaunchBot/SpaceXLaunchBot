@@ -5,8 +5,8 @@ botInfo = """
 
 This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
 
-*API: https://github.com/r-spacex/SpaceX-API*
-*Bot source: https://github.com/thatguywiththatname/SpaceX-Launch-Bot*
+*Website: https://thatguywiththatname.github.io/SpaceX-Launch-Bot*
+*Github: https://github.com/thatguywiththatname/SpaceX-Launch-Bot*
 """
 
 helpText = """
