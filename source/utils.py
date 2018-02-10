@@ -11,7 +11,6 @@ helpText = """
 Command prefix: {prefix}
 
 Commands:
- • `!addchannel` - Subscribe the channel to the bots notification service - admins only
  • `!nextlaunch` - Show info about the next upcoming launch - any user can use this command
  • `!info` - Information about the bot - any user can use this command
  • `!help` - List these commands - any user can use this command
