@@ -20,3 +20,7 @@ The command prefix can be changed by editing `PREFIX = "!"` in `main.py` to what
  - `!info` - Information about the bot - any user can use this command
  - `!help` - List these commands - any user can use this command
  
+ # Technical Info
+ 
+ The API used it the [r/Space-X API](https://github.com/r-spacex/SpaceX-API)
+ 
