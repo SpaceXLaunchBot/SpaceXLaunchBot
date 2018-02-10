@@ -9,7 +9,7 @@ PREFIX = "!"
 
 client = discord.Client()
 try:
-    token = os.environ["SpaceX-Launch-Bot-Token"]
+    token = os.environ["SpaceXLaunchBotToken"]
 except KeyError:
     utils.err("Environment Variable \"SpaceX-Launch-Bot-Token\" cannot be found")
     
