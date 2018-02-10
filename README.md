@@ -2,7 +2,7 @@
 
 A Discord bot for gathering news and info about upcoming SpaceX launches
 
-[Add this bot to your server](https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896)
+[**Add this bot to your server**](https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896)
 
 # What does this bot do?
 
