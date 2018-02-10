@@ -1,24 +1,68 @@
 from discord import Embed
+import datetime
 import asyncio
 import aiohttp
-from datetime import datetime
 
-upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
-rocketImages = {
-    "F9": "",
-    "FH": "",
-    "DR": ""
+rocketIDImages = {
+    "falcon9": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falcon9.png",
+    "falconheavy": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falconHeavy.png",
+    "falcon1": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/logo.jpg"
 }
+hexColours = {
+    "errorRed": 0xFF0000,
+    "falconRed": 0xEE0F46
+}
+upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
+APIErrorEmbed = embed = Embed(title="Error", description="SpaceX API error", color=hexColours["errorRed"])
 
-async def getNextLaunchEmbed(plus=False):
+async def getNextLaunchEmbed():
+    # Using aiohttp, grab the latest launch info
     async with aiohttp.ClientSession() as session:
         async with session.get(upcomingLaunchesURL) as response:
+            if response.status != 200:
+                # Return error embed if request did not succeed
+                return APIErrorEmbed
             nextLaunch = list(await response.json())[0]
-    embed = Embed(
-        title="title",
-        description="description",
-        footer="footer",
-        url="",
-        color=0x00ff00
+
+    # Create embed & insert reddit discussion link + simple description
+    launchEmbed = Embed(
+        title="r/SpaceX Discussion",
+        url = nextLaunch["links"]["reddit_campaign"],
+        description="A {} rocket carrying {} payloads, launching from {}".format(
+            nextLaunch["rocket"]["rocket_name"],
+            len(nextLaunch["rocket"]["second_stage"]["payloads"]),
+            nextLaunch["launch_site"]["site_name_long"]
+        ),
+        color=hexColours["falconRed"]
     )
-    return embed
+
+    # Set thumbnail depending on rocked ID & set the authoor to the launch no.
+    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunch["rocket"]["rocket_id"]])
+    launchEmbed.set_author(name="Launch #{}".format(nextLaunch["flight_number"]))
+
+    # Add a field for the launch date
+    unixDate = int(nextLaunch["launch_date_unix"])
+    formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
+    launchEmbed.add_field(name="Launching on", value="{} UTC".format(formattedDate))
+
+    # Add a field showing each reused component
+    reusing = []
+    for component in nextLaunch["reuse"]:
+        if nextLaunch["reuse"][component]:
+            reusing.append(component)
+    launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
+
+
+    # Add a field for each payload, with basic information
+    for payload in nextLaunch["rocket"]["second_stage"]["payloads"]:
+        launchEmbed.add_field(
+            name="Payload: {}".format(payload["payload_id"]),
+            value="Type: {}\nOrbit: {}\nMass: {}kg\nCustomer(s): {}".format(
+                payload["payload_type"],
+                payload["orbit"],
+                payload["payload_mass_kg"],
+                ", ".join(payload["customers"])
+            )
+        )
+
+    return launchEmbed
