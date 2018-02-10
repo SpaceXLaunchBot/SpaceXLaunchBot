@@ -26,9 +26,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith(PREFIX + "addchannel"):
-        await client.send_message(message.channel, "addchannel currently not implemented")
-    elif message.content.startswith(PREFIX + "nextlaunch"):
+    if message.content.startswith(PREFIX + "nextlaunch"):
         embed = await launchAPI.getNextLaunchEmbed()
         await client.send_message(message.channel, embed=embed)
     elif message.content.startswith(PREFIX + "info"):
