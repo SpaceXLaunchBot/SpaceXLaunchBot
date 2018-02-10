@@ -1,8 +1,6 @@
 import sys
 
 botInfo = """
-**SpaceX-Launch-Bot**
-
 This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
 
 *Website: https://thatguywiththatname.github.io/SpaceX-Launch-Bot*
