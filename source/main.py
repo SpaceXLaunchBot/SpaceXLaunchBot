@@ -11,7 +11,7 @@ client = discord.Client()
 try:
     token = os.environ["SpaceXLaunchBotToken"]
 except KeyError:
-    utils.err("Environment Variable \"SpaceX-Launch-Bot-Token\" cannot be found")
+    utils.err("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
     
 @client.event
 async def on_ready():
