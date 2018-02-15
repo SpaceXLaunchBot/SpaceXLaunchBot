@@ -86,20 +86,25 @@ async def on_message(message):
     
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
+        replyMsg = "This channel has been added to the launch notification service"
         with launchNotifDictLock:
-            launchNotifDict["subscribedChannels"].append(message.channel.id)
-            utils.saveDict(launchNotifDict)
-        await client.send_message(message.channel, "This channel has been added to the launch notification service")
+            if message.channel.id not in launchNotifDict["subscribedChannels"]:
+                launchNotifDict["subscribedChannels"].append(message.channel.id)
+                utils.saveDict(launchNotifDict)
+            else:
+                replyMsg = "This channel is already subscribed to the launch notification service"
+        await client.send_message(message.channel, replyMsg)
     
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
+        replyMsg = "This channel has been removed from the launch notification service"
         with launchNotifDictLock:
             try:
                 launchNotifDict["subscribedChannels"].remove(message.channel.id)
                 utils.saveDict(launchNotifDict)
             except ValueError:
-                pass  # Channel was not in subscribedChannels
-        await client.send_message(message.channel, "This channel has been removed from the launch notification service")
+                replyMsg = "This channel was not previously subscribed to the launch notification service"
+        await client.send_message(message.channel, replyMsg)
 
     elif message.content.startswith(PREFIX + "info"):
         await client.send_message(message.channel, utils.botInfo)
