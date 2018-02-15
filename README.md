@@ -7,6 +7,7 @@ A Discord bot for gathering news and info about upcoming SpaceX launches
 # What does this bot do?
 
  - Allow users to see information about the closest launch by using a command
+ - Allows users to "subscribe" channels to the bots new launch notification channel service. This service will send a new message to the channel every time the next upcoming launch has changed (e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different)
 
 # Commands
 
