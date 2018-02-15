@@ -8,8 +8,8 @@ newLaunchErrorEmbed = Embed(title="Error", description="nextLaunchEmbed error, c
 botInfo = """
 This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
 
-*Website: https://thatguywiththatname.github.io/SpaceX-Launch-Bot*
-*Github: https://github.com/thatguywiththatname/SpaceX-Launch-Bot*
+*Website: https://r-spacex.github.io/SpaceX-Launch-Bot/*
+*Github: https://github.com/r-spacex/SpaceX-Launch-Bot*
 """
 
 helpText = """
