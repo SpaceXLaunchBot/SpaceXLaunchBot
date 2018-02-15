@@ -1,5 +1,9 @@
+from launchAPI import hexColours
+from discord import Embed
 import pickle
 import sys
+
+newLaunchErrorEmbed = Embed(title="Error", description="nextLaunchEmbed error, contact @Dragon#0571", color=hexColours["errorRed"])
 
 botInfo = """
 This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
@@ -19,13 +23,15 @@ Commands:
  • `!help` - List these commands - any user can use this command
 """
 
+pickleProtocol = pickle.HIGHEST_PROTOCOL
+
 def err(message):
     print("\nERROR:\n" + message)
     sys.exit(-1)
 
 def saveDict(dictObj):
     with open("resources/dict.pkl", "wb") as f:
-        pickle.dump(dictObj, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(dictObj, f, pickleProtocol)
 
 def loadDict():
     try:
@@ -33,6 +39,6 @@ def loadDict():
             return pickle.load(f)
     except FileNotFoundError:
         # No .pkl, create default dict, save to file & return
-        temp = {"subscribedChannels":[], "nextLaunchJSON":{}}
+        temp = {"subscribedChannels": [], "nextLaunchEmbedPickled": pickle.dumps(newLaunchErrorEmbed, pickleProtocol)}
         saveDict(temp)
         return temp

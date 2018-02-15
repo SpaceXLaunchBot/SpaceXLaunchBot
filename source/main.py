@@ -1,6 +1,7 @@
 from threading import Lock
 import discord
 import asyncio
+import pickle
 import os
 
 import utils
@@ -26,20 +27,23 @@ async def nextLaunchBackgroundTask():
         nextLaunchJSON = await getnextLaunchJSON()
         if nextLaunchJSON == 0:
             pass  # Error, do nothing, wait for 30 more mins
+        
         else:
+            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
+            nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
+            
             with dictLock:
-                if launchNotifDict["nextLaunchJSON"] == nextLaunchJSON:
+                if launchNotifDict["nextLaunchEmbedPickled"] == nextLaunchEmbedPickled:
                     newLaunch = False
                 else:
                     # Add and save new launch info
-                    launchNotifDict["nextLaunchJSON"] = nextLaunchJSON
+                    launchNotifDict["nextLaunchEmbedPickled"] = nextLaunchEmbedPickled
                     utils.saveDict(launchNotifDict)
                 
             if newLaunch:
                 # new launch found, send all "subscribed" channel the embed
-                embed = await getnextLaunchEmbed(nextLaunchJSON)
                 for channelID in launchNotifDict["subscribedChannels"]:
-                    await client.send_message(discord.Object(id=channelID), embed=embed)
+                    await client.send_message(discord.Object(id=channelID), embed=nextLaunchEmbed)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 

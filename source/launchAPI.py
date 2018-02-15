@@ -13,7 +13,7 @@ hexColours = {
     "falconRed": 0xEE0F46
 }
 upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
-APIErrorEmbed = embed = Embed(title="Error", description="SpaceX API error, contact @Dragon#0571", color=hexColours["errorRed"])
+APIErrorEmbed = Embed(title="Error", description="SpaceX API error, contact @Dragon#0571", color=hexColours["errorRed"])
 
 async def getnextLaunchJSON():
     """
