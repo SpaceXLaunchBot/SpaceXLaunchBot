@@ -26,4 +26,4 @@ The command prefix can be changed by editing `PREFIX = "!"` in `main.py` to what
  # To Do
 
  - Only allow admins to subscribe / unsubscribe channels to / from the bots notification service
- - Only update subscrined channels if embed has changed, not if JSON has changed (unimportant details can change)
+ - Only update subscribed channels if embed has changed, not if JSON has changed (unimportant details can change)
