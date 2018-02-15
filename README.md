@@ -20,8 +20,3 @@ The command prefix can be changed by editing `PREFIX = "!"` in `main.py` to what
  
  The API used it the [r/Space-X API](https://github.com/r-spacex/SpaceX-API)
  
-# Planned
-
- - Provide a "subscribed" channel that will be notified with up to date information about upcoming SpaceX launches
- - `!addchannel` - Subscribe the channel to the bots notification service - admins only
- 
