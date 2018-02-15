@@ -28,7 +28,6 @@ async def nextLaunchBackgroundTask():
             pass  # Error, do nothing, wait for 30 more mins
         else:
             with dictLock:
-                print("$", launchNotifDict["nextLaunchJSON"])
                 if launchNotifDict["nextLaunchJSON"] == nextLaunchJSON:
                     newLaunch = False
                 else:
@@ -46,14 +45,17 @@ async def nextLaunchBackgroundTask():
 
 @client.event
 async def on_ready():
+    with dictLock:
+        subbedLen = len(launchNotifDict["subscribedChannels"])
     await client.change_presence(game=discord.Game(name="with Elon"))
     servers = list(client.servers)
     print("\nLogged into Discord API\n")
-    print("Username: {}\nClientID: {}\n\nConnected to {} server(s):\n{}".format(
+    print("Username: {}\nClientID: {}\n\nConnected to {} server(s):\n{}\n\nConnected to {} subscribed channels".format(
         client.user.name,
         client.user.id,
         len(servers),
-        "\n".join([n.name for n in servers])
+        "\n".join([n.name for n in servers],
+        subbedLen)
     ))
 
 @client.event
