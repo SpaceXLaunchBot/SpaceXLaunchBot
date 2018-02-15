@@ -13,6 +13,8 @@ Command prefix: {prefix}
 
 Commands:
  • `!nextlaunch` - Show info about the next upcoming launch - any user can use this command
+ • `!addchannel` - Add the current channel to the bots launch notification service - any user can use this command
+ • `!removechannel` - Remove the current channel to the bots launch notification service - any user can use this command
  • `!info` - Information about the bot - any user can use this command
  • `!help` - List these commands - any user can use this command
 """

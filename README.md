@@ -13,6 +13,8 @@ A Discord bot for gathering news and info about upcoming SpaceX launches
 The command prefix can be changed by editing `PREFIX = "!"` in `main.py` to whatever you want
 
  - `!nextlaunch` - Show info about the next upcoming launch - any user can use this command
+ - `!addchannel` - Add the current channel to the bots launch notification service - any user can use this command
+ - `!removechannel` - Remove the current channel to the bots launch notification service - any user can use this command
  - `!info` - Information about the bot - any user can use this command
  - `!help` - List these commands - any user can use this command
  
@@ -20,3 +22,7 @@ The command prefix can be changed by editing `PREFIX = "!"` in `main.py` to what
  
  The API used it the [r/Space-X API](https://github.com/r-spacex/SpaceX-API)
  
+ # To Do
+
+  - Only allow admins to subscribe / unsubscribe channels to / from the bots notification service
+  
