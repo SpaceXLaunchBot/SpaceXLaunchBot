@@ -13,48 +13,51 @@ hexColours = {
     "falconRed": 0xEE0F46
 }
 upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
-APIErrorEmbed = embed = Embed(title="Error", description="SpaceX API error", color=hexColours["errorRed"])
+APIErrorEmbed = embed = Embed(title="Error", description="SpaceX API error, contact @Dragon#0571", color=hexColours["errorRed"])
 
-async def getNextLaunchEmbed():
-    # Using aiohttp, grab the latest launch info
+async def getnextLaunchJSON():
+    """
+    Using aiohttp, grab the latest launch info
+    Returns 0 if fail
+    """
     async with aiohttp.ClientSession() as session:
         async with session.get(upcomingLaunchesURL) as response:
             if response.status != 200:
-                # Return error embed if request did not succeed
-                return APIErrorEmbed
-            nextLaunch = list(await response.json())[0]
+                return 0
+            return list(await response.json())[0]
 
+async def getnextLaunchEmbed(nextLaunchJSON):
     # Create embed & insert reddit discussion link + simple description
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
-        url = nextLaunch["links"]["reddit_campaign"],
+        url = nextLaunchJSON["links"]["reddit_campaign"],
         description="A {} rocket carrying {} payloads, launching from {}".format(
-            nextLaunch["rocket"]["rocket_name"],
-            len(nextLaunch["rocket"]["second_stage"]["payloads"]),
-            nextLaunch["launch_site"]["site_name_long"]
+            nextLaunchJSON["rocket"]["rocket_name"],
+            len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
+            nextLaunchJSON["launch_site"]["site_name_long"]
         ),
         color=hexColours["falconRed"]
     )
 
     # Set thumbnail depending on rocked ID & set the authoor to the launch no.
-    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunch["rocket"]["rocket_id"]])
-    launchEmbed.set_author(name="Launch #{}".format(nextLaunch["flight_number"]))
+    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
+    launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
     # Add a field for the launch date
-    unixDate = int(nextLaunch["launch_date_unix"])
+    unixDate = int(nextLaunchJSON["launch_date_unix"])
     formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
     launchEmbed.add_field(name="Launching on", value="{} UTC".format(formattedDate))
 
     # Add a field showing each reused component
     reusing = []
-    for component in nextLaunch["reuse"]:
-        if nextLaunch["reuse"][component]:
+    for component in nextLaunchJSON["reuse"]:
+        if nextLaunchJSON["reuse"][component]:
             reusing.append(component)
     launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
 
 
     # Add a field for each payload, with basic information
-    for payload in nextLaunch["rocket"]["second_stage"]["payloads"]:
+    for payload in nextLaunchJSON["rocket"]["second_stage"]["payloads"]:
         launchEmbed.add_field(
             name="Payload: {}".format(payload["payload_id"]),
             value="Type: {}\nOrbit: {}\nMass: {}kg\nCustomer(s): {}".format(
