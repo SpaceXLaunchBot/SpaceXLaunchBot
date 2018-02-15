@@ -1,1 +1,2 @@
-nohup python3 source/main.py &
+cd source
+nohup python3 main.py &
