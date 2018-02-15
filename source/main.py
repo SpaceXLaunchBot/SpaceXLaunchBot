@@ -15,6 +15,7 @@ except KeyError:
     
 @client.event
 async def on_ready():
+    await client.change_presence(game=discord.Game(name="with Elon"))
     servers = list(client.servers)
     print("\nLogged into Discord API\n")
     print("Username: {}\nClientID: {}\n\nConnected to {} server(s):\n{}".format(
