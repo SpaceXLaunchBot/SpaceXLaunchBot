@@ -54,8 +54,8 @@ async def on_ready():
         client.user.name,
         client.user.id,
         len(servers),
-        "\n".join([n.name for n in servers],
-        subbedLen)
+        "\n".join([n.name for n in servers]),
+        subbedLen
     ))
 
 @client.event
