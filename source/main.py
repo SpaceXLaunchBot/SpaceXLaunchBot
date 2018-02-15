@@ -8,9 +8,17 @@ import utils
 from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed
 
 PREFIX = "!"
+
+"""
+launchNotifDict is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
+to store 2 things: the list of channel IDs that are subscribed, and the latest embed that was sent. It is
+what is saved to and loaded from a file (so it persists through reboots/updates)
+"""
 launchNotifDict = utils.loadDict()
-dictLock = Lock()  # locks access when saving / loading
+launchNotifDictLock = Lock()  # locks access when saving / loading
+
 client = discord.Client()
+
 try:
     token = os.environ["SpaceXLaunchBotToken"]
 except KeyError:
@@ -18,7 +26,8 @@ except KeyError:
 
 async def nextLaunchBackgroundTask():
     """
-    Every 1/2 hour, update dict with latest launch then see if subs need updating
+    Every 1/2 hour, get latest JSON & format an embed. If the embed has changed since the last 1/2 hour, then
+    something new has happened to send all channels an update. Else do nothing
     """
     await client.wait_until_ready()
     while not client.is_closed:
@@ -32,7 +41,7 @@ async def nextLaunchBackgroundTask():
             nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
             nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
             
-            with dictLock:
+            with launchNotifDictLock:
                 if launchNotifDict["nextLaunchEmbedPickled"] == nextLaunchEmbedPickled:
                     newLaunch = False
                 else:
@@ -49,7 +58,7 @@ async def nextLaunchBackgroundTask():
 
 @client.event
 async def on_ready():
-    with dictLock:
+    with launchNotifDictLock:
         subbedLen = len(launchNotifDict["subscribedChannels"])
     await client.change_presence(game=discord.Game(name="with Elon"))
     servers = list(client.servers)
@@ -64,7 +73,8 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-
+    userIsAdmin = message.author.permissions_in(message.channel).administrator
+    
     if message.content.startswith(PREFIX + "nextlaunch"):
         # Send latest launch JSON embed to message.channel
         nextLaunchJSON = await getnextLaunchJSON()
@@ -74,16 +84,16 @@ async def on_message(message):
             embed = await getnextLaunchEmbed(nextLaunchJSON)
         await client.send_message(message.channel, embed=embed)
     
-    elif message.content.startswith(PREFIX + "addchannel"):
+    elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
-        with dictLock:
+        with launchNotifDictLock:
             launchNotifDict["subscribedChannels"].append(message.channel.id)
             utils.saveDict(launchNotifDict)
         await client.send_message(message.channel, "This channel has been added to the launch notification service")
     
-    elif message.content.startswith(PREFIX + "removechannel"):
+    elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
-        with dictLock:
+        with launchNotifDictLock:
             try:
                 launchNotifDict["subscribedChannels"].remove(message.channel.id)
                 utils.saveDict(launchNotifDict)
