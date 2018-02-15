@@ -1,1 +1,3 @@
-pkill -9 -f source/main.py
+cd source
+pkill -9 -f main.py
+cd ..
