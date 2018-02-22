@@ -68,4 +68,28 @@ async def getnextLaunchEmbed(nextLaunchJSON):
             )
         )
 
-    return launchEmbed, nextLaunchJSON["links"]["reddit_campaign"]
+    return launchEmbed
+
+async def getLiteEmbed(nextLaunchJSON):
+    # A "lite" version of the embed that should never reach the embed size limit
+    launchEmbed = Embed(
+        title="r/SpaceX Discussion",
+        url = nextLaunchJSON["links"]["reddit_campaign"],
+        description="A {} rocket carrying {} payloads, launching from {}".format(
+            nextLaunchJSON["rocket"]["rocket_name"],
+            len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
+            nextLaunchJSON["launch_site"]["site_name_long"]
+        ),
+        color=hexColours["falconRed"]
+    )
+
+    # Set thumbnail depending on rocked ID & set the authoor to the launch no.
+    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
+    launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
+
+    # Add a field for the launch date
+    unixDate = int(nextLaunchJSON["launch_date_unix"])
+    formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
+    launchEmbed.add_field(name="Launching on", value="{} UTC".format(formattedDate))
+
+    return launchEmbed

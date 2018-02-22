@@ -5,7 +5,7 @@ import pickle
 import os
 
 import utils
-from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed
+from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed, getLiteEmbed
 
 PREFIX = "!"
 
@@ -38,7 +38,8 @@ async def nextLaunchBackgroundTask():
             pass  # Error, do nothing, wait for 30 more mins
         
         else:
-            nextLaunchEmbed, nextLaunchRedditURL = await getnextLaunchEmbed(nextLaunchJSON)
+            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
+            liteEmbed = await getLiteEmbed(nextLaunchJSON)  # Generate now just in case
             nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
             
             with launchNotifDictLock:
@@ -56,7 +57,8 @@ async def nextLaunchBackgroundTask():
                     try:
                         await client.send_message(channel, embed=nextLaunchEmbed)
                     except discord.errors.HTTPException:
-                        await client.send_message(channel, "Info too big, see information about this launch at {}".format(nextLaunchRedditURL))
+                        # getnextLaunchEmbed was too big, send lite version
+                        await client.send_message(message.channel, embed=liteEmbed)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
@@ -85,11 +87,13 @@ async def on_message(message):
         if nextLaunchJSON == 0:
             embed = APIErrorEmbed
         else:
-            embed, nextLaunchRedditURL = await getnextLaunchEmbed(nextLaunchJSON)
+            embed = await getnextLaunchEmbed(nextLaunchJSON)
         try:
             await client.send_message(message.channel, embed=embed)
         except discord.errors.HTTPException:
-            await client.send_message(message.channel, "Info too big, see information about this launch at {}".format(nextLaunchRedditURL))
+            # getnextLaunchEmbed was too big, send lite version
+            embed = await getLiteEmbed(nextLaunchJSON)
+            await client.send_message(message.channel, embed=embed)
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
