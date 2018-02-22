@@ -25,6 +25,5 @@ Each command requires a prefix (the default is "!"), this can be changed by edit
 
 # ToDo
 
- - If embed unabled to send (e.g. > 2000 chars) then send basic embed with just launch num, rocket type, date, etc.
  - Show in notifications what has changed since the last message, e.g. if just the date has changed or if it is a new launch #
  - Send a notification when a launch is about to happen, maybe with a link to livestream / press kit
