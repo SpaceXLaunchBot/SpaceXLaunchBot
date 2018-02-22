@@ -38,7 +38,7 @@ async def nextLaunchBackgroundTask():
             pass  # Error, do nothing, wait for 30 more mins
         
         else:
-            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
+            nextLaunchEmbed, nextLaunchRedditURL = await getnextLaunchEmbed(nextLaunchJSON)
             nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
             
             with launchNotifDictLock:
@@ -52,7 +52,11 @@ async def nextLaunchBackgroundTask():
             if newLaunch:
                 # new launch found, send all "subscribed" channel the embed
                 for channelID in launchNotifDict["subscribedChannels"]:
-                    await client.send_message(discord.Object(id=channelID), embed=nextLaunchEmbed)
+                    channel = discord.Object(id=channelID)
+                    try:
+                        await client.send_message(channel, embed=nextLaunchEmbed)
+                    except discord.errors.HTTPException:
+                        await client.send_message(channel, "Info too big, see information about this launch at {}".format(nextLaunchRedditURL))
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
@@ -81,9 +85,12 @@ async def on_message(message):
         if nextLaunchJSON == 0:
             embed = APIErrorEmbed
         else:
-            embed = await getnextLaunchEmbed(nextLaunchJSON)
-        await client.send_message(message.channel, embed=embed)
-    
+            embed, nextLaunchRedditURL = await getnextLaunchEmbed(nextLaunchJSON)
+        try:
+            await client.send_message(message.channel, embed=embed)
+        except discord.errors.HTTPException:
+            await client.send_message(message.channel, "Info too big, see information about this launch at {}".format(nextLaunchRedditURL))
+
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"

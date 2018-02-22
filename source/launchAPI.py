@@ -68,4 +68,4 @@ async def getnextLaunchEmbed(nextLaunchJSON):
             )
         )
 
-    return launchEmbed
+    return launchEmbed, nextLaunchJSON["links"]["reddit_campaign"]
