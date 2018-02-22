@@ -75,7 +75,7 @@ async def getLiteEmbed(nextLaunchJSON):
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
         url = nextLaunchJSON["links"]["reddit_campaign"],
-        description="A {} rocket carrying {} payloads, launching from {}".format(
+        description="This information has been reduced as the data is too large to contain in this embed: A {} rocket carrying {} payloads, launching from {}".format(
             nextLaunchJSON["rocket"]["rocket_name"],
             len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
             nextLaunchJSON["launch_site"]["site_name_long"]
