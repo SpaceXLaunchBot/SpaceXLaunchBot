@@ -31,7 +31,7 @@ async def getnextLaunchEmbed(nextLaunchJSON):
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
         url = nextLaunchJSON["links"]["reddit_campaign"],
-        description="A {} rocket carrying {} payloads, launching from {}".format(
+        description="A {} rocket carrying {} payload(s), launching from {}".format(
             nextLaunchJSON["rocket"]["rocket_name"],
             len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
             nextLaunchJSON["launch_site"]["site_name_long"]
@@ -75,17 +75,20 @@ async def getLiteEmbed(nextLaunchJSON):
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
         url = nextLaunchJSON["links"]["reddit_campaign"],
-        description="This information has been reduced as the data is too large to contain in this embed: A {} rocket carrying {} payloads, launching from {}".format(
-            nextLaunchJSON["rocket"]["rocket_name"],
-            len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
-            nextLaunchJSON["launch_site"]["site_name_long"]
-        ),
+        description="This information has been reduced as the data is too large to contain in this embed",
         color=hexColours["falconRed"]
     )
 
     # Set thumbnail depending on rocked ID & set the authoor to the launch no.
     launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
+
+    # Info in new field
+    launchEmbed.add_field(name="Information", value="A {} rocket carrying {} payload(s), launching from {}".format(
+        nextLaunchJSON["rocket"]["rocket_name"],
+        len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
+        nextLaunchJSON["launch_site"]["site_name_long"]
+    ))
 
     # Add a field for the launch date
     unixDate = int(nextLaunchJSON["launch_date_unix"])
