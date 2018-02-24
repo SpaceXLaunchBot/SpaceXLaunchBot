@@ -58,7 +58,7 @@ async def nextLaunchBackgroundTask():
                         await client.send_message(channel, embed=nextLaunchEmbed)
                     except discord.errors.HTTPException:
                         # getnextLaunchEmbed was too big, send lite version
-                        await client.send_message(message.channel, embed=liteEmbed)
+                        await client.send_message(channel, embed=liteEmbed)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
