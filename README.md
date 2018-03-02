@@ -25,6 +25,7 @@ Each command requires a prefix (the default is "!"), this can be changed by edit
 
 # ToDo
 
+ - Change date to "To be announced" if API returns a datetime of `null`
  - Include `details` field if not `null`
  - Show in notifications what has changed since the last message, e.g. if just the date has changed or if it is a new launch #
  - Send a notification when a launch is about to happen, maybe with a link to livestream / press kit
