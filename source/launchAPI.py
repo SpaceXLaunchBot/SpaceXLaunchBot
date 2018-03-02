@@ -44,9 +44,12 @@ async def getnextLaunchEmbed(nextLaunchJSON):
     launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
     # Add a field for the launch date
-    unixDate = int(nextLaunchJSON["launch_date_unix"])
-    formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
-    launchEmbed.add_field(name="Launching on", value="{} UTC".format(formattedDate))
+    launchingOn = "To Be Announced"
+    unixDate = nextLaunchJSON["launch_date_unix"]
+    if unixDate != "null":
+        formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
+        launchingOn = "{} UTC".format(formattedDate)
+    launchEmbed.add_field(name="Launching on", value=launchingOn)
 
     # Add a field showing each reused component
     reusing = []
