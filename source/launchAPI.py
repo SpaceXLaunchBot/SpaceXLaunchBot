@@ -93,9 +93,12 @@ async def getLiteEmbed(nextLaunchJSON):
         nextLaunchJSON["launch_site"]["site_name_long"]
     ))
 
-    # Add a field for the launch date
-    unixDate = int(nextLaunchJSON["launch_date_unix"])
-    formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
-    launchEmbed.add_field(name="Launching on", value="{} UTC".format(formattedDate))
+    # Add a field for the launch date  
+    launchingOn = "To Be Announced"
+    unixDate = nextLaunchJSON["launch_date_unix"]
+    if unixDate != "null":
+        formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
+        launchingOn = "{} UTC".format(formattedDate)
+    launchEmbed.add_field(name="Launching on", value=launchingOn)
 
     return launchEmbed
