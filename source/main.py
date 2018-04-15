@@ -68,18 +68,27 @@ async def on_ready():
         subbedLen = len(launchNotifDict["subscribedChannels"])
     await client.change_presence(game=discord.Game(name="with Elon"))
     servers = list(client.servers)
+    
+    totalClients = 0
+    for server in client.servers:
+        totalClients += len(server.members)
+
     print("\nLogged into Discord API\n")
-    print("Username: {}\nClientID: {}\n\nConnected to {} server(s):\n{}\n\nConnected to {} subscribed channels".format(
+    print("Username: {}\nClientID: {}\n\nConnected to {} servers:\n{}\n\nConnected to {} subscribed channels\n\nServing {} clients".format(
         client.user.name,
         client.user.id,
         len(servers),
         "\n".join([n.name for n in servers]),
-        subbedLen
+        subbedLen,
+        totalClients
     ))
 
 @client.event
 async def on_message(message):
-    userIsAdmin = message.author.permissions_in(message.channel).administrator
+    try:
+        userIsAdmin = message.author.permissions_in(message.channel).administrator
+    except AttributeError:
+        userIsAdmin = False
     
     if message.content.startswith(PREFIX + "nextlaunch"):
         # Send latest launch JSON embed to message.channel
