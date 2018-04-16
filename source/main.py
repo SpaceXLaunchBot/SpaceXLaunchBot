@@ -1,7 +1,6 @@
 from threading import Lock
 import discord
 import asyncio
-import pickle
 import os
 
 import utils
@@ -50,14 +49,13 @@ async def nextLaunchBackgroundTask():
         
         else:
             nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
-            nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
             
             with launchNotifDictLock:
-                if launchNotifDict["nextLaunchEmbedPickled"] == nextLaunchEmbedPickled:
+                if launchNotifDict["nextLaunchEmbed"].to_dict() == nextLaunchEmbed.to_dict():
                     pass
                 else:
                     # Add and save new launch info
-                    launchNotifDict["nextLaunchEmbedPickled"] = nextLaunchEmbedPickled
+                    launchNotifDict["nextLaunchEmbed"] = nextLaunchEmbed
                     utils.saveDict(launchNotifDict)
                 
                     nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)

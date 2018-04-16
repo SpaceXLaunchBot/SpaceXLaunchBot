@@ -39,6 +39,6 @@ def loadDict():
             return pickle.load(f)
     except FileNotFoundError:
         # No .pkl, create default dict, save to file & return
-        temp = {"subscribedChannels": [], "nextLaunchEmbedPickled": pickle.dumps(newLaunchErrorEmbed, pickleProtocol)}
+        temp = {"subscribedChannels": [], "nextLaunchEmbed": newLaunchErrorEmbed}
         saveDict(temp)
         return temp
