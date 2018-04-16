@@ -1,3 +1,10 @@
+"""
+launchAPI.py
+
+Contains async defs for functions that get the next upcoming launch JSON from the API,
+Create a Discord embed & create a "lite" discord embed
+"""
+
 from discord import Embed
 import datetime
 import asyncio
@@ -13,7 +20,10 @@ hexColours = {
     "falconRed": 0xEE0F46
 }
 upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
+
+# Embeds to send if an error happens
 APIErrorEmbed = Embed(title="Error", description="SpaceX API error, contact @Dragon#0571", color=hexColours["errorRed"])
+generalErrorEmbed = Embed(title="Error", description="An error occurred, contact @Dragon#0571", color=hexColours["errorRed"])
 
 async def getnextLaunchJSON():
     """
@@ -73,7 +83,7 @@ async def getnextLaunchEmbed(nextLaunchJSON):
 
     return launchEmbed
 
-async def getLiteEmbed(nextLaunchJSON):
+async def getnextLaunchLiteEmbed(nextLaunchJSON):
     # A "lite" version of the embed that should never reach the embed size limit
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
@@ -99,6 +109,6 @@ async def getLiteEmbed(nextLaunchJSON):
     if unixDate != "null":
         formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
         launchingOn = "{} UTC".format(formattedDate)
-    launchEmbed.add_field(name="Launching on", value=launchingOn)
+    launchEmbed.add_field(name="Launching date", value=launchingOn)
 
     return launchEmbed

@@ -5,7 +5,7 @@ import pickle
 import os
 
 import utils
-from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed, getLiteEmbed
+from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed, getnextLaunchLiteEmbed, generalErrorEmbed
 
 PREFIX = "!"
 
@@ -24,6 +24,17 @@ try:
 except KeyError:
     utils.err("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
 
+async def sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite):
+    """
+    General func for sending a channel the latest launch embed
+    """
+    for embed in [nextLaunchEmbed, nextLaunchEmbedLite]:
+        try:
+            return await client.send_message(channel, embed=embed)
+        except discord.errors.HTTPException:
+            pass
+        await client.send_message(channel, embed=generalErrorEmbed)
+
 async def nextLaunchBackgroundTask():
     """
     Every 1/2 hour, get latest JSON & format an embed. If the embed has changed since the last 1/2 hour, then
@@ -31,44 +42,36 @@ async def nextLaunchBackgroundTask():
     """
     await client.wait_until_ready()
     while not client.is_closed:
-        newLaunch = True
-
         nextLaunchJSON = await getnextLaunchJSON()
         if nextLaunchJSON == 0:
             pass  # Error, do nothing, wait for 30 more mins
         
         else:
             nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
-            liteEmbed = await getLiteEmbed(nextLaunchJSON)  # Generate now just in case
             nextLaunchEmbedPickled = pickle.dumps(nextLaunchEmbed, utils.pickleProtocol)
             
             with launchNotifDictLock:
                 if launchNotifDict["nextLaunchEmbedPickled"] == nextLaunchEmbedPickled:
-                    newLaunch = False
+                    pass
                 else:
                     # Add and save new launch info
                     launchNotifDict["nextLaunchEmbedPickled"] = nextLaunchEmbedPickled
                     utils.saveDict(launchNotifDict)
                 
-            if newLaunch:
-                # new launch found, send all "subscribed" channel the embed
-                for channelID in launchNotifDict["subscribedChannels"]:
-                    channel = discord.Object(id=channelID)
-                    try:
-                        await client.send_message(channel, embed=nextLaunchEmbed)
-                    except discord.errors.HTTPException:
-                        # getnextLaunchEmbed was too big, send lite version
-                        await client.send_message(channel, embed=liteEmbed)
+                    nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)
+                    # new launch found, send all "subscribed" channel the embed
+                    for channelID in launchNotifDict["subscribedChannels"]:
+                        channel = discord.Object(id=channelID)
+                        await sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
 @client.event
 async def on_ready():
     with launchNotifDictLock:
-        subbedLen = len(launchNotifDict["subscribedChannels"])
+        totalSubbed = len(launchNotifDict["subscribedChannels"])
     await client.change_presence(game=discord.Game(name="with Elon"))
-    servers = list(client.servers)
-    
+    totalServers = len(list(client.servers))
     totalClients = 0
     for server in client.servers:
         totalClients += len(server.members)
@@ -77,9 +80,9 @@ async def on_ready():
     print("Username: {}\nClientID: {}\n\nConnected to {} servers:\n{}\n\nConnected to {} subscribed channels\n\nServing {} clients".format(
         client.user.name,
         client.user.id,
-        len(servers),
-        "\n".join([n.name for n in servers]),
-        subbedLen,
+        totalServers,
+        "\n".join([n.name for n in client.servers]),
+        totalSubbed,
         totalClients
     ))
 
@@ -88,21 +91,18 @@ async def on_message(message):
     try:
         userIsAdmin = message.author.permissions_in(message.channel).administrator
     except AttributeError:
+        # Happens if user has no roles
         userIsAdmin = False
     
     if message.content.startswith(PREFIX + "nextlaunch"):
-        # Send latest launch JSON embed to message.channel
         nextLaunchJSON = await getnextLaunchJSON()
         if nextLaunchJSON == 0:
-            embed = APIErrorEmbed
+            nextLaunchEmbed = APIErrorEmbed
+            nextLaunchEmbedLite = APIErrorEmbed
         else:
-            embed = await getnextLaunchEmbed(nextLaunchJSON)
-        try:
-            await client.send_message(message.channel, embed=embed)
-        except discord.errors.HTTPException:
-            # getnextLaunchEmbed was too big, send lite version
-            embed = await getLiteEmbed(nextLaunchJSON)
-            await client.send_message(message.channel, embed=embed)
+            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
+            nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)
+        await sendLaunchEmbed(message.channel, nextLaunchEmbed, nextLaunchEmbedLite)
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
