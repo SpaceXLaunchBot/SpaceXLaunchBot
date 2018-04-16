@@ -1,4 +1,14 @@
 Location = /lib/systemd/system/SpaceX-Launch-Bot.service
+
+Setup =
+sudo chmod 644 /lib/systemd/system/SpaceX-Launch-Bot.service
+sudo systemctl daemon-reload
+sudo systemctl enable SpaceX-Launch-Bot.service
+sudo reboot
+
+Status check =
+sudo systemctl status SpaceX-Launch-Bot.service
+
 Contents =
 [Unit]
 Description=SpaceX-Launch-Bot Service
