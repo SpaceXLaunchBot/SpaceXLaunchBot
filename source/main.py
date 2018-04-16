@@ -33,6 +33,8 @@ async def sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite):
             return await client.send_message(channel, embed=embed)
         except discord.errors.HTTPException:
             pass
+        except discord.errors.Forbidden:
+            return  # No permission to message this channel, stop trying
         await client.send_message(channel, embed=generalErrorEmbed)
 
 async def nextLaunchBackgroundTask():
