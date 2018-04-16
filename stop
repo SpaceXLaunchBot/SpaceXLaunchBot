@@ -1,3 +1,1 @@
-cd source
-pkill -9 -f main.py
-cd ..
+sudo stop SpaceX-Launch-Bot
