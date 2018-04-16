@@ -33,7 +33,7 @@ async def sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite):
             return await client.send_message(channel, embed=embed)
         except discord.errors.HTTPException:
             pass
-        except discord.errors.Forbidden:
+        except (discord.errors.Forbidden, discord.errors.InvalidArgument):
             return  # No permission to message this channel, stop trying
         await client.send_message(channel, embed=generalErrorEmbed)
 
@@ -63,7 +63,7 @@ async def nextLaunchBackgroundTask():
                     nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in launchNotifDict["subscribedChannels"]:
-                        channel = discord.Object(id=channelID)
+                        channel = client.get_channel(channelID)
                         await sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
@@ -71,20 +71,28 @@ async def nextLaunchBackgroundTask():
 @client.event
 async def on_ready():
     with launchNotifDictLock:
-        totalSubbed = len(launchNotifDict["subscribedChannels"])
+        subbedIDs = launchNotifDict["subscribedChannels"]
+        totalSubbed = len(subbedIDs)
     await client.change_presence(game=discord.Game(name="with Elon"))
     totalServers = len(list(client.servers))
     totalClients = 0
     for server in client.servers:
         totalClients += len(server.members)
+    channelNames = ""
+    for channelID in subbedIDs:
+        try:
+            channelNames += client.get_channel(channelID).name + "\n"
+        except (discord.errors.Forbidden, discord.errors.InvalidArgument, AttributeError):
+            channelNames += "Channel ID {} is not accesible\n".format(channelID)
 
     print("\nLogged into Discord API\n")
-    print("Username: {}\nClientID: {}\n\nConnected to {} servers:\n{}\n\nConnected to {} subscribed channels\n\nServing {} clients".format(
+    print("Username: {}\nClientID: {}\n\nConnected to {} servers:\n{}\n\nConnected to {} subscribed channels:\n{}\nServing {} clients".format(
         client.user.name,
         client.user.id,
         totalServers,
         "\n".join([n.name for n in client.servers]),
         totalSubbed,
+        channelNames,
         totalClients
     ))
 
