@@ -23,6 +23,8 @@ After=multi-user.target
 [Service]
 Type=idle
 ExecStart=/usr/bin/python3 /home/simon/files/SpaceX-Launch-Bot/source/main.py > /home/simon/files/SpaceX-Launch-Bot/source/main.log 2>&1
+Restart=always
+RestartSec=3
 ```
 
 Run:
