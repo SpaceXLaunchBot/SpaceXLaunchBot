@@ -8,7 +8,9 @@ insert contents:
 ```bash
 [Unit]
 Description=SpaceX-Launch-Bot Service
-After=multi-user.target
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
 
 [Service]
 # Env var
@@ -19,8 +21,11 @@ Type=idle
 # -u otherwise journal wont show print() output
 ExecStart=/usr/bin/python3 -u /home/simon/files/SpaceX-Launch-Bot/source/main.py
 Restart=always
-RestartSec=3
+RestartSec=10
 StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 Run:
