@@ -50,4 +50,4 @@ Check the status:
 
 See program output:
 
-`journalctl -u SpaceX-Launch-Bot`
+`sudo journalctl -u SpaceX-Launch-Bot`
