@@ -1,0 +1,9 @@
+Location = /lib/systemd/system/SpaceX-Launch-Bot.service
+Contents =
+[Unit]
+Description=SpaceX-Launch-Bot Service
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=python3 /home/simon/files/SpaceX-Launch-Bot/source/main.py
