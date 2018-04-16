@@ -2,6 +2,7 @@ from launchAPI import hexColours
 from discord import Embed
 import pickle
 import sys
+import os
 
 newLaunchErrorEmbed = Embed(title="Error", description="nextLaunchEmbed error, contact @Dragon#0571", color=hexColours["errorRed"])
 
@@ -25,17 +26,20 @@ Commands:
 
 pickleProtocol = pickle.HIGHEST_PROTOCOL
 
+# Absolute path
+resourceFilePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources/dict.pkl") 
+
 def err(message):
     print("\nERROR:\n" + message)
     sys.exit(-1)
 
 def saveDict(dictObj):
-    with open("resources/dict.pkl", "wb") as f:
+    with open(resourceFilePath, "wb") as f:
         pickle.dump(dictObj, f, pickleProtocol)
 
 def loadDict():
     try:
-        with open("resources/dict.pkl", "rb") as f:
+        with open(resourceFilePath, "rb") as f:
             return pickle.load(f)
     except FileNotFoundError:
         # No .pkl, create default dict, save to file & return
