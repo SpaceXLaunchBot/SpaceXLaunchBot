@@ -1,3 +1,2 @@
-cd source
-nohup python3 main.py &
-cd ..
+# /etc/init/SpaceX-Launch-Bot.conf needs to exist
+sudo start SpaceX-Launch-Bot
