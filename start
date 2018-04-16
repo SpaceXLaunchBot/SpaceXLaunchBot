@@ -1,2 +1,0 @@
-# /etc/init/SpaceX-Launch-Bot.conf needs to exist
-sudo start SpaceX-Launch-Bot
