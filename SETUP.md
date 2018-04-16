@@ -16,7 +16,7 @@ After=network-online.target
 # Env var
 Environment="SpaceXLaunchBotToken=YOUR-TOKEN-HERE"
 # Service stuff
-User=YOUR-USER-NAME
+User=YOUR-USERNAME
 Type=idle
 # -u otherwise journal wont show print() output
 ExecStart=/usr/bin/python3 -u /home/YOUR-USERNAME/files/SpaceX-Launch-Bot/source/main.py
