@@ -1,12 +1,14 @@
 # Using Systemd to run automatically
 
-File location: `/lib/systemd/system/SpaceX-Launch-Bot.service`
+Systemd file location: `/lib/systemd/system/SpaceX-Launch-Bot.service`
 
 Setup:
 
+Git clone this repo, pip3 install the requirements.txt, then:
+
 Edit the system wide env file:
 
-`sudo -H gedit /etc/environment`
+`sudo -H nano /etc/environment`
 
 Insert the `SpaceXLaunchBotToken` env variable on a new line:
 
@@ -30,6 +32,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable SpaceX-Launch-Bot.service
 sudo reboot
 ```
+
+Disable / Stop:
+
+`sudo systemctl enable SpaceX-Launch-Bot.service`
 
 How to check the status:
 
