@@ -1,6 +1,6 @@
 # Settup up SpaceX-Launch-Bot to run automatically on Ubuntu 16.x
 
-Git clone this repo, pip3 install the requirements.txt, then:
+Git clone this repo to `/home/YOUR-USERNAME/files`, pip3 install the requirements.txt, then:
 
 run `sudo nano /lib/systemd/system/SpaceX-Launch-Bot.service`
 
@@ -19,7 +19,7 @@ Environment="SpaceXLaunchBotToken=YOUR-TOKEN-HERE"
 User=YOUR-USER-NAME
 Type=idle
 # -u otherwise journal wont show print() output
-ExecStart=/usr/bin/python3 -u /home/simon/files/SpaceX-Launch-Bot/source/main.py
+ExecStart=/usr/bin/python3 -u /home/YOUR-USERNAME/files/SpaceX-Launch-Bot/source/main.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -28,7 +28,7 @@ StandardOutput=journal
 WantedBy=multi-user.target
 ```
 
-Run:
+run:
 ```bash
 sudo chmod 644 /lib/systemd/system/SpaceX-Launch-Bot.service
 sudo systemctl daemon-reload
@@ -36,12 +36,15 @@ sudo systemctl enable SpaceX-Launch-Bot.service
 sudo systemctl start SpaceX-Launch-Bot.service
 ```
 
-Disable / Stop:
+## Misc
+
+Disable & Stop:
 
 `sudo systemctl disable SpaceX-Launch-Bot.service`
+
 `sudo systemctl stop SpaceX-Launch-Bot.service`
 
-How to check the status:
+Check the status:
 
 `sudo systemctl status SpaceX-Launch-Bot.service`
 
