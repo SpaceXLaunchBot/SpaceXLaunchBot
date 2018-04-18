@@ -34,7 +34,7 @@ async def sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite):
         except discord.errors.HTTPException:
             pass
         except (discord.errors.Forbidden, discord.errors.InvalidArgument):
-            return  # No permission to message this channel, stop trying
+            return  # No permission to message this channel, or this channel does not exist, stop trying
         await client.send_message(channel, embed=generalErrorEmbed)
 
 async def nextLaunchBackgroundTask():
@@ -70,7 +70,7 @@ async def nextLaunchBackgroundTask():
 @client.event
 async def on_ready():
     await client.change_presence(game=discord.Game(name="with Elon"))
-    
+
     with launchNotifDictLock:
         totalSubbed = len(launchNotifDict["subscribedChannels"])
     totalServers = len(list(client.servers))
