@@ -69,29 +69,21 @@ async def nextLaunchBackgroundTask():
 
 @client.event
 async def on_ready():
-    with launchNotifDictLock:
-        subbedIDs = launchNotifDict["subscribedChannels"]
-        totalSubbed = len(subbedIDs)
     await client.change_presence(game=discord.Game(name="with Elon"))
+    
+    with launchNotifDictLock:
+        totalSubbed = len(launchNotifDict["subscribedChannels"])
     totalServers = len(list(client.servers))
     totalClients = 0
     for server in client.servers:
         totalClients += len(server.members)
-    channelNames = ""
-    for channelID in subbedIDs:
-        try:
-            channelNames += client.get_channel(channelID).name + "\n"
-        except (discord.errors.Forbidden, discord.errors.InvalidArgument, AttributeError):
-            channelNames += "Channel ID {} is not accesible\n".format(channelID)
 
     print("\nLogged into Discord API\n")
-    print("Username: {}\nClientID: {}\n\nConnected to {} servers:\n{}\n\nConnected to {} subscribed channels:\n{}\nServing {} clients".format(
+    print("Username: {}\nClientID: {}\n\nConnected to {} servers\nConnected to {} subscribed channels\nServing {} clients".format(
         client.user.name,
         client.user.id,
         totalServers,
-        "\n".join([n.name for n in client.servers]),
         totalSubbed,
-        channelNames,
         totalClients
     ))
 
