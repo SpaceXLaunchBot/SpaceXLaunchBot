@@ -4,6 +4,7 @@ import asyncio
 import os
 
 import utils
+from utils import safeTextMessage  # So `utils.` doesen't need to be prepended
 from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed, getnextLaunchLiteEmbed, generalErrorEmbed
 
 PREFIX = "!"
@@ -121,7 +122,7 @@ async def on_message(message):
                 utils.saveDict(launchNotifDict)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
-        await client.send_message(message.channel, replyMsg)
+        await safeTextMessage(client, message.channel, replyMsg)
     
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
@@ -132,12 +133,12 @@ async def on_message(message):
                 utils.saveDict(launchNotifDict)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
-        await client.send_message(message.channel, replyMsg)
+        await safeTextMessage(client, message.channel, replyMsg)
 
     elif message.content.startswith(PREFIX + "info"):
-        await client.send_message(message.channel, utils.botInfo)
+        await safeTextMessage(client, message.channel, utils.botInfo)
     elif message.content.startswith(PREFIX + "help"):
-        await client.send_message(message.channel, utils.helpText.format(prefix=PREFIX))
+        await safeTextMessage(client, message.channel, utils.helpText.format(prefix=PREFIX))
 
 client.loop.create_task(nextLaunchBackgroundTask())
 client.run(token)

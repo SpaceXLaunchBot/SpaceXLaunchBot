@@ -1,5 +1,5 @@
 from launchAPI import hexColours
-from discord import Embed
+from discord import Embed, errors
 import pickle
 import sys
 import os
@@ -28,6 +28,14 @@ pickleProtocol = pickle.HIGHEST_PROTOCOL
 
 # Absolute path
 resourceFilePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources/dict.pkl") 
+
+async def safeTextMessage(client, channel, message):
+    try:
+        return await client.send_message(channel, message)
+    except errors.HTTPException:
+        return  # API down, Message too big, etc.
+    except errors.Forbidden:
+        return  # No permission to message this channel
 
 def err(message):
     print("\nERROR:\n" + message)
