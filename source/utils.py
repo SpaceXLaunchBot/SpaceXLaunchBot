@@ -30,6 +30,10 @@ pickleProtocol = pickle.HIGHEST_PROTOCOL
 resourceFilePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources/dict.pkl") 
 
 async def safeTextMessage(client, channel, message):
+    """
+    Send a text message to a client, and if an error occurs,
+    safely supress it
+    """
     try:
         return await client.send_message(channel, message)
     except errors.HTTPException:
