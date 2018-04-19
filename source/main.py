@@ -36,7 +36,7 @@ async def sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite):
         except (discord.errors.Forbidden, discord.errors.InvalidArgument):
             # TODO: double check if InvalidArgument when a channel does not exist
             return  # No permission to message this channel, or this channel does not exist, stop trying
-        await client.send_message(channel, embed=generalErrorEmbed)
+    await client.send_message(channel, embed=generalErrorEmbed)
 
 async def nextLaunchBackgroundTask():
     """
