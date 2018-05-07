@@ -1,7 +1,7 @@
 """
 Gather and show basic stats about the bot:
  - How many servers it is in
- - How many client it is serving
+ - How many clients it is serving
  - How many subscribed channels there are
 """
 
