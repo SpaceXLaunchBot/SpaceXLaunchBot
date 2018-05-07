@@ -5,7 +5,7 @@ import os
 
 import utils
 from utils import safeTextMessage  # So `utils.` doesen't need to be prepended
-from launchAPI import getnextLaunchJSON, getnextLaunchEmbed, APIErrorEmbed, getnextLaunchLiteEmbed, generalErrorEmbed
+from launchAPI import getnextLaunchJSON, getNextLaunchEmbed, APIErrorEmbed, generalErrorEmbed
 
 PREFIX = "!"
 
@@ -49,7 +49,7 @@ async def nextLaunchBackgroundTask():
             pass  # Error, do nothing, wait for 30 more mins
         
         else:
-            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
+            nextLaunchEmbed, nextLaunchEmbedLite = await getNextLaunchEmbed(nextLaunchJSON)
             
             with launchNotifDictLock:
                 if launchNotifDict["nextLaunchEmbed"].to_dict() == nextLaunchEmbed.to_dict():
@@ -59,7 +59,6 @@ async def nextLaunchBackgroundTask():
                     launchNotifDict["nextLaunchEmbed"] = nextLaunchEmbed
                     utils.saveDict(launchNotifDict)
                 
-                    nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in launchNotifDict["subscribedChannels"]:
                         channel = client.get_channel(channelID)
@@ -101,8 +100,7 @@ async def on_message(message):
             nextLaunchEmbed = APIErrorEmbed
             nextLaunchEmbedLite = APIErrorEmbed
         else:
-            nextLaunchEmbed = await getnextLaunchEmbed(nextLaunchJSON)
-            nextLaunchEmbedLite = await getnextLaunchLiteEmbed(nextLaunchJSON)
+            nextLaunchEmbed, nextLaunchEmbedLite = await getNextLaunchEmbed(nextLaunchJSON)
         await sendLaunchEmbed(message.channel, nextLaunchEmbed, nextLaunchEmbedLite)
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
