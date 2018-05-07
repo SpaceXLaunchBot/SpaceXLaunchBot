@@ -1,7 +1,7 @@
 """
 Reset the latest launch embed in dict.pkl, so that an update is sent
-out within the next 30 mins (the rate at which the bot check for new)
-launch info
+out within the next 30 mins (the rate at which the bot checks for new
+launch info)
 """
 
 import sys
