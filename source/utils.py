@@ -58,3 +58,10 @@ async def isInt(possiblyInteger):
         return True
     except ValueError:
         return False
+
+async def getUTCFromTimestamp(timestamp):
+    dateIsInt = await isInt(unixDate)
+    if dateIsInt:
+        formattedDate = datetime.utcfromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
+        return "{} UTC".format(formattedDate)
+    return "To Be Announced"

@@ -4,10 +4,10 @@ api.py
 Contains functions for dealing with the r/SpaceX API
 """
 
+from utils import getUTCFromTimestamp
 from datetime import datetime
 from copy import deepcopy
 from discord import Embed
-from utils import isInt
 import asyncio
 import aiohttp
 
@@ -95,13 +95,8 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
         ))
 
     # Add a field for the launch date  
-    launchingOn = "To Be Announced"
-    unixDate = nextLaunchJSON["launch_date_unix"]
-    dateIsInt = await isInt(unixDate)
-    if dateIsInt:
-        formattedDate = datetime.utcfromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
-        launchingOn = "{} UTC".format(formattedDate)
-    launchEmbed.add_field(name="Launching date", value=launchingOn)
+    UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    launchEmbed.add_field(name="Launch date", value=UTCDate)
 
     return launchEmbed
 
@@ -116,13 +111,7 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     notifEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
-    # Just incase
-    launchingOn = "Somethings gone wrong here, please contact @Dragon#0571"
-    unixDate = nextLaunchJSON["launch_date_unix"]
-    dateIsInt = await isInt(unixDate)
-    if dateIsInt:
-        formattedDate = datetime.utcfromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
-        launchingOn = "{} UTC".format(formattedDate)
-    notifEmbed.add_field(name="Launching on", value=launchingOn)
+    UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    notifEmbed.add_field(name="Launching on", value=UTCDate)
 
     return notifEmbed
