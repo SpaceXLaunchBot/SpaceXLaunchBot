@@ -15,7 +15,7 @@ import os
 
 warning()  # Ask/show user important stuff
 
-launchNotifDict = utils.loadDict()
+localData = utils.loadDict()
 
 try:
     token = os.environ["SpaceXLaunchBotToken"]
@@ -26,9 +26,8 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name="with Elon"))
 
-    totalSubbed = len(launchNotifDict["subscribedChannels"])
+    totalSubbed = len(localData["subscribedChannels"])
     totalServers = len(list(client.servers))
     totalClients = 0
     for server in client.servers:

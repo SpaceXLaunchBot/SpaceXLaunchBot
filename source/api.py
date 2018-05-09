@@ -1,14 +1,13 @@
 """
-launchAPI.py
+api.py
 
-Contains async defs for functions that get the next upcoming launch JSON from the API,
-Create a Discord embed & create a "lite" discord embed
+Contains functions for dealing with the r/SpaceX API
 """
 
+from datetime import datetime
 from copy import deepcopy
 from discord import Embed
 from utils import isInt
-import datetime
 import asyncio
 import aiohttp
 
@@ -17,17 +16,14 @@ rocketIDImages = {
     "falconheavy": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falconHeavy.png",
     "falcon1": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/logo.jpg"
 }
-hexColours = {
-    "errorRed": 0xFF0000,
-    "falconRed": 0xEE0F46
-}
+hexColours = {"errorRed": 0xFF0000, "falconRed": 0xEE0F46}
 upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
 
 # Embeds to send if an error happens
-APIErrorEmbed = Embed(title="Error", description="SpaceX API error, contact @Dragon#0571", color=hexColours["errorRed"])
+APIErrorEmbed = Embed(title="Error", description="An API error occurred, contact @Dragon#0571", color=hexColours["errorRed"])
 generalErrorEmbed = Embed(title="Error", description="An error occurred, contact @Dragon#0571", color=hexColours["errorRed"])
 
-async def getnextLaunchJSON():
+async def getNextLaunchJSON():
     """
     Using aiohttp, grab the latest launch info
     Returns 0 if fail
@@ -38,9 +34,9 @@ async def getnextLaunchJSON():
                 return 0
             return list(await response.json())[0]
 
-async def getNextLaunchEmbed(nextLaunchJSON):
+async def getLaunchInfoEmbed(nextLaunchJSON):
     # No need to do the same thing twice
-    launchEmbed = await getNextLaunchEmbedLite(nextLaunchJSON, small=False)
+    launchEmbed = await getLaunchInfoEmbedLite(nextLaunchJSON, small=False)
 
     # Don't just copy a pointer, copy the whole thing into another section of memory
     originalLaunchEmbedLite = deepcopy(launchEmbed)
@@ -73,11 +69,11 @@ async def getNextLaunchEmbed(nextLaunchJSON):
 
     return launchEmbed, originalLaunchEmbedLite
 
-async def getNextLaunchEmbedLite(nextLaunchJSON, small=True):
+async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
+    # A "lite" version of the embed that should never reach the embed size limit
     # small is used to determine whether this is going to be used to make the bigger embed,
     # or actually needs to contain less content
 
-    # A "lite" version of the embed that should never reach the embed size limit
     launchEmbed = Embed(
         title="r/SpaceX Discussion",
         url = nextLaunchJSON["links"]["reddit_campaign"],
@@ -85,7 +81,7 @@ async def getNextLaunchEmbedLite(nextLaunchJSON, small=True):
         color=hexColours["falconRed"]
     )
 
-    # Set thumbnail depending on rocked ID & set the authoor to the launch no.
+    # Set thumbnail depending on rocket ID
     launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
@@ -102,9 +98,31 @@ async def getNextLaunchEmbedLite(nextLaunchJSON, small=True):
     launchingOn = "To Be Announced"
     unixDate = nextLaunchJSON["launch_date_unix"]
     dateIsInt = await isInt(unixDate)
-    if unixDate != "null" and dateIsInt:
-        formattedDate = datetime.datetime.fromtimestamp(unixDate).strftime('%Y-%m-%d %H:%M:%S')
+    if dateIsInt:
+        formattedDate = datetime.fromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
         launchingOn = "{} UTC".format(formattedDate)
     launchEmbed.add_field(name="Launching date", value=launchingOn)
 
     return launchEmbed
+
+async def getLaunchNotifEmbed(nextLaunchJSON):
+    notifEmbed = Embed(
+        title="r/SpaceX Discussion",
+        url = nextLaunchJSON["links"]["reddit_campaign"],
+        description="{} is launching soon!".format(nextLaunchJSON["mission_name"]),
+        color=hexColours["falconRed"]
+    )
+
+    notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
+    notifEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
+
+    # Just incase
+    launchingOn = "Somethings gone wrong here, please contact @Dragon#0571"
+    unixDate = nextLaunchJSON["launch_date_unix"]
+    dateIsInt = await isInt(unixDate)
+    if dateIsInt:
+        formattedDate = datetime.fromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
+        launchingOn = "{} UTC".format(formattedDate)
+    notifEmbed.add_field(name="Launching on", value=launchingOn)
+
+    return notifEmbed

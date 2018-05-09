@@ -11,10 +11,8 @@ from general import warning
 import utils
 
 warning()  # Ask/show user important stuff
+localData = utils.loadDict()
+localData["latestLaunchInfoEmbed"] = utils.nextLaunchErrorEmbed
 
-launchNotifDict = utils.loadDict()
-
-launchNotifDict["nextLaunchEmbed"] = utils.nextLaunchErrorEmbed
-utils.saveDict(launchNotifDict)
-
-print("nextLaunchErrorEmbed saved to launchNotifDict")
+await utils.saveDictSync(localData)
+print("latestLaunchInfoEmbed saved to localData")

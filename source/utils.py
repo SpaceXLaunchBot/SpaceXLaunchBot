@@ -1,9 +1,10 @@
-from discord import Embed, errors
+from discord import Embed
+from os import path
 import pickle
 import sys
-import os
 
-nextLaunchErrorEmbed = Embed(title="Error", description="nextLaunchEmbed error, contact @Dragon#0571", color=0xFF0000)
+# Saved to the dictionary file by default
+nextLaunchErrorEmbed = Embed(title="Error", description="launchInfoEmbed error, contact @Dragon#0571", color=0xFF0000)
 
 botInfo = """
 This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
@@ -23,30 +24,23 @@ Commands:
  • `help` - List these commands - any user can use this command
 """
 
-pickleProtocol = pickle.HIGHEST_PROTOCOL
-
-# Absolute path
-resourceFilePath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources/dict.pkl") 
-
-async def safeTextMessage(client, channel, message):
-    """
-    Send a text message to a client, and if an error occurs,
-    safely supress it
-    """
-    try:
-        return await client.send_message(channel, message)
-    except errors.HTTPException:
-        return  # API down, Message too big, etc.
-    except errors.Forbidden:
-        return  # No permission to message this channel
+# Absolute paths are better
+resourceFilePath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl") 
 
 def err(message):
     print("\nERROR:\n" + message)
     sys.exit(-1)
 
-def saveDict(dictObj):
+async def saveDict(dictObj):
     with open(resourceFilePath, "wb") as f:
-        pickle.dump(dictObj, f, pickleProtocol)
+        pickle.dump(dictObj, f, pickle.HIGHEST_PROTOCOL)
+
+def saveDictSync(dictObj):
+    """
+    Because it isn't always called from inside an async loop
+    """
+    with open(resourceFilePath, "wb") as f:
+        pickle.dump(dictObj, f, pickle.HIGHEST_PROTOCOL)
 
 def loadDict():
     try:
@@ -54,8 +48,8 @@ def loadDict():
             return pickle.load(f)
     except FileNotFoundError:
         # No .pkl, create default dict, save to file & return
-        temp = {"subscribedChannels": [], "nextLaunchEmbed": nextLaunchErrorEmbed}
-        saveDict(temp)
+        temp = {"subscribedChannels": [], "latestLaunchInfoEmbed": nextLaunchErrorEmbed, "launchNotifSent":False}
+        saveDictSync(temp)
         return temp
 
 async def isInt(possiblyInteger):
