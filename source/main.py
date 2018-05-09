@@ -10,12 +10,16 @@ from launchAPI import getnextLaunchJSON, getNextLaunchEmbed, APIErrorEmbed, gene
 PREFIX = "!"
 
 """
-launchNotifDict is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
-to store 2 things: the list of channel IDs that are subscribed, and the latest embed that was sent. It is
-what is saved to and loaded from a file (so it persists through reboots/updates)
+localData is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
+to store multiple things:
+ - A list of channel IDs that are subscribed
+ - The latest launch information embed that was sent
+ - Whether or not an active launch notification has been sent for the current launch
+Tjos is saved to and loaded from a file (so it persists through reboots/updates)
 """
-launchNotifDict = utils.loadDict()
-launchNotifDictLock = Lock()  # locks access when saving / loading
+# TODO: In variable & function names, distinguish more between launch information embeds, and active launch notification embeds
+localData = utils.loadDict()
+localDataLock = Lock()  # locks access when saving / loading
 
 client = discord.Client()
 
@@ -51,18 +55,40 @@ async def nextLaunchBackgroundTask():
         else:
             nextLaunchEmbed, nextLaunchEmbedLite = await getNextLaunchEmbed(nextLaunchJSON)
             
-            with launchNotifDictLock:
-                if launchNotifDict["nextLaunchEmbed"].to_dict() == nextLaunchEmbed.to_dict():
+            with localDataLock:
+                if localData["nextLaunchEmbed"].to_dict() == nextLaunchEmbed.to_dict():
                     pass
                 else:
                     # Add and save new launch info
-                    launchNotifDict["nextLaunchEmbed"] = nextLaunchEmbed
-                    utils.saveDict(launchNotifDict)
+                    localData["nextLaunchEmbed"] = nextLaunchEmbed
+                    utils.saveDict(localData)
                 
                     # new launch found, send all "subscribed" channel the embed
-                    for channelID in launchNotifDict["subscribedChannels"]:
+                    for channelID in localData["subscribedChannels"]:
                         channel = client.get_channel(channelID)
                         await sendLaunchEmbed(channel, nextLaunchEmbed, nextLaunchEmbedLite)
+
+        """
+        TODO:
+         - Have a variable called launchNotifSent in localData
+        
+        # Place in above code
+        if launch has changed
+            localData["launchNotifSent"] = False
+
+        # Send a notification if the launch is within the next hour
+        # Don't send another notification if one has already been sent for the current launch time
+        # If the launch has changed, send another notification/embed with updated info
+
+        launchTime = nextLaunchJSON["launch_date_unix"]
+        if isInt(launchTime):
+            if unix_Within_Next_Hour(launchTime):
+                if localData["launchNotifSent"] == False:
+                    localData["launchNotifSent"] = True
+                    saveDict(localData)
+                    e = await getLaunchNotifEmbed(nextLaunchJSON)
+                    await sendLaunchNotifiEmbed(e)
+        """
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
@@ -70,8 +96,8 @@ async def nextLaunchBackgroundTask():
 async def on_ready():
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    with launchNotifDictLock:
-        totalSubbed = len(launchNotifDict["subscribedChannels"])
+    with localDataLock:
+        totalSubbed = len(localData["subscribedChannels"])
     totalServers = len(list(client.servers))
     totalClients = 0
     for server in client.servers:
@@ -106,10 +132,10 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
-        with launchNotifDictLock:
-            if message.channel.id not in launchNotifDict["subscribedChannels"]:
-                launchNotifDict["subscribedChannels"].append(message.channel.id)
-                utils.saveDict(launchNotifDict)
+        with localDataLock:
+            if message.channel.id not in localData["subscribedChannels"]:
+                localData["subscribedChannels"].append(message.channel.id)
+                utils.saveDict(localData)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
         await safeTextMessage(client, message.channel, replyMsg)
@@ -117,10 +143,10 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
-        with launchNotifDictLock:
+        with localDataLock:
             try:
-                launchNotifDict["subscribedChannels"].remove(message.channel.id)
-                utils.saveDict(launchNotifDict)
+                localData["subscribedChannels"].remove(message.channel.id)
+                utils.saveDict(localData)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
         await safeTextMessage(client, message.channel, replyMsg)
