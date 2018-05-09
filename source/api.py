@@ -5,7 +5,6 @@ Contains functions for dealing with the r/SpaceX API
 """
 
 from utils import getUTCFromTimestamp
-from datetime import datetime
 from copy import deepcopy
 from discord import Embed
 import asyncio
