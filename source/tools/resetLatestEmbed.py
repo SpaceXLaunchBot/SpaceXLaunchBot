@@ -14,5 +14,5 @@ warning()  # Ask/show user important stuff
 localData = utils.loadDict()
 localData["latestLaunchInfoEmbed"] = utils.nextLaunchErrorEmbed
 
-await utils.saveDictSync(localData)
+utils.saveDictSync(localData)
 print("latestLaunchInfoEmbed saved to localData")

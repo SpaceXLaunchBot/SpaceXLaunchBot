@@ -18,5 +18,5 @@ localData["subscribedChannels"]    = oldLocalData["subscribedChannels"]
 localData["latestLaunchInfoEmbed"] = oldLocalData["nextLaunchEmbed"]
 localData["launchNotifSent"]       = False
 
-await utils.saveDictSync(localData)
+utils.saveDictSync(localData)
 print("New info saved to data.pkl")

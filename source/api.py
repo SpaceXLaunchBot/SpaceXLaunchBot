@@ -99,7 +99,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     unixDate = nextLaunchJSON["launch_date_unix"]
     dateIsInt = await isInt(unixDate)
     if dateIsInt:
-        formattedDate = datetime.fromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
+        formattedDate = datetime.utcfromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
         launchingOn = "{} UTC".format(formattedDate)
     launchEmbed.add_field(name="Launching date", value=launchingOn)
 
@@ -121,7 +121,7 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     unixDate = nextLaunchJSON["launch_date_unix"]
     dateIsInt = await isInt(unixDate)
     if dateIsInt:
-        formattedDate = datetime.fromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
+        formattedDate = datetime.utcfromtimestamp(unixDate).strftime("%Y-%m-%d %H:%M:%S")
         launchingOn = "{} UTC".format(formattedDate)
     notifEmbed.add_field(name="Launching on", value=launchingOn)
 

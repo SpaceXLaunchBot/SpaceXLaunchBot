@@ -64,8 +64,8 @@ async def notificationBackgroundTask():
             launchTimeIsInt = await utils.isInt(launchTime)
             if launchTimeIsInt:
 
-                # Unix timestamp of next hour
-                nextHour = (datetime.now() + timedelta(hours=1)).timestamp()
+                # Unix timestamp of next hour (UTC)
+                nextHour = (datetime.utcnow() + timedelta(hours=1)).timestamp()
                 # If the launch time is within the next hour
                 if nextHour > int(launchTime):
 
