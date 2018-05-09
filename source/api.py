@@ -112,6 +112,6 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     notifEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
     UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
-    notifEmbed.add_field(name="Launching on", value=UTCDate)
+    notifEmbed.add_field(name="Launch date", value=UTCDate)
 
     return notifEmbed
