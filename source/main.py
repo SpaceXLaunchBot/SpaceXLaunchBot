@@ -18,7 +18,6 @@ to store multiple things:
  - Whether or not an active launch notification has been sent for the current launch
 Tjos is saved to and loaded from a file (so it persists through reboots/updates)
 """
-# TODO: In variable & function names, distinguish more between launch information embeds, and active launch notification embeds
 localData = utils.loadDict()
 localDataLock = Lock()  # locks access when saving / loading
 

@@ -100,17 +100,30 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     return launchEmbed
 
 async def getLaunchNotifEmbed(nextLaunchJSON):
-    notifEmbed = Embed(
-        title="r/SpaceX Discussion",
-        url = nextLaunchJSON["links"]["reddit_campaign"],
-        description="{} is launching soon!".format(nextLaunchJSON["mission_name"]),
-        color=hexColours["falconRed"]
-    )
+    notifEmbed = Embed(color=hexColours["falconRed"])
 
-    notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
-    notifEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
+    notifEmbed.set_author(name="{} is launching soon!".format(nextLaunchJSON["mission_name"]))
+    
+    if nextLaunchJSON["links"]["video_link"] != None:
+        notifEmbed.title= "Livestream"
+        notifEmbed.url = nextLaunchJSON["links"]["video_link"]
+    else:
+        notifEmbed.title="r/SpaceX Discussion"
+        notifEmbed.url = nextLaunchJSON["links"]["reddit_campaign"]
+
+    if nextLaunchJSON["links"]["mission_patch_small"] != None:
+        notifEmbed.set_thumbnail(url=nextLaunchJSON["links"]["mission_patch_small"])
+    else:
+        notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
 
     UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
     notifEmbed.add_field(name="Launch date", value=UTCDate)
 
+    if nextLaunchJSON["links"]["reddit_launch"] != None:
+        # TODO: Shorten this to just reddit.com/ID instead of the whole link (looks better)
+        notifEmbed.add_field(name="r/SpaceX Launch Thread", value=nextLaunchJSON["links"]["reddit_launch"])
+
+    if nextLaunchJSON["links"]["presskit"] != None:
+        notifEmbed.add_field(name="Press kit", value=nextLaunchJSON["links"]["presskit"])
+    
     return notifEmbed
