@@ -1,6 +1,6 @@
 # SpaceX-Launch-Bot
 
-A Discord bot for gathering news and info about upcoming SpaceX launches
+A Discord bot for providing news and information about upcoming SpaceX launches. Also provides a notification service for launches
 
 [**Add this bot to your server**](https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896)
 
@@ -25,6 +25,4 @@ Each command requires a prefix (the default is "!"), this can be changed by edit
 
 # ToDo
 
- - Include `details` field if not `null`
  - Show in notifications what has changed since the last message, e.g. if just the date has changed or if it is a new launch #
- - Send a notification when a launch is about to happen, maybe with a link to livestream / press kit
