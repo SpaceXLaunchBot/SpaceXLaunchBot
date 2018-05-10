@@ -52,7 +52,6 @@ async def notificationBackgroundTask():
                     # Launch info has changed, set variables
                     localData["launchNotifSent"] = False
                     localData["latestLaunchInfoEmbed"] = launchInfoEmbed
-                    await utils.saveDict(localData)
 
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in localData["subscribedChannels"]:
@@ -65,18 +64,21 @@ async def notificationBackgroundTask():
 
                 # Unix timestamp of next hour (UTC)
                 nextHour = (datetime.utcnow() + timedelta(hours=1)).timestamp()
+
                 # If the launch time is within the next hour
                 if nextHour > int(launchTime):
 
-                    if localData["launchNotifSent"] == False:
-                        localData["launchNotifSent"] = True
                         with localDataLock:
-                            await utils.saveDict(localData)
+                            if localData["launchNotifSent"] == False:
+                                localData["launchNotifSent"] = True
 
-                        notifEmbed = await getLaunchNotifEmbed(nextLaunchJSON)
-                        for channelID in localData["subscribedChannels"]:
-                            channel = client.get_channel(channelID)
-                            await safeSendEmbed(client, channel, [notifEmbed])
+                                notifEmbed = await getLaunchNotifEmbed(nextLaunchJSON)
+                                for channelID in localData["subscribedChannels"]:
+                                    channel = client.get_channel(channelID)
+                                    await safeSendEmbed(client, channel, [notifEmbed])
+
+        with localDataLock:
+            await utils.saveDict(localData)
 
         await asyncio.sleep(60 * 30) # task runs every 30 minutes
 
