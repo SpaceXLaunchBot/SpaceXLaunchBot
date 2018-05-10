@@ -81,6 +81,12 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     )
 
     # Set thumbnail depending on rocket ID
+    """
+    TODO: Test why thumbnail sometimes isn't set
+    Sometimes a thumbnail is not set (or atleast not shown?) in the embed, causing a notification to be sent
+    out about new launch info, when actually the only thing that is different is that the thumbnail did not
+    set properly / show up properly
+    """
     launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
 
