@@ -33,4 +33,4 @@ Each command requires a prefix (the default is "!"), this can be changed by edit
 
 # ToDo
 
- - Show in notifications what has changed since the last message, e.g. if just the date has changed or if it is a new launch #
+ - Show in new launch info notifications what has changed since the last launch info embed, e.g. if just the date has changed or if it is a new launch #
