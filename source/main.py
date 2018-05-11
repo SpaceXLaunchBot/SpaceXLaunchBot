@@ -5,8 +5,8 @@ import asyncio
 import os
 
 import utils
+from api import getNextLaunchJSON, APIErrorEmbed
 from discordUtils import safeSendText, safeSendEmbed
-from api import getNextLaunchJSON, APIErrorEmbed, generalErrorEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 
 """

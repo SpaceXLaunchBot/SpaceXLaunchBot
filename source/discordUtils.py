@@ -1,3 +1,4 @@
+from api import generalErrorEmbed
 from discord import errors
 
 async def safeSendText(client, channel, message):
