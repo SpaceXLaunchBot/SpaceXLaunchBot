@@ -6,9 +6,18 @@ import os
 
 import utils
 from discordUtils import safeSendText, safeSendEmbed
-from api import getNextLaunchJSON, getLaunchInfoEmbed, getLaunchNotifEmbed, APIErrorEmbed, generalErrorEmbed
+from api import getNextLaunchJSON, APIErrorEmbed, generalErrorEmbed
+from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 
+"""
+Constants / important variables
+"""
+# The prefix needed to activate a command
 PREFIX = "!"
+# The interval time, in minutes, between checking the API for updates - must be an int
+API_CHECK_INTERVAL = 15
+# How far into the future to look for launches that are happening soon. Should be at least $API_CHECK_INTERVAL * 2
+LAUNCH_NOTIF_DELTA = timedelta(minutes=30)
 
 """
 localData is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
@@ -16,13 +25,12 @@ to store multiple things:
  - A list of channel IDs that are subscribed
  - The latest launch information embed that was sent
  - Whether or not an active launch notification has been sent for the current launch
-Tjos is saved to and loaded from a file (so it persists through reboots/updates)
+This is saved to and loaded from a file (so it persists through reboots/updates)
 """
 localData = utils.loadDict()
 localDataLock = Lock()  # locks access when saving / loading
 
 client = discord.Client()
-
 try:
     token = os.environ["SpaceXLaunchBotToken"]
 except KeyError:
@@ -30,7 +38,7 @@ except KeyError:
 
 async def notificationBackgroundTask():
     """
-    Every 1/2 hour:
+    Every $API_CHECK_INTERVAL minutes:
     If the embed has changed, something new has happened so send
         all channels an embed with updated info
     If the time of the next upcoming launch is within the next hour,
@@ -59,11 +67,10 @@ async def notificationBackgroundTask():
                         await safeSendEmbed(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             launchTime = nextLaunchJSON["launch_date_unix"]
-            launchTimeIsInt = await utils.isInt(launchTime)
-            if launchTimeIsInt:
+            if await utils.isInt(launchTime):
 
-                # Unix timestamp of next hour (UTC)
-                nextHour = (datetime.utcnow() + timedelta(hours=1)).timestamp()
+                # Get timestamp for the time $LAUNCH_NOTIF_DELTA minutes from now
+                nextHour = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next hour
                 if nextHour > int(launchTime):
@@ -80,7 +87,7 @@ async def notificationBackgroundTask():
         with localDataLock:
             await utils.saveDict(localData)
 
-        await asyncio.sleep(60 * 30) # task runs every 30 minutes
+        await asyncio.sleep(60 * API_CHECK_INTERVAL)
 
 @client.event
 async def on_message(message):

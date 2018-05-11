@@ -6,8 +6,14 @@ A Discord bot for providing news and information about upcoming SpaceX launches.
 
 # What does this bot do?
 
- - Allow users to see information about the closest launch by using a command
- - Allows users to "subscribe" channels to the bots launch notification service. This service will send a new message to the channel every time the next upcoming launch has changed (e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different)
+ - Allow users to see information about the next upcoming launch
+ - Allows admins to "subscribe" channels to the bots launch notification service. This service will send a new message to the channel every time the next upcoming launch has changed (e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different). A notification will also be sent around half an hour before a launch, containing useful links such as the livestream and the press kit
+
+Launch Info:
+![LaunchInfo](screenshots/launchInfo.png)
+
+Launch Notification:
+![LaunchNotif](screenshots/launchNotif.png)
 
 # Commands
 
@@ -21,7 +27,7 @@ Each command requires a prefix (the default is "!"), this can be changed by edit
  
  # Technical Info
  
- The API used it the [r/Space-X API](https://github.com/r-spacex/SpaceX-API)
+ The API used is the [r/Space-X API](https://github.com/r-spacex/SpaceX-API)
 
 # ToDo
 

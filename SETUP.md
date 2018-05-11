@@ -1,4 +1,4 @@
-# Settup up SpaceX-Launch-Bot to run automatically on Ubuntu 16.x
+# Settup up SpaceX-Launch-Bot to run automatically on Ubuntu 16.x +
 
 Git clone this repo to `/home/YOUR-USERNAME/files`, pip3 install the requirements.txt, then:
 
@@ -48,6 +48,6 @@ Check the status:
 
 `sudo systemctl status SpaceX-Launch-Bot.service`
 
-See program output:
+*or*
 
 `sudo journalctl -u SpaceX-Launch-Bot`
