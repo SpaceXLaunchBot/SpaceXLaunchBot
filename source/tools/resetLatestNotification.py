@@ -1,7 +1,5 @@
 """
-Reset the latest launch embed in dict.pkl, so that an update is sent
-out within the next 30 mins (the rate at which the bot checks for new
-launch info)
+Reset launchNotifSent in data.pkl
 """
 
 import sys
