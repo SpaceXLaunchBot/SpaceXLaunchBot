@@ -13,8 +13,9 @@ except KeyError:
     utils.err("Environment Variable \"dblToken\" cannot be found")
 
 def dblBackgroundTask(clientObject):
+    await clientObject.wait_until_ready()
     dblpy = dbl.Client(clientObject, dblToken)
-    while 1:
+    while not client.is_closed:
         try:
             await dblpy.post_server_count()
         except Exception as e:
