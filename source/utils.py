@@ -2,6 +2,7 @@ from datetime import datetime
 from discord import Embed
 from os import path
 import pickle
+import json
 import sys
 
 # Saved to the dictionary file by default
@@ -26,32 +27,41 @@ Commands:
 """
 
 # Absolute paths are better
-resourceFilePath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl") 
+localDataPath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl") 
+configFilePath = path.join(path.dirname(path.abspath(__file__)), "config/config.json") 
 
 def err(message):
     print("\nERROR:\n" + message)
     sys.exit(-1)
 
-async def saveDict(dictObj):
-    with open(resourceFilePath, "wb") as f:
+async def saveLocalData(dictObj):
+    with open(localDataPath, "wb") as f:
         pickle.dump(dictObj, f, pickle.HIGHEST_PROTOCOL)
 
-def saveDictSync(dictObj):
+def saveLocalDataSync(dictObj):
     """
     Because it isn't always called from inside an async loop
     """
-    with open(resourceFilePath, "wb") as f:
+    with open(localDataPath, "wb") as f:
         pickle.dump(dictObj, f, pickle.HIGHEST_PROTOCOL)
 
-def loadDict():
+def loadLocalData():
     try:
-        with open(resourceFilePath, "rb") as f:
+        with open(localDataPath, "rb") as f:
             return pickle.load(f)
     except FileNotFoundError:
         # No .pkl, create default dict, save to file & return
         temp = {"subscribedChannels": [], "latestLaunchInfoEmbed": nextLaunchErrorEmbed, "launchNotifSent":False}
-        saveDictSync(temp)
+        saveLocalDataSync(temp)
         return temp
+
+def loadConfig():
+    # TODO: Check for needed keys
+    try:
+        with open(configFilePath, "r") as inFile:
+            return json.load(inFile)
+    except FileNotFoundError:
+        err("Configuration file / directory not found")
 
 async def isInt(possiblyInteger):
     try:

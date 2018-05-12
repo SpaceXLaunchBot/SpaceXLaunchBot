@@ -1,23 +1,25 @@
 from datetime import datetime, timedelta
+from os import environ as envVars
 from threading import Lock
 import discord
 import asyncio
-import os
 
 import utils
 from api import getNextLaunchJSON, APIErrorEmbed
 from discordUtils import safeSendText, safeSendEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 
+config = utils.loadConfig()
+
 """
 Constants / important variables
 """
 # The prefix needed to activate a command
-PREFIX = "!"
+PREFIX = config["commandPrefix"]
 # The interval time, in minutes, between checking the API for updates - must be an int
-API_CHECK_INTERVAL = 15
+API_CHECK_INTERVAL = config["apiCheckInterval"]
 # How far into the future to look for launches that are happening soon. Should be at least $API_CHECK_INTERVAL * 2
-LAUNCH_NOTIF_DELTA = timedelta(minutes=30)
+LAUNCH_NOTIF_DELTA = timedelta(minutes = config["launchNotificationDelta"])
 
 """
 localData is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
@@ -27,12 +29,12 @@ to store multiple things:
  - Whether or not an active launch notification has been sent for the current launch
 This is saved to and loaded from a file (so it persists through reboots/updates)
 """
-localData = utils.loadDict()
+localData = utils.loadLocalData()
 localDataLock = Lock()  # locks access when saving / loading
 
 client = discord.Client()
 try:
-    token = os.environ["SpaceXLaunchBotToken"]
+    token = envVars["SpaceXLaunchBotToken"]
 except KeyError:
     utils.err("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
 
@@ -85,7 +87,7 @@ async def notificationBackgroundTask():
                                     await safeSendEmbed(client, channel, [notifEmbed])
 
         with localDataLock:
-            await utils.saveDict(localData)
+            await utils.saveLocalData(localData)
 
         await asyncio.sleep(60 * API_CHECK_INTERVAL)
 
@@ -98,6 +100,7 @@ async def on_message(message):
         userIsAdmin = False
     
     if message.content.startswith(PREFIX + "nextlaunch"):
+        # TODO: Maybe just pull latest embed from localData instead of requesting every time?
         nextLaunchJSON = await getNextLaunchJSON()
         if nextLaunchJSON == 0:
             launchInfoEmbed, launchInfoEmbedLite = APIErrorEmbed, APIErrorEmbed
@@ -111,7 +114,7 @@ async def on_message(message):
         with localDataLock:
             if message.channel.id not in localData["subscribedChannels"]:
                 localData["subscribedChannels"].append(message.channel.id)
-                await utils.saveDict(localData)
+                await utils.saveLocalData(localData)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
         await safeSendText(client, message.channel, replyMsg)
@@ -122,7 +125,7 @@ async def on_message(message):
         with localDataLock:
             try:
                 localData["subscribedChannels"].remove(message.channel.id)
-                await utils.saveDict(localData)
+                await utils.saveLocalData(localData)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
         await safeSendText(client, message.channel, replyMsg)
@@ -153,4 +156,9 @@ async def on_ready():
     ))
 
 client.loop.create_task(notificationBackgroundTask())
+
+if config["dblIntegration"]:
+    from dblTask import dblBackgroundTask
+    client.loop.create_task(dblBackgroundTask(client))
+
 client.run(token)
