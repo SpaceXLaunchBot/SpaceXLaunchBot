@@ -12,7 +12,7 @@ try:
 except KeyError:
     utils.err("Environment Variable \"dblToken\" cannot be found")
 
-def dblBackgroundTask(clientObject):
+async def dblBackgroundTask(clientObject):
     await clientObject.wait_until_ready()
     dblpy = dbl.Client(clientObject, dblToken)
     while not client.is_closed:
