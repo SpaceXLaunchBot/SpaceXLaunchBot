@@ -14,7 +14,7 @@ After=network-online.target
 
 [Service]
 # Env var
-Environment="SpaceXLaunchBotToken=YOUR-TOKEN-HERE"
+Environment="SpaceXLaunchBotToken=YOUR-TOKEN-HERE" "dblToken=YOUR-TOKEN-HERE"
 # Service stuff
 User=YOUR-USERNAME
 Type=idle
