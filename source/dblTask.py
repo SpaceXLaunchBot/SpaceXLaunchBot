@@ -21,7 +21,7 @@ async def dblBackgroundTask(clientObject):
     await clientObject.wait_until_ready()
     dblUpdateURL = dblAPI.format(clientObject.user.id)
 
-    while not client.is_closed:
+    while not clientObject.is_closed:
         # POST Stats
         serverCount = len(list(clientObject.servers))
 
