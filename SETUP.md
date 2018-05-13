@@ -4,7 +4,7 @@ Git clone this repo to `/home/YOUR-USERNAME/files`, pip3 install the requirement
 
 run `sudo nano /lib/systemd/system/SpaceX-Launch-Bot.service`
 
-insert contents:
+insert contents (MAKE SURE TO REPLACE ALL OCCURRENCES OF `YOUR-USERNAME`):
 ```bash
 [Unit]
 Description=SpaceX-Launch-Bot Service
