@@ -18,8 +18,8 @@ dblHeaders = {"Authorization": dblToken, "Content-Type": "application/json"}
 
 async def dblBackgroundTask(clientObject):
 
-    dblUpdateURL = dblAPI.format(clientObject.user.id)
     await clientObject.wait_until_ready()
+    dblUpdateURL = dblAPI.format(clientObject.user.id)
 
     while not client.is_closed:
         # POST Stats
