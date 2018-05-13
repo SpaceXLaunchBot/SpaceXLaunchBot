@@ -2,5 +2,5 @@
     "commandPrefix": "!",
     "apiCheckInterval": 15,
     "launchNotificationDelta": 30,
-    "dblIntegration": false
+    "dblIntegration": true
 }
