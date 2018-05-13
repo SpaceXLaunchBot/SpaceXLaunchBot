@@ -27,7 +27,7 @@ async def dblBackgroundTask(clientObject):
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(dblUpdateURL, json={"server_count": serverCount}, headers=dblHeaders)
+                await session.post(dblUpdateURL, json={"server_count": serverCount}, headers=dblHeaders)
         except Exception as e:
             print("[dbl] Failed to post server count\n{}: {}".format(type(e).__name__, e))
 
