@@ -9,9 +9,11 @@ import sys
 nextLaunchErrorEmbed = Embed(title="Error", description="launchInfoEmbed error, contact @Dragon#0571", color=0xFF0000)
 
 botInfo = """
-This bot displays information about the latest upcoming SpaceX launches from the r/Space-X API
+I am a bot for providing news and information about upcoming SpaceX launches
 
-*Website: https://r-spacex.github.io/SpaceX-Launch-Bot/*
+I also provide a notification service for launch information and reminders for launches happening soon
+
+*Website: https://discordbots.org/bot/411618411169447950*
 *Github: https://github.com/r-spacex/SpaceX-Launch-Bot*
 """
 
@@ -22,7 +24,7 @@ Commands:
  • `nextlaunch` - Show info about the next upcoming launch - any user can use this command
  • `addchannel` - Add the current channel to the bots launch notification service - only admins can use this command
  • `removechannel` - Remove the current channel to the bots launch notification service - only admins can use this command
- • `info` - Information about the bot - any user can use this command
+ • `info` - Information about this bot - any user can use this command
  • `help` - List these commands - any user can use this command
 """
 
