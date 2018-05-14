@@ -15,6 +15,8 @@ I also provide a notification service for launch information and reminders for l
 
 *Website: https://discordbots.org/bot/411618411169447950*
 *Github: https://github.com/r-spacex/SpaceX-Launch-Bot*
+
+If you have any questions or suggestions, you can message <@263412940869206027> or raise an issue in the Github repo
 """
 
 helpText = """
