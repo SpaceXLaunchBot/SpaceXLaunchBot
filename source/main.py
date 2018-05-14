@@ -5,9 +5,11 @@ import discord
 import asyncio
 
 import utils
-from api import getNextLaunchJSON, APIErrorEmbed
+from api import getNextLaunchJSON, apiErrorEmbed
 from discordUtils import safeSendText, safeSendEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
+
+# TODO: Replace print statements with propper logging
 
 config = utils.loadConfig()
 
@@ -103,7 +105,7 @@ async def on_message(message):
         # TODO: Maybe just pull latest embed from localData instead of requesting every time?
         nextLaunchJSON = await getNextLaunchJSON()
         if nextLaunchJSON == 0:
-            launchInfoEmbed, launchInfoEmbedLite = APIErrorEmbed, APIErrorEmbed
+            launchInfoEmbed, launchInfoEmbedLite = apiErrorEmbed, apiErrorEmbed
         else:
             launchInfoEmbed, launchInfoEmbedLite = await getLaunchInfoEmbed(nextLaunchJSON)
         await safeSendEmbed(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
@@ -159,6 +161,6 @@ client.loop.create_task(notificationBackgroundTask())
 
 if config["dblIntegration"]:
     from dblTask import dblBackgroundTask
-    client.loop.create_task(dblBackgroundTask(client))
+    client.loop.create_task(dblBackgroundTask(client, config["dblPostInterval"]))
 
 client.run(token)
