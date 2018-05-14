@@ -2,9 +2,13 @@
 <img width="400" src="https://discordbots.org/api/widget/411618411169447950.svg" href='https://discordbots.org/bot/411618411169447950'>
 </p>
 
-<p align="center">A Discord bot for providing news and information about upcoming SpaceX launches. Also provides a notification service for launches</p>
+<p align="center">
+A Discord bot for providing news and information about upcoming SpaceX launches.
 
-<b align="center"><a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896">Add this bot to your server</a> | <a href="https://discordbots.org/bot/411618411169447950">View on discordbots.org</a></b>
+Also provides a notification service for launch information and reminders for launches happening soon
+</p>
+
+<p align="center"><b><a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896">Add this bot to your server</a> | <a href="https://discordbots.org/bot/411618411169447950">View on discordbots.org</a></b></p>
 
 # What does this bot do?
 
