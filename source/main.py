@@ -5,6 +5,7 @@ import discord
 import asyncio
 
 import utils
+from dblAPI import dblClient
 from api import getNextLaunchJSON, apiErrorEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
@@ -143,11 +144,14 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
+    global dbl  # Can't define this until client is ready
+    dbl = dblClient(client)
+
     await client.change_presence(game=discord.Game(name="with Elon"))
 
     with localDataLock:
         totalSubbed = len(localData["subscribedChannels"])
-    totalServers = len(list(client.servers))
+    totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:
         totalClients += len(server.members)
@@ -160,11 +164,15 @@ async def on_ready():
         totalSubbed,
         totalClients
     ))
+    await dbl.updateServerCount(totalServers)
+
+@client.event
+async def on_server_join(server):
+    await dbl.updateServerCount(len(client.servers))
+
+@client.event
+async def on_server_remove(server):
+    await dbl.updateServerCount(len(client.servers))
 
 client.loop.create_task(notificationBackgroundTask())
-
-if config["dblIntegration"]:
-    from dblTask import dblBackgroundTask
-    client.loop.create_task(dblBackgroundTask(client, config["dblPostInterval"]))
-
 client.run(token)
