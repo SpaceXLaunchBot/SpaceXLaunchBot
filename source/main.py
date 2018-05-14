@@ -11,6 +11,7 @@ from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
 
 # TODO: Replace print statements with propper logging
+# TODO: Remove a channel from localData if it causes an InvalidArgument error (doesn't exist anymore)
 
 config = utils.loadConfig()
 
