@@ -6,7 +6,7 @@ import asyncio
 
 import utils
 from dblAPI import dblClient
-from api import getNextLaunchJSON, apiErrorEmbed
+from spacexAPI import getNextLaunchJSON, apiErrorEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
 from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
 
