@@ -6,8 +6,8 @@ import asyncio
 
 import utils
 from api import getNextLaunchJSON, apiErrorEmbed
-from discordUtils import safeSendText, safeSendEmbed
 from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
+from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
 
 # TODO: Replace print statements with propper logging
 
@@ -68,7 +68,7 @@ async def notificationBackgroundTask():
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in localData["subscribedChannels"]:
                         channel = client.get_channel(channelID)
-                        await safeSendEmbed(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
+                        await safeSendLaunchInfoEmbeds(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             launchTime = nextLaunchJSON["launch_date_unix"]
             if await utils.isInt(launchTime):
@@ -86,7 +86,7 @@ async def notificationBackgroundTask():
                                 notifEmbed = await getLaunchNotifEmbed(nextLaunchJSON)
                                 for channelID in localData["subscribedChannels"]:
                                     channel = client.get_channel(channelID)
-                                    await safeSendEmbed(client, channel, [notifEmbed])
+                                    await safeSendEmbed(client, channel, notifEmbed)
 
         with localDataLock:
             await utils.saveLocalData(localData)
@@ -95,6 +95,10 @@ async def notificationBackgroundTask():
 
 @client.event
 async def on_message(message):
+    if message.author.bot:
+        # Don't reply to bots (includes self)
+        return
+
     try:
         userIsAdmin = message.author.permissions_in(message.channel).administrator
     except AttributeError:
@@ -108,7 +112,7 @@ async def on_message(message):
             launchInfoEmbed, launchInfoEmbedLite = apiErrorEmbed, apiErrorEmbed
         else:
             launchInfoEmbed, launchInfoEmbedLite = await getLaunchInfoEmbed(nextLaunchJSON)
-        await safeSendEmbed(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+        await safeSendLaunchInfoEmbeds(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
