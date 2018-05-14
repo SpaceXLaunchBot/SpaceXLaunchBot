@@ -15,6 +15,8 @@ rocketIDImages = {
     "falcon1": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/logo.jpg"
 }
 
+# TODO: Add checks for empty fields in Embeds: empty fields = HTTPException
+
 async def getLaunchInfoEmbed(nextLaunchJSON):
     # No need to do the same thing twice
     launchEmbed = await getLaunchInfoEmbedLite(nextLaunchJSON, small=False)
@@ -34,6 +36,8 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
     for component in nextLaunchJSON["reuse"]:
         if nextLaunchJSON["reuse"][component]:
             reusing.append(component)
+    if reusing == []:
+        reusing = ["None"]  # Can't have empty fields
     launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
 
     # Add a field for each payload, with basic information
