@@ -5,27 +5,37 @@ async def safeSendText(client, channel, message):
     """
     Send a text message to a client, and if an error occurs,
     safely supress it
-    Returns 0 on error
+    On failure, returns:
+         0 : HTTPException
+        -1 : Forbidden
+        -2 : InvalidArgument
     """
     try:
         return await client.send_message(channel, message)
     except errors.HTTPException:
         return 0  # API down, Message too big, etc.
     except errors.Forbidden:
-        return 0  # No permission to message this channel
+        return -1  # No permission to message this channel
+    except errors.InvalidArgument:
+        return -2  # Invalid channel ID
 
 async def safeSendEmbed(client, channel, embed):
     """
     Send an embed to a client, and if an error occurs, safely
     supress it
-    Returns 0 on error
+    On failure, returns:
+         0 : HTTPException
+        -1 : Forbidden
+        -2 : InvalidArgument
     """
     try:
         return await client.send_message(channel, embed=embed)
     except errors.HTTPException:
         return 0
     except errors.Forbidden:
-        return 0
+        return -1
+    except errors.InvalidArgument:
+        return -2
 
 async def safeSendLaunchInfoEmbeds(client, channel, embeds):
     """
@@ -40,13 +50,15 @@ async def safeSendLaunchInfoEmbeds(client, channel, embeds):
         is over the char limit, nothing will happen.
         Other errors are automatically handled
     
-    Returns 0 if both fail to send
+    Returns 0 if neither embeds are sent
     """
     for embed in embeds:
-        try:
-            return await client.send_message(channel, embed=embed)
-        except errors.HTTPException:
-            pass
-        except errors.Forbidden:
-            return 0  # No permissions to message this channel
-    return await safeSendEmbed(client, channel, generalErrorEmbed)
+        v = await safeSendEmbed(client, channel, embed)
+        if v == 0:
+            pass  # Embed might be too big, try lite version
+        elif v == -1 or v == -2:
+            return 0
+        else:
+            return v
+    await safeSendEmbed(client, channel, generalErrorEmbed)
+    return 0
