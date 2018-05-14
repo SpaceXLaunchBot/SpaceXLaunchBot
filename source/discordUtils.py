@@ -1,4 +1,4 @@
-from api import generalErrorEmbed
+from spacexAPI import generalErrorEmbed
 from discord import errors
 
 async def safeSendText(client, channel, message):
