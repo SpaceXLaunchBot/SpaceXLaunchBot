@@ -1,6 +1,4 @@
 """
-staticMessages.py
-
 Messages / embeds that won't be dynamically changing, such as the help message
 """
 

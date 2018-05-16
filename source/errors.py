@@ -1,3 +1,7 @@
+"""
+Embeds and functions for dealing with errors
+"""
+
 from discord import Embed
 
 from colours import hexColours

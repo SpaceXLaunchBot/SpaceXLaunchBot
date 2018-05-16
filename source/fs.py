@@ -1,6 +1,4 @@
 """
-fs.py
-
 For dealing with file system interactions, such as loading and saving data
 """
 

@@ -1,3 +1,7 @@
+"""
+Extra things to make the discord library nicer
+"""
+
 from discord import errors
 
 from errors import generalErrorEmbed

@@ -1,6 +1,4 @@
 """
-utils.py
-
 General utility variables & functions, for example:
  + Time conversions
  + Variable validation

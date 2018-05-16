@@ -1,6 +1,4 @@
 """
-embedGenerators.py
-
 Contains functions for generating/creating embeds about launches to send to users
 """
 
