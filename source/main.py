@@ -13,7 +13,7 @@ import dblAPI
 import spacexAPI
 import staticMessages
 import embedGenerators
-from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
+from discordUtils import safeSend, safeSendLaunchInfo
 
 # TODO: Replace print statements with propper logging
 # TODO: Remove a channel from localData if it causes an InvalidArgument error (doesn't exist anymore)
@@ -69,7 +69,7 @@ async def notificationBackgroundTask():
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in localData["subscribedChannels"]:
                         channel = client.get_channel(channelID)
-                        await safeSendLaunchInfoEmbeds(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
+                        await safeSendLaunchInfo(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             launchTime = nextLaunchJSON["launch_date_unix"]
             if await utils.isInt(launchTime):
@@ -87,7 +87,7 @@ async def notificationBackgroundTask():
                                 notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                                 for channelID in localData["subscribedChannels"]:
                                     channel = client.get_channel(channelID)
-                                    await safeSendEmbed(client, channel, notifEmbed)
+                                    await safeSend(client, channel, embed=notifEmbed)
 
         with localDataLock:
             await fs.saveLocalData(localData)
@@ -116,7 +116,7 @@ async def on_message(message):
             launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
         else:
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-        await safeSendLaunchInfoEmbeds(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+        await safeSendLaunchInfo(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
@@ -127,7 +127,7 @@ async def on_message(message):
                 await fs.saveLocalData(localData)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
-        await safeSendText(client, message.channel, replyMsg)
+        await safeSend(client, message.channel, text=replyMsg)
     
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
@@ -138,12 +138,12 @@ async def on_message(message):
                 await fs.saveLocalData(localData)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
-        await safeSendText(client, message.channel, replyMsg)
+        await safeSend(client, message.channel, text=replyMsg)
 
     elif message.content.startswith(PREFIX + "info"):
-        await safeSendEmbed(client, message.channel, staticMessages.infoEmbed)
+        await safeSend(client, message.channel, embed=staticMessages.infoEmbed)
     elif message.content.startswith(PREFIX + "help"):
-        await safeSendEmbed(client, message.channel, staticMessages.helpEmbed)
+        await safeSend(client, message.channel, embed=staticMessages.helpEmbed)
 
 @client.event
 async def on_ready():

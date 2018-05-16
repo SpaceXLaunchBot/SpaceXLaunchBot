@@ -2,43 +2,32 @@ from discord import errors
 
 from errors import generalErrorEmbed
 
-async def safeSendText(client, channel, message):
+async def safeSend(client, channel, text=None, embed=None):
     """
-    Send a text message to a client, and if an error occurs,
-    safely supress it
+    Send a text / embed message (one or the other, not both) to a
+    client, and if an error occurs, safely supress it
     On failure, returns:
-         0 : HTTPException
-        -1 : Forbidden
-        -2 : InvalidArgument
+        -1 : Nothing to send (text & embed are `None`)
+        -2 : HTTPException
+        -3 : Forbidden
+        -4 : InvalidArgument
+    On success returns what the client.send_message method returns
     """
     try:
-        return await client.send_message(channel, message)
+        if text:
+            return await client.send_message(channel, text)
+        elif embed:
+            return await client.send_message(channel, embed=embed)
+        else:
+            return -1
     except errors.HTTPException:
-        return 0  # API down, Message too big, etc.
+        return -2  # API down, Message too big, etc.
     except errors.Forbidden:
-        return -1  # No permission to message this channel
+        return -3  # No permission to message this channel
     except errors.InvalidArgument:
-        return -2  # Invalid channel ID
+        return -4  # Invalid channel ID (channel deleted)
 
-async def safeSendEmbed(client, channel, embed):
-    """
-    Send an embed to a client, and if an error occurs, safely
-    supress it
-    On failure, returns:
-         0 : HTTPException
-        -1 : Forbidden
-        -2 : InvalidArgument
-    """
-    try:
-        return await client.send_message(channel, embed=embed)
-    except errors.HTTPException:
-        return 0
-    except errors.Forbidden:
-        return -1
-    except errors.InvalidArgument:
-        return -2
-
-async def safeSendLaunchInfoEmbeds(client, channel, embeds):
+async def safeSendLaunchInfo(client, channel, embeds):
     """
     Specifically for sending 2 launch embeds, a full-detail one,
     and failing that, a "lite" version of the embed
@@ -54,12 +43,13 @@ async def safeSendLaunchInfoEmbeds(client, channel, embeds):
     Returns 0 if neither embeds are sent
     """
     for embed in embeds:
-        v = await safeSendEmbed(client, channel, embed)
-        if v == 0:
+        v = await safeSend(client, channel, embed=embed)
+        if v == -2:
             pass  # Embed might be too big, try lite version
-        elif v == -1 or v == -2:
+        elif v == -3 or v == -4:
             return 0
         else:
             return v
-    await safeSendEmbed(client, channel, generalErrorEmbed)
+    # 
+    await safeSend(client, channel, embed=generalErrorEmbed)
     return 0
