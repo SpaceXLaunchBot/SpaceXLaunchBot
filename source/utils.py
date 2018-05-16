@@ -16,7 +16,7 @@ async def isInt(possiblyInteger):
     except ValueError:
         return False
 
-async def getUTCFromTimestamp(timestamp):
+async def UTCFromTimestamp(timestamp):
     dateIsInt = await isInt(timestamp)
     if dateIsInt:
         formattedDate = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")

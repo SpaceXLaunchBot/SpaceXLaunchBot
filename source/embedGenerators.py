@@ -5,7 +5,7 @@ Contains functions for generating/creating embeds about launches to send to user
 from copy import deepcopy
 from discord import Embed
 
-from utils import getUTCFromTimestamp
+from utils import UTCFromTimestamp
 from colours import hexColours
 
 rocketIDImages = {
@@ -85,7 +85,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
         ))
 
     # Add a field for the launch date  
-    UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    UTCDate = await UTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
     launchEmbed.add_field(name="Launch date", value=UTCDate)
 
     return launchEmbed
@@ -107,7 +107,7 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     else:
         notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
 
-    UTCDate = await getUTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    UTCDate = await UTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
     notifEmbed.add_field(name="Launch date", value=UTCDate)
 
     if nextLaunchJSON["links"]["reddit_launch"] != None:
