@@ -50,6 +50,6 @@ async def safeSendLaunchInfo(client, channel, embeds):
             return 0
         else:
             return v
-    # 
+    # Both failed to send, try to let user know something went wrong
     await safeSend(client, channel, embed=generalErrorEmbed)
     return 0
