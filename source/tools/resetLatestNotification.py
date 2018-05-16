@@ -6,11 +6,11 @@ import sys
 sys.path.append("..")
 
 from general import warning
-import utils
+import fs
 
 warning()  # Ask/show user important stuff
-localData = utils.loadLocalData()
+localData = fs.loadLocalData()
 localData["launchNotifSent"] = False
 
-utils.saveLocalDataSync(localData)
+fs.saveLocalDataSync(localData)
 print("launchNotifSent set to False")

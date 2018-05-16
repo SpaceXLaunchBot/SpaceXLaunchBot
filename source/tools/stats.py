@@ -8,19 +8,20 @@ Gather and show basic stats about the bot:
 import sys
 sys.path.append("..")
 
+from errors import fatalError
 from general import warning
 import discord
-import utils
+import fs
 import os
 
 warning()  # Ask/show user important stuff
 
-localData = utils.loadDict()
+localData = fs.loadLocalData()
 
 try:
     token = os.environ["SpaceXLaunchBotToken"]
 except KeyError:
-    utils.err("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
+    fatalError("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
 
 client = discord.Client()
 

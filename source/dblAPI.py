@@ -5,17 +5,14 @@ Handles interactions with the discordbots.org API
 from asyncio import sleep
 from os import environ
 import aiohttp
-import utils
 
-try:
-    dblToken = environ["dblToken"]
-except KeyError:
-    utils.err("Environment Variable \"dblToken\" cannot be found")
+from utils import loadEnvVar
+
+dblToken = loadEnvVar("dblToken")
 dblHeaders = {"Authorization": dblToken, "Content-Type": "application/json"}
 
 class dblClient(object):
     def __init__(self, discordClient):
-        self.discordClient = discordClient
         self.dblURL = "https://discordbots.org/api/bots/{}/stats".format(discordClient.user.id)
 
     async def updateServerCount(self, serverCount):

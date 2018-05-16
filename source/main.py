@@ -1,28 +1,30 @@
+# Built-ins and 3rd party modules
 from datetime import datetime, timedelta
 from os import environ as envVars
 from threading import Lock
 import discord
 import asyncio
 
+# Local modules
+import fs
 import utils
-from dblAPI import dblClient
-from spacexAPI import getNextLaunchJSON, apiErrorEmbed
-from embedGenerators import getLaunchInfoEmbed, getLaunchNotifEmbed
+import errors
+import dblAPI
+import spacexAPI
+import staticMessages
+import embedGenerators
 from discordUtils import safeSendText, safeSendEmbed, safeSendLaunchInfoEmbeds
 
 # TODO: Replace print statements with propper logging
 # TODO: Remove a channel from localData if it causes an InvalidArgument error (doesn't exist anymore)
 
-config = utils.loadConfig()
+config = fs.loadConfig()
 
 """
-Constants / important variables
+Constants / important variables - See config/README.md
 """
-# The prefix needed to activate a command
 PREFIX = config["commandPrefix"]
-# The interval time, in minutes, between checking the API for updates - must be an int
 API_CHECK_INTERVAL = config["apiCheckInterval"]
-# How far into the future to look for launches that are happening soon. Should be at least $API_CHECK_INTERVAL * 2
 LAUNCH_NOTIF_DELTA = timedelta(minutes = config["launchNotificationDelta"])
 
 """
@@ -33,14 +35,11 @@ to store multiple things:
  - Whether or not an active launch notification has been sent for the current launch
 This is saved to and loaded from a file (so it persists through reboots/updates)
 """
-localData = utils.loadLocalData()
+localData = fs.loadLocalData()
 localDataLock = Lock()  # locks access when saving / loading
 
+discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
 client = discord.Client()
-try:
-    token = envVars["SpaceXLaunchBotToken"]
-except KeyError:
-    utils.err("Environment Variable \"SpaceXLaunchBotToken\" cannot be found")
 
 async def notificationBackgroundTask():
     """
@@ -52,12 +51,12 @@ async def notificationBackgroundTask():
     """
     await client.wait_until_ready()
     while not client.is_closed:
-        nextLaunchJSON = await getNextLaunchJSON()
+        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
             pass  # Error, do nothing, wait for 30 more mins
         
         else:
-            launchInfoEmbed, launchInfoEmbedLite = await getLaunchInfoEmbed(nextLaunchJSON)
+            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             
             with localDataLock:
                 if localData["latestLaunchInfoEmbed"].to_dict() == launchInfoEmbed.to_dict():
@@ -85,13 +84,13 @@ async def notificationBackgroundTask():
                             if localData["launchNotifSent"] == False:
                                 localData["launchNotifSent"] = True
 
-                                notifEmbed = await getLaunchNotifEmbed(nextLaunchJSON)
+                                notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                                 for channelID in localData["subscribedChannels"]:
                                     channel = client.get_channel(channelID)
                                     await safeSendEmbed(client, channel, notifEmbed)
 
         with localDataLock:
-            await utils.saveLocalData(localData)
+            await fs.saveLocalData(localData)
 
         await asyncio.sleep(60 * API_CHECK_INTERVAL)
 
@@ -106,14 +105,17 @@ async def on_message(message):
     except AttributeError:
         # Happens if user has no roles
         userIsAdmin = False
+
+    # Commands can be in any case
+    message.content = message.content.lower()
     
     if message.content.startswith(PREFIX + "nextlaunch"):
         # TODO: Maybe just pull latest embed from localData instead of requesting every time?
-        nextLaunchJSON = await getNextLaunchJSON()
+        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
-            launchInfoEmbed, launchInfoEmbedLite = apiErrorEmbed, apiErrorEmbed
+            launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
         else:
-            launchInfoEmbed, launchInfoEmbedLite = await getLaunchInfoEmbed(nextLaunchJSON)
+            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
         await safeSendLaunchInfoEmbeds(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
@@ -122,7 +124,7 @@ async def on_message(message):
         with localDataLock:
             if message.channel.id not in localData["subscribedChannels"]:
                 localData["subscribedChannels"].append(message.channel.id)
-                await utils.saveLocalData(localData)
+                await fs.saveLocalData(localData)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
         await safeSendText(client, message.channel, replyMsg)
@@ -133,20 +135,20 @@ async def on_message(message):
         with localDataLock:
             try:
                 localData["subscribedChannels"].remove(message.channel.id)
-                await utils.saveLocalData(localData)
+                await fs.saveLocalData(localData)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
         await safeSendText(client, message.channel, replyMsg)
 
     elif message.content.startswith(PREFIX + "info"):
-        await safeSendText(client, message.channel, utils.botInfo)
+        await safeSendEmbed(client, message.channel, staticMessages.infoEmbed)
     elif message.content.startswith(PREFIX + "help"):
-        await safeSendText(client, message.channel, utils.helpText.format(prefix=PREFIX))
+        await safeSendEmbed(client, message.channel, staticMessages.helpEmbed)
 
 @client.event
 async def on_ready():
     global dbl  # Can't define this until client is ready
-    dbl = dblClient(client)
+    dbl = dblAPI.dblClient(client)
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
@@ -176,4 +178,4 @@ async def on_server_remove(server):
     await dbl.updateServerCount(len(client.servers))
 
 client.loop.create_task(notificationBackgroundTask())
-client.run(token)
+client.run(discordToken)

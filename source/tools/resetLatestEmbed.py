@@ -5,12 +5,13 @@ Reset the latest launch embed in data.pkl, so that an update is sent out
 import sys
 sys.path.append("..")
 
+from errors import nextLaunchErrorEmbed
 from general import warning
-import utils
+import fs
 
 warning()  # Ask/show user important stuff
-localData = utils.loadLocalData()
-localData["latestLaunchInfoEmbed"] = utils.nextLaunchErrorEmbed
+localData = fs.loadLocalData()
+localData["latestLaunchInfoEmbed"] = nextLaunchErrorEmbed
 
-utils.saveLocalDataSync(localData)
+fs.saveLocalDataSync(localData)
 print("latestLaunchInfoEmbed saved to localData")

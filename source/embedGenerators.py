@@ -1,13 +1,14 @@
 """
 embedGenerators.py
 
-Contains functions for generating/creating embeds to send to users
+Contains functions for generating/creating embeds about launches to send to users
 """
 
-from utils import getUTCFromTimestamp
-from spacexAPI import hexColours
 from copy import deepcopy
 from discord import Embed
+
+from utils import getUTCFromTimestamp
+from colours import hexColours
 
 rocketIDImages = {
     "falcon9": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falcon9.png",
