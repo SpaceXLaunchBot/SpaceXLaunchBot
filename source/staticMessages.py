@@ -7,8 +7,6 @@ from discord import Embed
 from colours import hexColours
 import fs
 
-config = fs.loadConfig()
-
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
     description="I am a bot for providing news and information about upcoming SpaceX launches\nI also provide a notification service for launch information and reminders for launches happening soon",
@@ -20,7 +18,7 @@ infoEmbed.add_field(name="Contact", value="If you have any questions or suggesti
 
 helpEmbed = Embed(
     title="SpaceX-Launch-Bot Commands",
-    description="Command prefix: {}".format(config["commandPrefix"]),
+    description="Command prefix: {}".format(fs.config["commandPrefix"]),
     color=hexColours["falconRed"]
 )
 helpEmbed.add_field(name="nextlaunch", value="Show info about the next upcoming launch\n*Any user can use this command*")

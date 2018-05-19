@@ -9,8 +9,7 @@ from general import warning
 import fs
 
 warning()  # Ask/show user important stuff
-localData = fs.loadLocalData()
-localData["launchNotifSent"] = False
 
-fs.saveLocalDataSync(localData)
+fs.localData["launchNotifSent"] = False
+fs.saveLocalDataSync()
 print("launchNotifSent set to False")

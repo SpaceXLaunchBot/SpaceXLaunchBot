@@ -1,9 +1,5 @@
 # Built-ins and 3rd party modules
-from datetime import datetime, timedelta
-from os import environ as envVars
-from threading import Lock
 import discord
-import asyncio
 
 # Local modules
 import fs
@@ -13,86 +9,16 @@ import dblAPI
 import spacexAPI
 import staticMessages
 import embedGenerators
+import backgroundTasks
 from discordUtils import safeSend, safeSendLaunchInfo
 
 # TODO: Replace print statements with propper logging
 # TODO: Remove a channel from localData if it causes an InvalidArgument error (doesn't exist anymore)
 
-config = fs.loadConfig()
-
-"""
-Constants / important variables - See config/README.md
-"""
-PREFIX = config["commandPrefix"]
-API_CHECK_INTERVAL = config["apiCheckInterval"]
-LAUNCH_NOTIF_DELTA = timedelta(minutes = config["launchNotificationDelta"])
-
-"""
-localData is a dictionary that has a lock (as it is accessed a lot in multiple functions) and is used
-to store multiple things:
- - A list of channel IDs that are subscribed
- - The latest launch information embed that was sent
- - Whether or not an active launch notification has been sent for the current launch
-This is saved to and loaded from a file (so it persists through reboots/updates)
-"""
-localData = fs.loadLocalData()
-localDataLock = asyncio.Lock()  # locks access when saving / loading
+PREFIX = fs.config["commandPrefix"]
 
 discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
 client = discord.Client()
-
-async def notificationBackgroundTask():
-    """
-    Every $API_CHECK_INTERVAL minutes:
-    If the embed has changed, something new has happened so send
-        all channels an embed with updated info
-    If the time of the next upcoming launch is within the next hour,
-        send out a notification embed alerting people
-    """
-    await client.wait_until_ready()
-    while not client.is_closed:
-        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
-        if nextLaunchJSON == 0:
-            pass  # Error, do nothing, wait for 30 more mins
-        
-        else:
-            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-            
-            with await localDataLock:
-                if localData["latestLaunchInfoEmbed"].to_dict() == launchInfoEmbed.to_dict():
-                    pass
-                else:
-                    # Launch info has changed, set variables
-                    localData["launchNotifSent"] = False
-                    localData["latestLaunchInfoEmbed"] = launchInfoEmbed
-
-                    # new launch found, send all "subscribed" channel the embed
-                    for channelID in localData["subscribedChannels"]:
-                        channel = client.get_channel(channelID)
-                        await safeSendLaunchInfo(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
-
-            launchTime = nextLaunchJSON["launch_date_unix"]
-            if await utils.isInt(launchTime):
-
-                # Get timestamp for the time $LAUNCH_NOTIF_DELTA minutes from now
-                nextHour = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
-
-                # If the launch time is within the next hour
-                if nextHour > int(launchTime):
-
-                        with await localDataLock:
-                            if localData["launchNotifSent"] == False:
-                                localData["launchNotifSent"] = True
-
-                                notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
-                                for channelID in localData["subscribedChannels"]:
-                                    channel = client.get_channel(channelID)
-                                    await safeSend(client, channel, embed=notifEmbed)
-
-        with await localDataLock:
-            await fs.saveLocalData(localData)
-
-        await asyncio.sleep(60 * API_CHECK_INTERVAL)
 
 @client.event
 async def on_message(message):
@@ -121,10 +47,10 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
-        with await localDataLock:
-            if message.channel.id not in localData["subscribedChannels"]:
-                localData["subscribedChannels"].append(message.channel.id)
-                await fs.saveLocalData(localData)
+        with await fs.localDataLock:
+            if message.channel.id not in fs.localData["subscribedChannels"]:
+                fs.localData["subscribedChannels"].append(message.channel.id)
+                await fs.saveLocalData()
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
         await safeSend(client, message.channel, text=replyMsg)
@@ -132,10 +58,11 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
-        with await localDataLock:
+        with await fs.localDataLock:
             try:
-                localData["subscribedChannels"].remove(message.channel.id)
-                await fs.saveLocalData(localData)
+                # No duplicate elements in the list so remove(value) will always work
+                fs.localData["subscribedChannels"].remove(message.channel.id)
+                await fs.saveLocalData()
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
         await safeSend(client, message.channel, text=replyMsg)
@@ -152,8 +79,8 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    with await localDataLock:
-        totalSubbed = len(localData["subscribedChannels"])
+    with await fs.localDataLock:
+        totalSubbed = len(fs.localData["subscribedChannels"])
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:
@@ -177,5 +104,9 @@ async def on_server_join(server):
 async def on_server_remove(server):
     await dbl.updateServerCount(len(client.servers))
 
-client.loop.create_task(notificationBackgroundTask())
+# Setup background tasks
+client.loop.create_task(backgroundTasks.notificationTask(client))
+client.loop.create_task(backgroundTasks.reaper(client))
+
+# Run bot
 client.run(discordToken)

@@ -10,8 +10,8 @@ from general import warning
 import fs
 
 warning()  # Ask/show user important stuff
-localData = fs.loadLocalData()
-localData["latestLaunchInfoEmbed"] = nextLaunchErrorEmbed
 
-fs.saveLocalDataSync(localData)
+# Lock not needed since bot is not currently running
+fs.localData["latestLaunchInfoEmbed"] = nextLaunchErrorEmbed
+fs.saveLocalDataSync()
 print("latestLaunchInfoEmbed saved to localData")
