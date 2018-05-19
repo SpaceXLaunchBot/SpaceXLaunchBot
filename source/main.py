@@ -1,5 +1,7 @@
 # Built-ins and 3rd party modules
+from os import path
 import discord
+import logging
 
 # Local modules
 import fs
@@ -12,11 +14,17 @@ import embedGenerators
 import backgroundTasks
 from discordUtils import safeSend, safeSendLaunchInfo
 
-# TODO: Replace print statements with propper logging
-# TODO: Remove a channel from localData if it causes an InvalidArgument error (doesn't exist anymore)
+# Setup Discord & custom logging
+logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
+handler = logging.FileHandler(filename=logFilePath, encoding="utf-8", mode="w")
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
+logging.basicConfig(level=logging.INFO, handlers=[handler])
 
+logger = logging.getLogger(__name__)
+logger.info("Starting bot")
+
+# Important vars
 PREFIX = fs.config["commandPrefix"]
-
 discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
 client = discord.Client()
 
@@ -84,17 +92,17 @@ async def on_ready():
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:
-        totalClients += len(server.members)
+        totalClients += len(server.members)   
+    
+    logger.info("Username: {}".format(client.user.name))
+    logger.info("ClientID: {}".format(client.user.id))
+    logger.info("Connected to {} servers".format(totalServers))
+    logger.info("Connected to {} subscribed channels".format(totalSubbed))
+    logger.info("Serving {} clients".format(totalClients))
 
-    print("\nLogged into Discord API\n")
-    print("Username: {}\nClientID: {}\n\nConnected to {} servers\nConnected to {} subscribed channels\nServing {} clients".format(
-        client.user.name,
-        client.user.id,
-        totalServers,
-        totalSubbed,
-        totalClients
-    ))
     await dbl.updateServerCount(totalServers)
+
+    print("Bot loaded and running")
 
 @client.event
 async def on_server_join(server):

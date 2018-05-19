@@ -20,7 +20,7 @@ from errors import fatalError, nextLaunchErrorEmbed
         - Whether or not an active launch notification has been sent for the current launch
 + This is saved to and loaded from a file (so it persists through reboots/updates)
 """
-localDataPath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl") 
+localDataPath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl")
 localDataLock = asyncio.Lock()
 # Don't need to use lock right now as this happens during import
 localData = {"subscribedChannels": [], "latestLaunchInfoEmbed": nextLaunchErrorEmbed, "launchNotifSent": False}

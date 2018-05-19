@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta
 import asyncio
+import logging
 
 import embedGenerators
 import spacexAPI
 import utils
 import fs
+
+logger = logging.getLogger(__name__)
 
 ONE_MINUTE = 60  # Just makes things a little more readable
 API_CHECK_INTERVAL = fs.config["apiCheckInterval"]
@@ -23,7 +26,8 @@ async def notificationTask(client):
     while not client.is_closed:
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
-            pass  # Error, do nothing, wait for 30 more mins
+            logger.warning("nextLaunchJSON returned 0, skipping this cycle")
+            pass  # Error, wait for next loop/cycle
         
         else:
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
@@ -32,7 +36,8 @@ async def notificationTask(client):
                 if fs.localData["latestLaunchInfoEmbed"].to_dict() == launchInfoEmbed.to_dict():
                     pass
                 else:
-                    # Launch info has changed, set variables
+                    logger.info("Launch info changed, sending notifications")
+
                     fs.localData["launchNotifSent"] = False
                     fs.localData["latestLaunchInfoEmbed"] = launchInfoEmbed
 
@@ -43,21 +48,24 @@ async def notificationTask(client):
 
             launchTime = nextLaunchJSON["launch_date_unix"]
             if await utils.isInt(launchTime):
+                
+                launchTime = int(launchTime)
 
                 # Get timestamp for the time $LAUNCH_NOTIF_DELTA minutes from now
                 nextHour = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next hour
-                if nextHour > int(launchTime):
+                if nextHour > launchTime:
+                    logger.info("Launch happening in {}, sending notification".format(str(nextHour - launchTime)))
 
-                        with await fs.localDataLock:
-                            if fs.localData["launchNotifSent"] == False:
-                                fs.localData["launchNotifSent"] = True
+                    with await fs.localDataLock:
+                        if fs.localData["launchNotifSent"] == False:
+                            fs.localData["launchNotifSent"] = True
 
-                                notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
-                                for channelID in fs.localData["subscribedChannels"]:
-                                    channel = client.get_channel(channelID)
-                                    await safeSend(client, channel, embed=notifEmbed)
+                            notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
+                            for channelID in fs.localData["subscribedChannels"]:
+                                channel = client.get_channel(channelID)
+                                await safeSend(client, channel, embed=notifEmbed)
 
         with await fs.localDataLock:
             await fs.saveLocalData()
@@ -77,4 +85,5 @@ async def reaper(client):
                 if client.get_channel(channelID) == None:
                     # No duplicate elements in the list so remove(value) will always work
                     fs.localData["subscribedChannels"].remove(channelID)
+                    logger.info("{} is not a valid ID, removing from localData".format(channelID))
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)
