@@ -36,7 +36,7 @@ to store multiple things:
 This is saved to and loaded from a file (so it persists through reboots/updates)
 """
 localData = fs.loadLocalData()
-localDataLock = Lock()  # locks access when saving / loading
+localDataLock = asyncio.Lock()  # locks access when saving / loading
 
 discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
 client = discord.Client()
@@ -58,7 +58,7 @@ async def notificationBackgroundTask():
         else:
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             
-            with localDataLock:
+            with await localDataLock:
                 if localData["latestLaunchInfoEmbed"].to_dict() == launchInfoEmbed.to_dict():
                     pass
                 else:
@@ -80,7 +80,7 @@ async def notificationBackgroundTask():
                 # If the launch time is within the next hour
                 if nextHour > int(launchTime):
 
-                        with localDataLock:
+                        with await localDataLock:
                             if localData["launchNotifSent"] == False:
                                 localData["launchNotifSent"] = True
 
@@ -89,7 +89,7 @@ async def notificationBackgroundTask():
                                     channel = client.get_channel(channelID)
                                     await safeSend(client, channel, embed=notifEmbed)
 
-        with localDataLock:
+        with await localDataLock:
             await fs.saveLocalData(localData)
 
         await asyncio.sleep(60 * API_CHECK_INTERVAL)
@@ -121,7 +121,7 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
-        with localDataLock:
+        with await localDataLock:
             if message.channel.id not in localData["subscribedChannels"]:
                 localData["subscribedChannels"].append(message.channel.id)
                 await fs.saveLocalData(localData)
@@ -132,7 +132,7 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
-        with localDataLock:
+        with await localDataLock:
             try:
                 localData["subscribedChannels"].remove(message.channel.id)
                 await fs.saveLocalData(localData)
@@ -152,7 +152,7 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    with localDataLock:
+    with await localDataLock:
         totalSubbed = len(localData["subscribedChannels"])
     totalServers = len(client.servers)
     totalClients = 0
