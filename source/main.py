@@ -15,6 +15,9 @@ import backgroundTasks
 from discordUtils import safeSend, safeSendLaunchInfo
 
 # Setup Discord & custom logging
+discordLogger = logging.getLogger("discord")
+discordLogger.setLevel(logging.WARNING)
+
 logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
 handler = logging.FileHandler(filename=logFilePath, encoding="utf-8", mode="w")
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
