@@ -20,10 +20,11 @@ async def notificationTask(client):
         send out a notification embed alerting people
     """
     await client.wait_until_ready()
+    logger.info("started")
     while not client.is_closed:
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
-            logger.warning("nextLaunchJSON returned 0, skipping this cycle")
+            logger.error("nextLaunchJSON returned 0, skipping this cycle")
             pass  # Error, wait for next loop/cycle
         
         else:
@@ -76,6 +77,7 @@ async def reaper(client):
     Essentially garbage collection for the channel list
     """
     await client.wait_until_ready()
+    logger.info("started")
     while not client.is_closed:
         with await fs.localDataLock:
             for channelID in fs.localData["subscribedChannels"]:

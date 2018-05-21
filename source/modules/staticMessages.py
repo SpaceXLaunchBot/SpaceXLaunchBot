@@ -18,7 +18,7 @@ infoEmbed.add_field(name="Contact", value="If you have any questions or suggesti
 
 helpEmbed = Embed(
     title="SpaceX-Launch-Bot Commands",
-    description=f"Command prefix: {fs.config["commandPrefix"]}",
+    description=f"Command prefix: {fs.config['commandPrefix']}",
     color=hexColours["falconRed"]
 )
 helpEmbed.add_field(name="nextlaunch", value="Show info about the next upcoming launch\n*Any user can use this command*")
