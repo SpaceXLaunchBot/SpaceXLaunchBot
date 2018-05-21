@@ -8,7 +8,7 @@ from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedG
 from modules.discordUtils import safeSend, safeSendLaunchInfo
 
 # Setup logging
-logFilePath = path.join(path.dirname(path.abspath(__file__)), "../bot.log")
+logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
 handler = logging.FileHandler(filename=logFilePath, encoding="utf-8", mode="w")
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
 logging.basicConfig(level=logging.INFO, handlers=[handler])
