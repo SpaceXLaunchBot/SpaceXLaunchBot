@@ -5,13 +5,14 @@ Reset the latest launch embed in data.pkl, so that an update is sent out
 import sys
 sys.path.append("..")
 
-from errors import nextLaunchErrorEmbed
 from general import warning
-import fs
+
+from modules import fs
+from modules.errors import nextLaunchErrorEmbed
 
 warning()  # Ask/show user important stuff
 
 # Lock not needed since bot is not currently running
-fs.localData["latestLaunchInfoEmbed"] = nextLaunchErrorEmbed
+fs.localData["latestLaunchInfoEmbedDict"] = nextLaunchErrorEmbed.to_dict()
 fs.saveLocalDataSync()
-print("latestLaunchInfoEmbed saved to localData")
+print("latestLaunchInfoEmbedDict saved to localData")

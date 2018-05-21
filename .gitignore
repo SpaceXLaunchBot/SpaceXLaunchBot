@@ -102,3 +102,4 @@ ENV/
 
 # SpaceX-Launch-Bot
 *.pkl
+source/tools/data.json

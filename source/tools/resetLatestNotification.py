@@ -6,7 +6,8 @@ import sys
 sys.path.append("..")
 
 from general import warning
-import fs
+
+from modules import fs
 
 warning()  # Ask/show user important stuff
 

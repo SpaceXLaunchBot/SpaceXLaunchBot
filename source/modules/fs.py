@@ -4,11 +4,14 @@ For dealing with file system interactions, such as loading and saving data
 
 from discord import Embed
 from os import path
+import logging
 import asyncio
 import pickle
 import json
 
 from modules.errors import fatalError, nextLaunchErrorEmbed
+
+logger = logging.getLogger(__name__)
 
 """
 + Load localData from file into variable, which stays in this module but can be edited
@@ -23,14 +26,6 @@ from modules.errors import fatalError, nextLaunchErrorEmbed
 # Path has ../ as it is resolved from this files location
 localDataPath = path.join(path.dirname(path.abspath(__file__)), "..", "resources", "data.pkl")
 localDataLock = asyncio.Lock()
-# Don't need to use lock right now as this happens during import
-localData = {"subscribedChannels": [], "latestLaunchInfoEmbed": nextLaunchErrorEmbed, "launchNotifSent": False}
-try:
-    with open(localDataPath, "rb") as f:
-        localData = pickle.load(f)
-except FileNotFoundError:
-    # No .pkl, save default to file
-    saveLocalDataSync(localData)
 
 async def saveLocalData():
     """
@@ -45,6 +40,17 @@ def saveLocalDataSync():
     """
     with open(localDataPath, "wb") as f:
         pickle.dump(localData, f, pickle.HIGHEST_PROTOCOL)
+
+# Don't need to use lock right now as this happens during import
+# Load data.pkl into variable, if not exists, use default and save it to file
+localData = {"subscribedChannels": [], "latestLaunchInfoEmbedDict": nextLaunchErrorEmbed.to_dict(), "launchNotifSent": False}
+try:
+    with open(localDataPath, "rb") as f:
+        localData = pickle.load(f)
+except FileNotFoundError:
+    # No .pkl, save default to file
+    logger.warning("data.pkl not found, saving default localData")
+    saveLocalDataSync()
 
 
 """

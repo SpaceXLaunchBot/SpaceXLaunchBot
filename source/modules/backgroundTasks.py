@@ -29,15 +29,16 @@ async def notificationTask(client):
         
         else:
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-            
+            launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
+
             with await fs.localDataLock:
-                if fs.localData["latestLaunchInfoEmbed"].to_dict() == launchInfoEmbed.to_dict():
+                if fs.localData["latestLaunchInfoEmbedDict"] == launchInfoEmbedDict:
                     pass
                 else:
                     logger.info("Launch info changed, sending notifications")
 
                     fs.localData["launchNotifSent"] = False
-                    fs.localData["latestLaunchInfoEmbed"] = launchInfoEmbed
+                    fs.localData["latestLaunchInfoEmbedDict"] = launchInfoEmbedDict
 
                     # new launch found, send all "subscribed" channel the embed
                     for channelID in fs.localData["subscribedChannels"]:
