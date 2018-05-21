@@ -20,7 +20,7 @@ async def UTCFromTimestamp(timestamp):
     dateIsInt = await isInt(timestamp)
     if dateIsInt:
         formattedDate = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
-        return "{} UTC".format(formattedDate)
+        return f"{formattedDate} UTC"
     return "To Be Announced"
 
 def loadEnvVar(varName):
@@ -30,4 +30,4 @@ def loadEnvVar(varName):
     try:
         return environ[varName]
     except KeyError:
-        fatalError("Environment Variable \"{}\" cannot be found".format(varName))
+        fatalError(f"Environment Variable \"{varName}\" cannot be found")

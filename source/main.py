@@ -9,7 +9,7 @@ from modules.discordUtils import safeSend, safeSendLaunchInfo
 
 # Setup logging
 logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
-handler = logging.FileHandler(filename=logFilePath, encoding="utf-8", mode="w")
+handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
 logging.basicConfig(level=logging.INFO, handlers=[handler])
 
@@ -90,11 +90,11 @@ async def on_ready():
     for server in client.servers:
         totalClients += len(server.members)   
     
-    logger.info("Username: {}".format(client.user.name))
-    logger.info("ClientID: {}".format(client.user.id))
-    logger.info("Connected to {} servers".format(totalServers))
-    logger.info("Connected to {} subscribed channels".format(totalSubbed))
-    logger.info("Serving {} clients".format(totalClients))
+    logger.info(f"Username: {client.user.name}")
+    logger.info(f"ClientID: {client.user.id}")
+    logger.info(f"Connected to {totalServers} servers")
+    logger.info(f"Connected to {totalSubbed} subscribed channels")
+    logger.info(f"Serving {totalClients} clients")
 
     await dbl.updateServerCount(totalServers)
 

@@ -53,7 +53,7 @@ async def notificationTask(client):
 
                 # If the launch time is within the next hour
                 if nextHour > launchTime:
-                    logger.info("Launch happening in {}, sending notification".format(str(nextHour - launchTime)))
+                    logger.info(f"Launch happening in {str(nextHour - launchTime)}, sending notification")
 
                     with await fs.localDataLock:
                         if fs.localData["launchNotifSent"] == False:
@@ -79,8 +79,9 @@ async def reaper(client):
     while not client.is_closed:
         with await fs.localDataLock:
             for channelID in fs.localData["subscribedChannels"]:
+                # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
                 if client.get_channel(channelID) == None:
                     # No duplicate elements in the list so remove(value) will always work
                     fs.localData["subscribedChannels"].remove(channelID)
-                    logger.info("{} is not a valid ID, removing from localData".format(channelID))
+                    logger.info(f"{channelID} is not a valid ID, removing from localData")
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)

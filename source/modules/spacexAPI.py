@@ -22,5 +22,5 @@ async def getNextLaunchJSON():
                     return 0
                 return (await response.json())[0]
         except Exception as e:
-            logger.error("Failed to get data from SpaceX API: {}: {}".format(type(e).__name__, e))
+            logger.error(f"Failed to get data from SpaceX API: {type(e).__name__}: {e}")
             return 0
