@@ -2,10 +2,7 @@ from datetime import datetime, timedelta
 import asyncio
 import logging
 
-import embedGenerators
-import spacexAPI
-import utils
-import fs
+from modules import embedGenerators, spacexAPI, utils, fs
 
 logger = logging.getLogger(__name__)
 

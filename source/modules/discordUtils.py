@@ -4,7 +4,7 @@ Extra things to make the discord library nicer
 
 from discord import errors
 
-from errors import generalErrorEmbed
+from modules.errors import generalErrorEmbed
 
 async def safeSend(client, channel, text=None, embed=None):
     """

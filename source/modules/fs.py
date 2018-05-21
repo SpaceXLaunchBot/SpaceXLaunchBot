@@ -8,7 +8,7 @@ import asyncio
 import pickle
 import json
 
-from errors import fatalError, nextLaunchErrorEmbed
+from modules.errors import fatalError, nextLaunchErrorEmbed
 
 """
 + Load localData from file into variable, which stays in this module but can be edited
@@ -20,7 +20,8 @@ from errors import fatalError, nextLaunchErrorEmbed
         - Whether or not an active launch notification has been sent for the current launch
 + This is saved to and loaded from a file (so it persists through reboots/updates)
 """
-localDataPath = path.join(path.dirname(path.abspath(__file__)), "resources/data.pkl")
+# Path has ../ as it is resolved from this files location
+localDataPath = path.join(path.dirname(path.abspath(__file__)), "../resources/data.pkl")
 localDataLock = asyncio.Lock()
 # Don't need to use lock right now as this happens during import
 localData = {"subscribedChannels": [], "latestLaunchInfoEmbed": nextLaunchErrorEmbed, "launchNotifSent": False}
@@ -50,7 +51,7 @@ def saveLocalDataSync():
 Load local config file and create a dictionary that can be accessed by everything
 that imports this module
 """
-configFilePath = path.join(path.dirname(path.abspath(__file__)), "config/config.json")
+configFilePath = path.join(path.dirname(path.abspath(__file__)), "../config/config.json")
 # TODO: Check for needed keys
 try:
     with open(configFilePath, "r") as inFile:

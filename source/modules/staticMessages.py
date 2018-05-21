@@ -4,8 +4,8 @@ Messages / embeds that won't be dynamically changing, such as the help message
 
 from discord import Embed
 
-from colours import hexColours
-import fs
+from modules.colours import hexColours
+from modules import fs
 
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",

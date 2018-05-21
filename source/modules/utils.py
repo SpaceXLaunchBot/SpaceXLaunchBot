@@ -7,7 +7,7 @@ General utility variables & functions, for example:
 from datetime import datetime
 from os import environ
 
-from errors import fatalError
+from modules.errors import fatalError
 
 async def isInt(possiblyInteger):
     try:

@@ -7,7 +7,7 @@ from os import environ
 import aiohttp
 import logging
 
-from utils import loadEnvVar
+from modules.utils import loadEnvVar
 
 logger = logging.getLogger(__name__)
 

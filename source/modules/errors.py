@@ -5,7 +5,7 @@ Embeds and functions for dealing with errors
 from discord import Embed
 import logging
 
-from colours import hexColours
+from modules.colours import hexColours
 
 logger = logging.getLogger(__name__)
 

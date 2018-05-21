@@ -5,8 +5,8 @@ Contains functions for generating/creating embeds about launches to send to user
 from copy import deepcopy
 from discord import Embed
 
-from utils import UTCFromTimestamp
-from colours import hexColours
+from modules.utils import UTCFromTimestamp
+from modules.colours import hexColours
 
 rocketIDImages = {
     "falcon9": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falcon9.png",
