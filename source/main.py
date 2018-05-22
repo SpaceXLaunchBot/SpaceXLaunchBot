@@ -1,20 +1,27 @@
+from time import time
+# Script has started, get time (for startup time) and show user we have started
+# Do this before other imports as they can take a few seconds
+startupTime = time()
+print("Init started")
+
 # Built-ins and 3rd party modules
-from os import path
-import discord
 import logging
+import discord
+from os import path
 
-# Local modules
-from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
-from modules.discordUtils import safeSend, safeSendLaunchInfo
-
-# Setup logging
+# Do this before other imports as some local modules use logging when imported
+# Direct logging to file, only log INFO level and above
 logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
 handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
 handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
 logging.basicConfig(level=logging.INFO, handlers=[handler])
 
-# Change discord to only log warnings and above
+# Change discord to only log WARNING level and above
 logging.getLogger("discord").setLevel(logging.WARNING)
+
+# Local modules
+from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
+from modules.discordUtils import safeSend, safeSendLaunchInfo
 
 logger = logging.getLogger(__name__)
 logger.info("Starting bot")
@@ -96,9 +103,11 @@ async def on_ready():
     logger.info(f"Connected to {totalSubbed} subscribed channels")
     logger.info(f"Serving {totalClients} clients")
 
-    await dbl.updateServerCount(totalServers)
+    formattedTime = str(time() - startupTime)[0:4]
+    print(f"Bot ready\nStarted in: {formattedTime}s")
+    logger.info(f"Started in: {formattedTime}s")
 
-    print("Bot loaded and running")
+    await dbl.updateServerCount(totalServers)
 
 @client.event
 async def on_server_join(server):
