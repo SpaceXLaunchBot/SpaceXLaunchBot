@@ -56,10 +56,10 @@ async def notificationTask(client):
 
                 # If the launch time is within the next hour
                 if nextHour > launchTime:
-                    logger.info(f"Launch happening in {str(nextHour - launchTime)}, sending notification")
-
                     with await fs.localDataLock:
                         if fs.localData["launchNotifSent"] == False:
+
+                            logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA} minutes, sending notification")
                             fs.localData["launchNotifSent"] = True
 
                             notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
