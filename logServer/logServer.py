@@ -1,10 +1,9 @@
 """
-Start the server
+Main server code
 """
 
 from flask import Flask, render_template
 from logParser import tailLog
-import logging
 
 app = Flask(__name__)
 
@@ -14,6 +13,5 @@ def showLog():
     return render_template("index.html", logEntries=logEntries)
 
 if __name__ == "__main__":
-    # Yep, logging this to a file as well
-    logging.basicConfig(filename="../logServer.log", level=logging.INFO)
-    app.run(host="0.0.0.0", port=80)
+    print("RUNNING IN DEBUG MODE")
+    app.run(host="0.0.0.0", port=80, debug=True)
