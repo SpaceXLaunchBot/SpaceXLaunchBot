@@ -9,9 +9,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def showLog():
-    logEntries = tailLog(20)
+    logEntries = tailLog(15)
     return render_template("index.html", logEntries=logEntries)
 
 if __name__ == "__main__":
     print("RUNNING IN DEBUG MODE")
-    app.run(host="0.0.0.0", port=80, debug=True)
+    app.run(host="127.0.0.1", port=8080, debug=True)

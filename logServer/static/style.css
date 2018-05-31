@@ -1,0 +1,16 @@
+body {
+    background-color: whitesmoke;
+    color: black;
+}
+
+.critical {
+    background-color: red;
+}
+
+.error {
+    background-color: red;
+}
+
+.warning {
+    background-color: orange;
+}
