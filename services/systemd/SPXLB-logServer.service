@@ -8,8 +8,8 @@ After=network-online.target
 # Service stuff
 User=YOUR-USERNAME
 Type=idle
-# -u otherwise journal wont show print() output
-ExecStart=/usr/bin/python3 -u /home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer/run.py
+WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer
+ExecStart=/usr/local/bin/uwsgi --ini logServer.ini
 Restart=always
 RestartSec=10
 StandardOutput=journal

@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name SERVER-IP;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer/logServer.sock;
+    }
+}

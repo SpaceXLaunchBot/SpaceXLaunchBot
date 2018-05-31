@@ -16,23 +16,43 @@ $ usermod -aG sudo YOUR-USERNAME
 $ su - YOUR-USERNAME
 $ sudo apt update
 $ sudo apt upgrade -y
-$ sudo apt install git python3-pip nginx -y
+$ sudo apt install git nginx -y
 $ mkdir ~/files && cd ~/files
+
+# Install pip the proper way
+# https://pip.pypa.io/en/stable/installing/
+$ wget https://bootstrap.pypa.io/get-pip.py
+$ sudo python3 get-pip.py
+$ rm get-pip.py
+
 # Start installing the actual bot
 $ git clone https://github.com/r-spacex/SpaceX-Launch-Bot.git
 $ cd SpaceX-Launch-Bot
 # Edit SpaceX-Launch-Bot/source/config/config.json with appopriate values
 $ nano source/config/config.json
-$ pip3 install -r requirements.txt
+$ sudo pip3 install -r requirements.txt
 # Edit the `.service` files in `/systemd` with appropriate values 
-$ sudo cp -R systemd/. /lib/systemd/system/.
+$ sudo cp -R services/systemd/. /lib/systemd/system/.
 $ sudo chmod 644 /lib/systemd/system/SpaceX-Launch-Bot.service
 $ sudo chmod 644 /lib/systemd/system/SPXLB-logServer.service
-$ systemctl daemon-reload
-$ systemctl enable SpaceX-Launch-Bot
-$ systemctl start SpaceX-Launch-Bot
-$ systemctl enable SPXLB-logServer
-$ systemctl start SPXLB-logServer
+
+# Actually enable and start the bot
+# If you are using a previous data.pkl, MAKE SURE IT IS IN /resources BEFORE STARTING
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable SpaceX-Launch-Bot
+$ sudo systemctl start SpaceX-Launch-Bot
+
+# Install web server stuff
+$ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
+$ sudo ln -s /etc/nginx/sites-available/logServer /etc/nginx/sites-enabled
+# Check for errors
+$ sudo nginx -t
+
+# Enable and start the log webserver
+$ sudo systemctl restart nginx
+$ sudo ufw allow 'Nginx Full'
+$ sudo systemctl enable SPXLB-logServer
+$ sudo systemctl start SPXLB-logServer
 ```
 
 ## Misc
@@ -40,8 +60,8 @@ $ systemctl start SPXLB-logServer
 #### Disable & Stop:
 
 ```bash
-systemctl disable $ServiceName
-systemctl stop $ServiceName
+sudo systemctl disable $ServiceName
+sudo systemctl stop $ServiceName
 ```
 
 #### Check status:
