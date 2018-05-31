@@ -1,6 +1,10 @@
-from time import time
+"""
+Run the bot and start everything
+"""
+
 # Script has started, get time (for startup time) and show user we have started
 # Do this before other imports as they can take a few seconds
+from time import time
 startupTime = time()
 print("Init started")
 
@@ -9,17 +13,11 @@ import logging
 import discord
 from os import path
 
-# Do this before other imports as some local modules use logging when imported
-# Direct logging to file, only log INFO level and above
-logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "bot.log")
-handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
-handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s:%(funcName)s: %(message)s"))
-logging.basicConfig(level=logging.INFO, handlers=[handler])
+# Setup logging stuff
+from modules import logSetup
+logSetup.setup()
 
-# Change discord to only log WARNING level and above
-logging.getLogger("discord").setLevel(logging.WARNING)
-
-# Local modules
+# Import everything else (once logging is set up)
 from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
 from modules.discordUtils import safeSend, safeSendLaunchInfo
 

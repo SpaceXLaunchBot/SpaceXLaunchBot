@@ -52,7 +52,6 @@ except FileNotFoundError:
     logger.warning("data.pkl not found, saving default localData")
     saveLocalDataSync()
 
-
 """
 Load local config file and create a dictionary that can be accessed by everything
 that imports this module

@@ -2,5 +2,6 @@
     "commandPrefix": "!",
     "apiCheckInterval": 15,
     "launchNotificationDelta": 30,
-    "reaperInterval": 60
+    "reaperInterval": 60,
+    "logFormat": "%(asctime)s : %(levelname)s : %(name)s.%(funcName)s : %(message)s"
 }

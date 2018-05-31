@@ -4,6 +4,7 @@ Embeds and functions for dealing with errors
 
 from discord import Embed
 import logging
+import sys
 
 from modules.colours import hexColours
 
