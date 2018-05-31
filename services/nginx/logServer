@@ -4,6 +4,6 @@ server {
 
     location / {
         include uwsgi_params;
-        uwsgi_pass unix:/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer/logServer.sock;
+        uwsgi_pass unix:/tmp/logServer.sock;
     }
 }

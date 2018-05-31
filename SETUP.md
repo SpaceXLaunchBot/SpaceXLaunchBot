@@ -1,6 +1,6 @@
 # Settup up SpaceX-Launch-Bot & logServer on a clean install of Ubuntu 16+
 
-In all steps (and SystemD files) replace `YOUR-USERNAME` and `YOUR-TOKEN` with their corresponding values
+In all steps, SystemD files, and NGINX files replace `YOUR-USERNAME`, `SERVER-IP`, and `YOUR-TOKEN` with their corresponding values
 
 ## Steps in order:
 
@@ -49,10 +49,10 @@ $ sudo ln -s /etc/nginx/sites-available/logServer /etc/nginx/sites-enabled
 $ sudo nginx -t
 
 # Enable and start the log webserver
-$ sudo systemctl restart nginx
-$ sudo ufw allow 'Nginx Full'
 $ sudo systemctl enable SPXLB-logServer
 $ sudo systemctl start SPXLB-logServer
+$ sudo ufw allow 'Nginx Full'
+$ sudo systemctl restart nginx
 ```
 
 ## Misc

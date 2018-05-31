@@ -7,7 +7,7 @@ After=network-online.target
 [Service]
 # Service stuff
 User=YOUR-USERNAME
-Type=idle
+Group=www-data
 WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer
 ExecStart=/usr/local/bin/uwsgi --ini logServer.ini
 Restart=always
