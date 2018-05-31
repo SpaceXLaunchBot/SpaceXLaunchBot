@@ -4,7 +4,7 @@ In all steps, SystemD files, and NGINX files replace `YOUR-USERNAME`, `SERVER-IP
 
 ## Steps in order:
 
-SSH into your server as the user you want to install this under (**not** root), then execute the following commands (reading the comments as you go):
+SSH into your server as root, then execute the following commands (reading the comments as you go):
 
 (lines starting with `$` are showing a new command)
 
