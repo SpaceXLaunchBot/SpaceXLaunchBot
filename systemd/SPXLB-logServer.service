@@ -1,0 +1,18 @@
+[Unit]
+Description=SpaceX-Launch-Bot log web server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+# Service stuff
+User=YOUR-USERNAME
+Type=idle
+# -u otherwise journal wont show print() output
+ExecStart=/usr/bin/python3 -u /home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer/run.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

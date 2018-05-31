@@ -1,3 +1,4 @@
+from time import time
 from os import path
 import re
 
@@ -30,8 +31,11 @@ def tailLog(n):
     currentMessage = []
     entriesRead = 0  # The amount of individual log entries read
 
-    with open(logFilePath, "r") as logFile:
-        linesToRead = logFile.readlines()
+    try:
+        with open(logFilePath, "r") as logFile:
+            linesToRead = logFile.readlines()
+    except FileNotFoundError:
+        return logEntry("", "CRITICAL", "", "Log file does not exist")
 
     for line in reversed(linesToRead):
         # Get parts of log entry
