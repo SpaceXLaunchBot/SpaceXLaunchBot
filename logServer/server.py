@@ -4,7 +4,6 @@ Start the server
 
 from flask import Flask, render_template
 from logParser import tailLog
-import ipgetter
 import logging
 
 app = Flask(__name__)
