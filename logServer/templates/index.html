@@ -1,0 +1,11 @@
+<title>SpaceX-Launch-Bot Log</title>
+<table>
+{% for entry in logEntries %}
+  <tr>
+    <th>{{entry.time}}</th>
+    <th>{{entry.level}}</th>
+    <th>{{entry.route}}</th>
+    <th>{{entry.message}}</th>
+  </tr>
+{% endfor %}
+</table>
