@@ -46,7 +46,7 @@ print("\nCopying variables to associated files")
 
 replacePlaceholderInFiles(
     usernameFiles,
-    "YOUR-USERNAME,
+    "YOUR-USERNAME",
     username
 )
 replacePlaceholderInFiles(
