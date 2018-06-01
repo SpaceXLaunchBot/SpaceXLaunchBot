@@ -28,8 +28,8 @@ dblTokenFiles = [path.join("services", "systemd", "SLB.service")]
 # Get needed variables
 username = getuser()
 externalIP = request.urlopen("https://ident.me").read().decode("utf8")
-discordToken = input("Input your discord token\n>> ")
-dblToken = input("Input your discord bot list token\n>> ")
+discordToken = input("Input your discord token\n>> ").strip()
+dblToken = input("Input your discord bot list token\n>> ").strip()
 
 print(f"""
 Using:
