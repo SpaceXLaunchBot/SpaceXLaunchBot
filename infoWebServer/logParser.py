@@ -20,25 +20,16 @@ def tailLog(n):
     logEntry objects
     """
     logObjects = []
-
-    """
-    Since we are reading the log in reverse order, logs that have multi-line
-    entries will need to be built up over the lines they span, then added into
-    a logEntry object when the start of that log entry is found. currentMessage
-    will hold all of the lines in that multi-line entry until the start of the
-    entry is found, it is then join()ed into the logEntry obj and reset to []
-    """
-    currentMessage = []
     entriesRead = 0  # The amount of individual log entries read
 
     try:
         with open(logFilePath, "r") as logFile:
-            linesToRead = logFile.readlines()
+            # Only get last $n lines
+            linesToRead = logFile.readlines()[-n:]
     except FileNotFoundError:
         return logEntry("", "CRITICAL", "", "Log file does not exist")
 
-    for line in reversed(linesToRead):
-        # Get parts of log entry
+    for line in linesToRead:
         line = line.strip()
 
         # If new log entry
@@ -46,28 +37,16 @@ def tailLog(n):
             if entriesRead == n:
                 break
             
+            # Get parts of log entry and create the logEntry object
             lineInfo = line.split(logFileSplitter)
-            """
-            If there were multiple lines to this log message then concat them
-            all now and append them to the current message section of the line
-            """
-            lineInfo[-1] += " " + " ".join(currentMessage)
-            currentMessage = []
-
             logObjects.append(logEntry(*lineInfo))
             entriesRead += 1
         
-        # Else this line is part of the next upcoming log entry
+        # Else this line is part of the previous log entry
         else:
-            """
-            Insert this line of text into the currentMessage list. Inserted at
-            the start so multi-line entries aren't displayed backwards, as we
-            are reading the message(s) in reverse order
-            """
-            currentMessage.insert(0, line)
+            if len(logObjects) == 0:
+                # We have started reading the file at a multi-line message
+                continue
+            logObjects[-1].message += " " + line
 
-    """
-    We read in reverse order to get the last $n entries, so now reverse back
-    into chronological order
-    """
-    return reversed(logObjects)
+    return logObjects
