@@ -21,7 +21,7 @@ $ sudo apt upgrade -y
 # gcc because uWSGI needs it to build
 $ sudo apt install git nginx python3-distutils gcc -y
 
-# Install DO monitoring
+# Install Digital Ocean monitoring (if using DO as hosting)
 curl -sSL https://agent.digitalocean.com/install.sh | sh
 
 $ mkdir ~/files && cd ~/files
