@@ -49,8 +49,8 @@ $ sudo chmod 644 /lib/systemd/system/SLB-infoWebServer.service
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 # Create a link so infoWebServer is enabled but also still in the available dir
 $ sudo ln -s /etc/nginx/sites-available/infoWebServer /etc/nginx/sites-enabled
-# Make sure NGINX is allowed in the firewall
-$ sudo ufw allow 'Nginx Full'
+# Make sure NGINX HTTP connections are allowed in the firewall
+$ sudo ufw allow 'Nginx HTTP'
 
 # Set scripts to be executable and boot everything up
 $ sudo chmod +x -R scripts
