@@ -1,6 +1,6 @@
 # Settup up SpaceX-Launch-Bot & infoWebServer on a clean install of Ubuntu 16+
 
-In all steps, SystemD files, ini files, and NGINX files replace `YOUR-USERNAME`, `SERVER-IP`, and `YOUR-TOKEN` with their corresponding values
+In all steps replace `YOUR-USERNAME` with the username that the service(s) will be run under
 
 ## Steps in order:
 
@@ -36,20 +36,14 @@ $ rm get-pip.py
 $ git clone https://github.com/r-spacex/SpaceX-Launch-Bot.git
 $ cd SpaceX-Launch-Bot
 
-# Edit source/config/config.json with appopriate values
-# Edit the files in /services with appropriate values 
-# Edit the ini file in infoWebServer with appropriate values
+# Now you can edit source/config/config.json with your chosen settings
 
 $ sudo pip3 install -r requirements.txt
+$ python3 setup.py
+
 $ sudo cp -R services/systemd/. /lib/systemd/system/.
 $ sudo chmod 644 /lib/systemd/system/SLB.service
 $ sudo chmod 644 /lib/systemd/system/SLB-infoWebServer.service
-
-# Actually enable and start the bot
-# If you are using a previous data.pkl, MAKE SURE IT IS IN /resources BEFORE STARTING
-$ sudo systemctl daemon-reload
-$ sudo systemctl enable SLB
-$ sudo systemctl start SLB
 
 # Install web server stuff
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
@@ -57,13 +51,13 @@ $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 $ sudo ln -s /etc/nginx/sites-available/infoWebServer /etc/nginx/sites-enabled
 # Check for errors
 $ sudo nginx -t
-
-# Enable and start the log webserver
-$ sudo systemctl enable SLB-infoWebServer
-$ sudo systemctl start SLB-infoWebServer
-# Make sure NGINX is allowed in our firewall
+# Make sure NGINX is allowed in the firewall
 $ sudo ufw allow 'Nginx Full'
-$ sudo systemctl restart nginx
+
+# Set scripts to be executable and boot everything up
+$ sudo chmod +x -R scripts
+$ cd scripts
+$ ./startAll
 ```
 
 ## Misc
@@ -76,3 +70,4 @@ $ systemctl status $serviceName
 $ journalctl -u $serviceName
 # or
 $ service $serviceName status
+```
