@@ -6,6 +6,13 @@ from urllib import request
 from os import path
 import sys
 
+def replacePlaceholderInFiles(filePathList, placeHolder, replaceWith):
+    for path in filePathList:
+        with open(path, "r") as fin:
+            body = fin.read()
+        with open(path, "w") as fout:
+            fout.write(body.replace(placeHolder, replaceWith))
+
 """
 Each array contains the paths to files that need said values replacing
 """
@@ -21,8 +28,8 @@ dblTokenFiles = [path.join("services", "systemd", "SLB.service")]
 # Get needed variables
 username = getuser()
 externalIP = request.urlopen("https://ident.me").read().decode("utf8")
-discordToken = input("Input your discord token\n>> ")
-dblToken = input("Input your discord bot list token\n>> ")
+discordToken = input("Input your discord token\n>> ").strip()
+dblToken = input("Input your discord bot list token\n>> ").strip()
 
 print(f"""
 Using:
@@ -37,28 +44,25 @@ if input("Is this correct? y/n ").strip().lower() == "n":
 
 print("\nCopying variables to associated files")
 
-for path in usernameFiles:
-    with open(path, "r") as fin:
-        body = fin.read()
-    with open(path, "w") as fout:
-        fout.write(body.replace("YOUR-USERNAME", username))
-
-for path in externalIPFiles:
-    with open(path, "r") as fin:
-        body = fin.read()
-    with open(path, "w") as fout:
-        fout.write(body.replace("SERVER-IP", externalIP))
-
-for path in discordTokenFiles:
-    with open(path, "r") as fin:
-        body = fin.read()
-    with open(path, "w") as fout:
-        fout.write(body.replace("DISCORD-TOKEN", discordToken))
-
-for path in dblTokenFiles:
-    with open(path, "r") as fin:
-        body = fin.read()
-    with open(path, "w") as fout:
-        fout.write(body.replace("DBL-TOKEN", dblToken))
+replacePlaceholderInFiles(
+    usernameFiles,
+    "YOUR-USERNAME",
+    username
+)
+replacePlaceholderInFiles(
+    externalIPFiles,
+    "SERVER-IP",
+    externalIP
+)
+replacePlaceholderInFiles(
+    discordTokenFiles,
+    "DISCORD-TOKEN",
+    discordToken
+)
+replacePlaceholderInFiles(
+    dblTokenFiles,
+    "DBL-TOKEN",
+    dblToken
+)
 
 print("\nDone")
