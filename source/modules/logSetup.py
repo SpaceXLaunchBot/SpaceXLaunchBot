@@ -12,7 +12,7 @@ def setup():
 
     # Do this before other imports as some local modules use logging when imported
     # Direct logging to file, only log INFO level and above
-    logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "..", "bot.log")
+    logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "..", "logs", "bot.log")
     handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
     handler.setFormatter(logging.Formatter(logFormat))
     logging.basicConfig(level=logging.INFO, handlers=[handler])

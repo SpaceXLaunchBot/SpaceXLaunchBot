@@ -1,4 +1,6 @@
-A simple webserver that parses the bots log file into HTML and then serves it over HTTP
+# infoWebServer
+
+A simple webserver for showing information about SpaceX-Launch-Bot. Currently just parses the bots log file into HTML and then serves it over HTTP
 
 This allows me to easily see what is happening with the bot without having to SSH into my server
 

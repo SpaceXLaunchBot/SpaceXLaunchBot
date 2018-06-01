@@ -1,5 +1,5 @@
 [Unit]
-Description=SpaceX-Launch-Bot log web server
+Description=SpaceX-Launch-Bot information web server
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
@@ -8,8 +8,8 @@ After=network-online.target
 # Service stuff
 User=YOUR-USERNAME
 Group=www-data
-WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/logServer
-ExecStart=/usr/local/bin/uwsgi --ini logServer.ini
+WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/infoWebServer
+ExecStart=/usr/local/bin/uwsgi --ini infoWebServer.ini
 Restart=always
 RestartSec=10
 StandardOutput=journal
