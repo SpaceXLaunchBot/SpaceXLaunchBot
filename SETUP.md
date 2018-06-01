@@ -18,8 +18,8 @@ $ sudo apt update
 $ sudo apt upgrade -y
 
 # distutils because get-pip needs it
-# gcc because uWSGI needs it to build
-$ sudo apt install git nginx python3-distutils gcc -y
+# gcc & python3-dev because uWSGI needs them to build
+$ sudo apt install git nginx python3-distutils python3-dev gcc -y
 
 # Install Digital Ocean monitoring (if using DO as hosting)
 curl -sSL https://agent.digitalocean.com/install.sh | sh
