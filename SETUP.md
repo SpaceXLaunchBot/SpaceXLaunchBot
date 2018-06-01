@@ -1,6 +1,6 @@
 # Settup up SpaceX-Launch-Bot & infoWebServer on a clean install of Ubuntu 16+
 
-In all steps, SystemD files, and NGINX files replace `YOUR-USERNAME`, `SERVER-IP`, and `YOUR-TOKEN` with their corresponding values
+In all steps, SystemD files, ini files, and NGINX files replace `YOUR-USERNAME`, `SERVER-IP`, and `YOUR-TOKEN` with their corresponding values
 
 ## Steps in order:
 
@@ -22,7 +22,7 @@ $ sudo apt upgrade -y
 $ sudo apt install git nginx python3-distutils python3-dev gcc -y
 
 # Install Digital Ocean monitoring (if using DO as hosting)
-curl -sSL https://agent.digitalocean.com/install.sh | sh
+$ curl -sSL https://agent.digitalocean.com/install.sh | sh
 
 $ mkdir ~/files && cd ~/files
 
@@ -68,13 +68,11 @@ $ sudo systemctl restart nginx
 
 ## Misc
 
-#### Disable & Stop:
-
-```bash
-sudo systemctl disable $ServiceName
-sudo systemctl stop $ServiceName
-```
-
 #### Check status:
 
-`systemctl status $ServiceName` *or* `journalctl -u $ServiceName`
+```bash
+$ systemctl status $serviceName
+# or
+$ journalctl -u $serviceName
+# or
+$ service $serviceName status
