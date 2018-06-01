@@ -16,8 +16,11 @@ $ usermod -aG sudo YOUR-USERNAME
 $ su - YOUR-USERNAME
 $ sudo apt update
 $ sudo apt upgrade -y
-$ sudo apt install git nginx -y
+$ sudo apt install git nginx python3-distutils -y
 $ mkdir ~/files && cd ~/files
+
+# Install DO monitoring
+curl -sSL https://agent.digitalocean.com/install.sh | sh
 
 # Install pip the proper way
 # https://pip.pypa.io/en/stable/installing/
