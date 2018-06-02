@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import asyncio
 import logging
 
+from redisClient import redisConn
+
 from modules import embedGenerators, spacexAPI, utils, fs
 from modules.discordUtils import safeSend, safeSendLaunchInfo
 

@@ -17,6 +17,10 @@ from os import path
 from modules import logSetup
 logSetup.setup()
 
+# Setup and start redis connection
+from redisClient import startRedisConnection
+redisConn = startRedisConnection()
+
 # Import everything else (once logging is set up)
 from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
 from modules.discordUtils import safeSend, safeSendLaunchInfo
