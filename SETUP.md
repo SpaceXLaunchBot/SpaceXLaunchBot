@@ -19,12 +19,27 @@ $ sudo apt upgrade -y
 
 # distutils because get-pip needs it
 # gcc & python3-dev because uWSGI needs them to build
-$ sudo apt install git nginx python3-distutils python3-dev gcc -y
+# make & tcl for building redis & running tests
+$ sudo apt install git nginx python3-distutils python3-dev gcc make tcl -y
 
 # Install Digital Ocean monitoring (if using DO as hosting)
 $ curl -sSL https://agent.digitalocean.com/install.sh | sh
 
-$ mkdir ~/files && cd ~/files
+# Install Redis
+$ cd /tmp
+$ curl -O http://download.redis.io/redis-stable.tar.gz
+$ tar xzvf redis-stable.tar.gz
+$ cd redis-stable
+$ make
+$ make test
+$ sudo make install
+$ cd .. && rm -rf redis-stable
+
+# For putting Redis .conf file(s) in
+$ sudo mkdir /etc/redis
+
+# We "install" the bot to /opt
+$ cd /opt
 
 # Install pip the proper way
 # https://pip.pypa.io/en/stable/installing/
@@ -41,6 +56,7 @@ $ cd SpaceX-Launch-Bot
 $ sudo pip3 install -r requirements.txt
 $ python3 setup.py
 
+# Copy systemd files over
 $ sudo cp -R services/systemd/. /lib/systemd/system/.
 $ sudo chmod 644 /lib/systemd/system/SLB.service
 $ sudo chmod 644 /lib/systemd/system/SLB-infoWebServer.service
