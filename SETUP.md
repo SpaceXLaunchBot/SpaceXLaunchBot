@@ -25,10 +25,10 @@ $ sudo apt install git nginx python3-distutils python3-dev gcc make tcl -y
 # Install Digital Ocean monitoring (if using DO as hosting)
 $ curl -sSL https://agent.digitalocean.com/install.sh | sh
 
-# Make sure NGINX HTTP connections are allowed in the firewall
-$ sudo ufw allow 'Nginx HTTP'
-# Make sure SSH connections are allowed
+# Make sure SSH connections are allowed in the firewall
 $ sudo ufw allow ssh
+# Make sure NGINX HTTP connections are allowed
+$ sudo ufw allow 'Nginx HTTP'
 # Turn on the firewall (you may need to reconnect)
 $ sudo ufw enable
 
@@ -44,6 +44,16 @@ $ cd .. && rm -rf redis-stable
 
 # For putting Redis .conf file(s) in
 $ sudo mkdir /etc/redis
+
+# Set Redis user
+$ sudo adduser --system --group --no-create-home redis
+
+# This is where we dump the DB to 
+$ sudo mkdir /var/lib/redis
+$ sudo chown redis:redis /var/lib/redis
+
+# Regular users should not be able to access this location
+$ sudo chmod 770 /var/lib/redis
 
 # We "install" the bot to /opt
 $ cd /opt
@@ -63,10 +73,14 @@ $ cd SpaceX-Launch-Bot
 $ sudo pip3 install -r requirements.txt
 $ python3 setup.py
 
-# Copy systemd files over
-$ sudo cp -R services/systemd/. /lib/systemd/system/.
-$ sudo chmod 644 /lib/systemd/system/SLB.service
-$ sudo chmod 644 /lib/systemd/system/SLB-infoWebServer.service
+# Everyone can read the services, only current user can write
+$ sudo chmod -R 644 services/systemd
+
+# Copy systemd files over (-p preserves the perms we just set)
+$ sudo cp -R -p services/systemd/. /lib/systemd/system/.
+
+# Copy Redis stuff over
+$ sudo cp -R services/redis/. /etc/redis
 
 # Install web server stuff
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
