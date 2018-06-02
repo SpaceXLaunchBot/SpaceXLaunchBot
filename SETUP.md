@@ -25,6 +25,13 @@ $ sudo apt install git nginx python3-distutils python3-dev gcc make tcl -y
 # Install Digital Ocean monitoring (if using DO as hosting)
 $ curl -sSL https://agent.digitalocean.com/install.sh | sh
 
+# Make sure NGINX HTTP connections are allowed in the firewall
+$ sudo ufw allow 'Nginx HTTP'
+# Make sure SSH connections are allowed
+$ sudo ufw allow ssh
+# Turn on the firewall (you may need to reconnect)
+$ sudo ufw enable
+
 # Install Redis
 $ cd /tmp
 $ curl -O http://download.redis.io/redis-stable.tar.gz
@@ -65,8 +72,6 @@ $ sudo chmod 644 /lib/systemd/system/SLB-infoWebServer.service
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 # Create a link so infoWebServer is enabled but also still in the available dir
 $ sudo ln -s /etc/nginx/sites-available/infoWebServer /etc/nginx/sites-enabled
-# Make sure NGINX HTTP connections are allowed in the firewall
-$ sudo ufw allow 'Nginx HTTP'
 
 # Set scripts to be executable and boot everything up
 $ sudo chmod +x -R scripts
