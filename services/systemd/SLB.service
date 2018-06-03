@@ -10,7 +10,7 @@ Environment="SpaceXLaunchBotToken=DISCORD-TOKEN" "dblToken=DBL-TOKEN"
 # Service stuff
 User=YOUR-USERNAME
 Type=idle
-WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/source
+WorkingDirectory=/opt/SpaceX-Launch-Bot/source
 # -u otherwise journal wont show print() output
 ExecStart=/usr/bin/python3 -u main.py
 Restart=always
