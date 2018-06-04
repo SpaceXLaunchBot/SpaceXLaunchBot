@@ -9,3 +9,4 @@ In order:
 - [ ] Re-write setup.py to use new service files (username not needed?)
 - [ ] Does redis.conf file need certain permissions?
 - [ ] Re-write /tools
+- [ ] Show in launch information notifications what has changed since the last notification
