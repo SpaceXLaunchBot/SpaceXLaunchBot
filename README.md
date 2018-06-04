@@ -21,7 +21,7 @@ Command|Description|Permissions needed
 `!info`|Information about the bot|None
 `!help`|List these commands|None
 
-### Launch notification service
+## Launch notification service
 
 The `!addchannel` comamnd allows admins to "subscribe" channels to the bots launch notification service. This service will send a new message to the channel every time the next upcoming launch has changed (e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different). A notification will also be sent around 15 minutes (not exact, due to technical reasons) before a launch, containing useful links such as the livestream and the press kit
 
