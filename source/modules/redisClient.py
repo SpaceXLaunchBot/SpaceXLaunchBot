@@ -32,6 +32,7 @@ class redisClient(object):
         return await self.r.set(key, value)
 
 def startRedisConnection():
+    # Global so it can be imported after being instanced
     global redisConn
     redisConn = redisClient("/tmp/redis.sock")
     return redisConn
