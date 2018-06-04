@@ -11,6 +11,7 @@ print("Init started")
 # Built-ins and 3rd party modules
 import logging
 import discord
+import pickle
 from os import path
 
 # Setup logging stuff
@@ -49,7 +50,6 @@ async def on_message(message):
     message.content = message.content.lower()
     
     if message.content.startswith(PREFIX + "nextlaunch"):
-        # TODO: Maybe just pull latest embed from localData instead of requesting every time?
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
             launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
