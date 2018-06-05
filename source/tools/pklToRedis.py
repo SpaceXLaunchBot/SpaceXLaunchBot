@@ -13,9 +13,9 @@ with open("data.pkl", "rb") as f:
 
 async def doRedisStuff():
     print("Connecting to /tmp/redis.sock")
-    client = StrictRedis(unix_socket_path="/tmp/redis.sock")
+    redisConn = StrictRedis(unix_socket_path="/tmp/redis.sock")
     print("Connected, flushing db")
-    await client.flushdb()
+    await redisConn.flushdb()
     print("Setting values")
     await redisConn.set("subscribedChannels", localData["subscribedChannels"])
     await redisConn.set("launchNotifSent", localData["launchNotifSent"])
