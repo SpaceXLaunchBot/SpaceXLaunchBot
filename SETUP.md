@@ -108,6 +108,13 @@ $ cd SpaceX-Launch-Bot
 
 Now you can edit `source/config/config.json` with your chosen settings
 
+```bash
+# SLB stands for SpaceX-Launch-Bot
+$ sudo adduser --system --group --no-create-home SLB
+
+$ sudo chown SLB:SLB /opt/SpaceX-Launch-Bot
+```
+
 ### Setup SpaceX-Launch-Bot
 
 ```bash
