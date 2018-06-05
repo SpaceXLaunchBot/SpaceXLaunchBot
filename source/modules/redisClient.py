@@ -34,7 +34,7 @@ class redisClient(object):
         try:
             # Currently accepts strings or objects (includes lists)
             if isinstance(value, str):
-                return await self.r.get(key)
+                return await self.r.set(key)
             # Set an object by serializing
             value = pickle.dumps(value)
             return await self.r.set(key, value)
