@@ -16,25 +16,21 @@ def replacePlaceholderInFiles(filePathList, placeHolder, replaceWith):
 """
 Each array contains the paths to files that need said values replacing
 """
-usernameFiles = [
-    path.join("infoWebServer", "infoWebServer.ini"),
-    path.join("services", "systemd", "SLB.service"),
-    path.join("services", "systemd", "SLB-infoWebServer.service"),
-]
 externalIPFiles = [path.join("services", "nginx", "infoWebServer")]
 discordTokenFiles = [path.join("services", "systemd", "SLB.service")]
 dblTokenFiles = [path.join("services", "systemd", "SLB.service")]
 
-# Get needed variables
-username = getuser()
-externalIP = request.urlopen("https://ident.me").read().decode("utf8")
-discordToken = input("Input your discord token\n>> ").strip()
-dblToken = input("Input your discord bot list token\n>> ").strip()
+# Get variables
+externalIP = input("Input the IP you want infoWebServer to bind to (leave blank for auto)\n>>")
+if externalIP.strip() == "":
+    externalIP = request.urlopen("https://ident.me").read().decode("utf8")
+
+discordToken = input("Input your Discord token\n>> ").strip()
+dblToken = input("Input your Discord bot list token\n>> ").strip()
 
 print(f"""
 Using:
-username : {username}
-ip       : {externalIP}
+bind IP       : {externalIP}
 discord token : {discordToken[0:10]}...{discordToken[-10:]}
 dbl token     : {dblToken[0:10]}...{dblToken[-10:]}
 """)
@@ -44,11 +40,6 @@ if input("Is this correct? y/n ").strip().lower() == "n":
 
 print("\nCopying variables to associated files")
 
-replacePlaceholderInFiles(
-    usernameFiles,
-    "YOUR-USERNAME",
-    username
-)
 replacePlaceholderInFiles(
     externalIPFiles,
     "SERVER-IP",
