@@ -5,8 +5,10 @@ In order:
 - [x] Re-write setup.md
 - [x] Re-write /services files to use /opt
 - [x] Refactor main.py to use Redis instead of fs.localData
-- [ ] Refactor backgroundTasks.py to use Redis instead of fs.localData
+- [x] Refactor backgroundTasks.py to use Redis instead of fs.localData
 - [ ] Re-write setup.py to use new service files (username not needed?)
-- [ ] Does redis.conf file need certain permissions?
+- [ ] Check if redis.conf file needs certain permissions
 - [ ] Re-write /tools
+- [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
 - [ ] Show in launch information notifications what has changed since the last notification
+- [ ] Deal with errors that can occur from Redis (e.g. losing connection)

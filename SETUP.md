@@ -63,7 +63,8 @@ $ cd redis-stable
 $ make
 $ make test
 $ sudo make install
-$ cd .. && rm -rf redis-stable
+$ cd ..
+$ rm -rf redis-stable redis-stable.tar.gz
 ```
 
 ### Setup Redis

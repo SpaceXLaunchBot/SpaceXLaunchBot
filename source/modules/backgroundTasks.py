@@ -29,6 +29,13 @@ async def notificationTask(client):
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed:
+        
+        # Gather latest data from redis
+        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        # launchNotifSent is a string so it can be saved to and loaded from Redis easily
+        launchNotifSent = await redisConn.get("launchNotifSent")
+        latestLaunchInfoEmbedDict = await redisConn.get("latestLaunchInfoEmbedDict", obj=True)
+
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
             logger.error("nextLaunchJSON returned 0, skipping this cycle")
@@ -38,19 +45,18 @@ async def notificationTask(client):
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
-            with await fs.localDataLock:
-                if fs.localData["latestLaunchInfoEmbedDict"] == launchInfoEmbedDict:
-                    pass
-                else:
-                    logger.info("Launch info changed, sending notifications")
+            if latestLaunchInfoEmbedDict == launchInfoEmbedDict:
+                pass
+            else:
+                logger.info("Launch info changed, sending notifications")
 
-                    fs.localData["launchNotifSent"] = False
-                    fs.localData["latestLaunchInfoEmbedDict"] = launchInfoEmbedDict
+                launchNotifSent = "False"
+                latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
-                    # new launch found, send all "subscribed" channel the embed
-                    for channelID in fs.localData["subscribedChannels"]:
-                        channel = client.get_channel(channelID)
-                        await safeSendLaunchInfo(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
+                # new launch found, send all "subscribed" channel the embed
+                for channelID in subbedChannelIDs:
+                    channel = client.get_channel(channelID)
+                    await safeSendLaunchInfo(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             launchTime = nextLaunchJSON["launch_date_unix"]
             if await utils.isInt(launchTime):
@@ -62,36 +68,37 @@ async def notificationTask(client):
 
                 # If the launch time is within the next hour
                 if nextHour > launchTime:
-                    with await fs.localDataLock:
-                        if fs.localData["launchNotifSent"] == False:
+                    if launchNotifSent == "False":
 
-                            logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA} minutes, sending notification")
-                            fs.localData["launchNotifSent"] = True
+                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA} minutes, sending notification")
+                        launchNotifSent = "True"
 
-                            notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
-                            for channelID in fs.localData["subscribedChannels"]:
-                                channel = client.get_channel(channelID)
-                                await safeSend(client, channel, embed=notifEmbed)
+                        notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
+                        for channelID in subbedChannelIDs:
+                            channel = client.get_channel(channelID)
+                            await safeSend(client, channel, embed=notifEmbed)
 
-        with await fs.localDataLock:
-            await fs.saveLocalData()
+        # Save any changed data to redis
+        await redisConn.set("launchNotifSent", launchNotifSent)
+        await redisConn.set("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict)
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
 
 async def reaper(client):
     """
-    Every $reaperInterval check for non-existant (dead) channels in localData["subscribedChannels"]
+    Every $reaperInterval check for non-existant (dead) channels in subbedChannelIDs
     and remove them
     Essentially garbage collection for the channel list
     """
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed:
-        with await fs.localDataLock:
-            for channelID in fs.localData["subscribedChannels"]:
-                # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
-                if client.get_channel(channelID) == None:
-                    # No duplicate elements in the list so remove(value) will always work
-                    fs.localData["subscribedChannels"].remove(channelID)
-                    logger.info(f"{channelID} is not a valid ID, removing from localData")
+        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        for channelID in subbedChannelIDs:
+            # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
+            if client.get_channel(channelID) == None:
+                # No duplicate elements in the list so remove(value) will always work
+                subbedChannelIDs.remove(channelID)
+                logger.info(f"{channelID} is not a valid ID, removing from db")
+        await redisConn.set("subscribedChannels", subbedChannelIDs)
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)
