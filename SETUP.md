@@ -112,7 +112,8 @@ Now you can edit `source/config/config.json` with your chosen settings
 # SLB stands for SpaceX-Launch-Bot
 $ sudo adduser --system --group --no-create-home SLB
 
-$ sudo chown SLB:SLB /opt/SpaceX-Launch-Bot
+# Everyone can read and write
+$ sudo chmod -R 777 /opt/SpaceX-Launch-Bot
 ```
 
 ### Setup SpaceX-Launch-Bot

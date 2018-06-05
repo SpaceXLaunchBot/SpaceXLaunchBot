@@ -8,7 +8,7 @@ After=network-online.target
 # Env var
 Environment="SpaceXLaunchBotToken=DISCORD-TOKEN" "dblToken=DBL-TOKEN"
 # Service stuff
-User=YOUR-USERNAME
+User=SLB
 Type=idle
 WorkingDirectory=/opt/SpaceX-Launch-Bot/source
 # -u otherwise journal wont show print() output
