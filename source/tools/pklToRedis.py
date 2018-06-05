@@ -17,9 +17,9 @@ async def doRedisStuff():
     print("Connected, flushing db")
     await redisConn.flushdb()
     print("Setting values")
-    await redisConn.set("subscribedChannels", localData["subscribedChannels"])
+    await redisConn.set("subscribedChannels", pickle.dumps(localData["subscribedChannels"]))
     await redisConn.set("launchNotifSent", localData["launchNotifSent"])
-    await redisConn.set("latestLaunchInfoEmbedDict", localData["latestLaunchInfoEmbedDict"])
+    await redisConn.set("latestLaunchInfoEmbedDict", pickle.dumps(localData["latestLaunchInfoEmbedDict"]))
     print("Done")
 
 loop = asyncio.get_event_loop()
