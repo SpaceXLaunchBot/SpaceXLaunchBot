@@ -9,9 +9,12 @@ In order:
 - [x] Re-write setup.py to use new service files (username not needed?)
 - [x] Check if redis.conf file needs certain permissions
 - [x] Re-write /tools
+- [x] Work out why NGINX isn't connecting to infoWebServer
 - [ ] Make sure that `subscribedChannels` is fully returned from Redis
-- [ ] Work out why NGINX isn't connecting to infoWebServer
-- [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
-- [ ] Show in launch information notifications what has changed since the last notification
 - [ ] Deal with errors that can occur from Redis (e.g. losing connection)
 - [ ] Fix permission error for Redis logging
+
+Not redis branch related:
+
+- [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
+- [ ] Show in launch information notifications what has changed since the last notification
