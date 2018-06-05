@@ -14,34 +14,48 @@ from aredis import StrictRedis
 import logging
 import pickle
 
+from modules import errors
+
 logger = logging.getLogger(__name__)
 
-class redisClient(object):
-    def __init__(self, socketPath):
-        self.r = StrictRedis(unix_socket_path=socketPath)
+class redisClient(StrictRedis):
+    def __init__(self, unix_socket_path):
+        super().__init__(unix_socket_path=unix_socket_path)
         logger.info(f"Connected to {socketPath}")
 
-    async def get(self, key, obj=False):
+    async def safeGet(self, key):
         try:
-            if obj:
-                # Return an un-serialized object
-                return pickle.loads(await self.r.get(key))
-            return await self.r.get(key)
+            return await self.get(key)
         except Exception as e:
-            logger.error(f"Failed to get data from Redis: {type(e).__name__}: {e}")
+            logger.error(f"Failed to safeGet data from Redis: {type(e).__name__}: {e}")
             return 0
 
-    async def set(self, key, value):
+    async def safeSet(self, key, value, serialize=False):
         try:
-            # Currently accepts strings or objects (includes lists)
-            if isinstance(value, str):
-                return await self.r.set(key, value)
-            # Set an object by serializing
-            value = pickle.dumps(value)
-            return await self.r.set(key, value)
+            if serialize:
+                return await self.set(key, pickle.dumps(value))    
+            return await self.set(key, value)
         except Exception as e:
-            logger.error(f"Failed to set data in Redis: {type(e).__name__}: {e}")
+            logger.error(f"Failed to safeSet data in Redis: {type(e).__name__}: {e}")
             return 0
+    
+    async def getSubscribedChannelIDs(self):
+        channels = await self.safeGet("subscribedChannels")
+        if channels:
+            return pickle.loads(channels)
+        return []  # Cannot get any subscribed channels so return empty
+    
+    async def getLaunchNotifSent(self):
+        lns = await self.safeGet("launchNotifSent")
+        if lns:
+            return lns
+        return "False"
+    
+    async def getLatestLaunchInfoEmbedDict(self):
+        llied = await self.safeGet("latestLaunchInfoEmbedDict")
+        if llied:
+            return pickle.loads(llied)
+        return 0
 
 def startRedisConnection():
     # Global so it can be imported after being set to a redisClient instance

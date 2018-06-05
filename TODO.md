@@ -10,8 +10,8 @@ In order:
 - [x] Check if redis.conf file needs certain permissions
 - [x] Re-write /tools
 - [x] Work out why NGINX isn't connecting to infoWebServer
+- [x] Deal with errors that can occur from Redis (e.g. losing connection)
 - [ ] Make sure that `subscribedChannels` is fully returned from Redis
-- [ ] Deal with errors that can occur from Redis (e.g. losing connection)
 - [ ] Fix permission error for Redis logging
 
 Not redis branch related:
