@@ -6,7 +6,7 @@ In order:
 - [x] Re-write /services files to use /opt
 - [x] Refactor main.py to use Redis instead of fs.localData
 - [x] Refactor backgroundTasks.py to use Redis instead of fs.localData
-- [ ] Re-write setup.py to use new service files (username not needed?)
+- [x] Re-write setup.py to use new service files (username not needed?)
 - [ ] Check if redis.conf file needs certain permissions
 - [ ] Re-write /tools
 - [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
