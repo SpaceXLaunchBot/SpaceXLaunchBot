@@ -17,10 +17,10 @@ import pickle
 logger = logging.getLogger(__name__)
 
 class redisClient(object):
-    def __init__(socketPath):
+    def __init__(self, socketPath):
         self.r = StrictRedis(unix_socket_path=socketPath)
 
-    async def get(key, obj=False):
+    async def get(self, key, obj=False):
         try:
             if obj:
                 # Return an un-serialized object
@@ -30,7 +30,7 @@ class redisClient(object):
             logger.error(f"Failed to get data from Redis: {type(e).__name__}: {e}")
             return 0
 
-    async def set(key, value):
+    async def set(self, key, value):
         try:
             # Currently accepts strings or objects (includes lists)
             if isinstance(value, str):

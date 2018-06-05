@@ -18,7 +18,7 @@ from modules import logSetup
 logSetup.setup()
 
 # Setup and start redis connection
-from redisClient import startRedisConnection
+from modules.redisClient import startRedisConnection
 redisConn = startRedisConnection()
 
 # Import everything else (once logging is set up)

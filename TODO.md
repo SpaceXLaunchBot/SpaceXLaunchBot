@@ -12,3 +12,4 @@ In order:
 - [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
 - [ ] Show in launch information notifications what has changed since the last notification
 - [ ] Deal with errors that can occur from Redis (e.g. losing connection)
+- [ ] Fix permission error for Redis logging

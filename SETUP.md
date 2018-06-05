@@ -100,7 +100,7 @@ The bot is "installed" to `/opt`
 
 ```bash
 $ cd /opt
-$ git clone https://github.com/r-spacex/SpaceX-Launch-Bot.git
+$ sudo git clone https://github.com/r-spacex/SpaceX-Launch-Bot.git
 $ cd SpaceX-Launch-Bot
 ```
 
@@ -112,7 +112,7 @@ Now you can edit `source/config/config.json` with your chosen settings
 
 ```bash
 $ sudo pip3 install -r requirements.txt
-$ python3 setup.py
+$ sudo python3 setup.py
 ```
 
 ### Setup services and system files
