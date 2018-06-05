@@ -79,8 +79,6 @@ $ sudo adduser --system --group --no-create-home redis
 # This is where we dump the DB to 
 $ sudo mkdir /var/lib/redis
 $ sudo chown redis:redis /var/lib/redis
-
-# Regular users should not be able to access this location
 $ sudo chmod 770 /var/lib/redis
 ```
 
