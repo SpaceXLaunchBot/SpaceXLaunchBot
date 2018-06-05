@@ -17,6 +17,10 @@ from os import path
 from modules import logSetup
 logSetup.setup()
 
+# Setup and start redis connection
+from modules.redisClient import startRedisConnection
+redisConn = startRedisConnection()
+
 # Import everything else (once logging is set up)
 from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
 from modules.discordUtils import safeSend, safeSendLaunchInfo
@@ -45,7 +49,6 @@ async def on_message(message):
     message.content = message.content.lower()
     
     if message.content.startswith(PREFIX + "nextlaunch"):
-        # TODO: Maybe just pull latest embed from localData instead of requesting every time?
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
             launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
@@ -56,24 +59,28 @@ async def on_message(message):
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
-        with await fs.localDataLock:
-            if message.channel.id not in fs.localData["subscribedChannels"]:
-                fs.localData["subscribedChannels"].append(message.channel.id)
-                await fs.saveLocalData()
-            else:
-                replyMsg = "This channel is already subscribed to the launch notification service"
+
+        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        if message.channel.id not in subbedChannelIDs:
+            subbedChannelIDs.append(message.channel.id)
+            await redisConn.set("subscribedChannels", subbedChannelIDs)
+        else:
+            replyMsg = "This channel is already subscribed to the launch notification service"
+
         await safeSend(client, message.channel, text=replyMsg)
     
     elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
-        with await fs.localDataLock:
-            try:
-                # No duplicate elements in the list so remove(value) will always work
-                fs.localData["subscribedChannels"].remove(message.channel.id)
-                await fs.saveLocalData()
-            except ValueError:
-                replyMsg = "This channel was not previously subscribed to the launch notification service"
+
+        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        try:
+            # No duplicate elements in the list so remove(value) will always work
+            subbedChannelIDs.remove(message.channel.id)
+            await redisConn.set("subscribedChannels", subbedChannelIDs)
+        except ValueError:
+            replyMsg = "This channel was not previously subscribed to the launch notification service"
+
         await safeSend(client, message.channel, text=replyMsg)
 
     elif message.content.startswith(PREFIX + "info"):
@@ -88,8 +95,7 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    with await fs.localDataLock:
-        totalSubbed = len(fs.localData["subscribedChannels"])
+    totalSubbed = len(await redisConn.get("subscribedChannels", obj=True))
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:

@@ -6,9 +6,9 @@ After=network-online.target
 
 [Service]
 # Service stuff
-User=YOUR-USERNAME
+User=SLB
 Group=www-data
-WorkingDirectory=/home/YOUR-USERNAME/files/SpaceX-Launch-Bot/infoWebServer
+WorkingDirectory=/opt/SpaceX-Launch-Bot/infoWebServer
 ExecStart=/usr/local/bin/uwsgi --ini infoWebServer.ini
 Restart=always
 RestartSec=10

@@ -1,4 +1,6 @@
 sudo systemctl daemon-reload
+sudo systemctl enable redis
+sudo systemctl start redis
 sudo systemctl enable SLB
 sudo systemctl start SLB
 sudo systemctl enable SLB-infoWebServer
