@@ -60,10 +60,10 @@ async def on_message(message):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
 
-        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
         if message.channel.id not in subbedChannelIDs:
             subbedChannelIDs.append(message.channel.id)
-            await redisConn.set("subscribedChannels", subbedChannelIDs)
+            await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
         else:
             replyMsg = "This channel is already subscribed to the launch notification service"
 
@@ -73,11 +73,11 @@ async def on_message(message):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
 
-        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
         try:
             # No duplicate elements in the list so remove(value) will always work
             subbedChannelIDs.remove(message.channel.id)
-            await redisConn.set("subscribedChannels", subbedChannelIDs)
+            await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
         except ValueError:
             replyMsg = "This channel was not previously subscribed to the launch notification service"
 
@@ -95,7 +95,7 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    totalSubbed = len(await redisConn.get("subscribedChannels", obj=True))
+    totalSubbed = len(await redisConn.getSubscribedChannelIDs())
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:

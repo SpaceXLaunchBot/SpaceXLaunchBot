@@ -31,10 +31,13 @@ async def notificationTask(client):
     while not client.is_closed:
         
         # Gather latest data from redis
-        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
         # launchNotifSent is a string so it can be saved to and loaded from Redis easily
-        launchNotifSent = await redisConn.get("launchNotifSent")
-        latestLaunchInfoEmbedDict = await redisConn.get("latestLaunchInfoEmbedDict", obj=True)
+        launchNotifSent = await redisConn.getLaunchNotifSent()
+        latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
+
+        if latestLaunchInfoEmbedDict == 0:
+            pass
 
         nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
         if nextLaunchJSON == 0:
@@ -79,8 +82,8 @@ async def notificationTask(client):
                             await safeSend(client, channel, embed=notifEmbed)
 
         # Save any changed data to redis
-        await redisConn.set("launchNotifSent", launchNotifSent)
-        await redisConn.set("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict)
+        await redisConn.safeSet("launchNotifSent", launchNotifSent)
+        await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
 
@@ -93,12 +96,12 @@ async def reaper(client):
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed:
-        subbedChannelIDs = await redisConn.get("subscribedChannels", obj=True)
+        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
         for channelID in subbedChannelIDs:
             # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
             if client.get_channel(channelID) == None:
                 # No duplicate elements in the list so remove(value) will always work
                 subbedChannelIDs.remove(channelID)
                 logger.info(f"{channelID} is not a valid ID, removing from db")
-        await redisConn.set("subscribedChannels", subbedChannelIDs)
+        await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)
