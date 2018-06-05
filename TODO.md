@@ -7,8 +7,10 @@ In order:
 - [x] Refactor main.py to use Redis instead of fs.localData
 - [x] Refactor backgroundTasks.py to use Redis instead of fs.localData
 - [x] Re-write setup.py to use new service files (username not needed?)
-- [ ] Check if redis.conf file needs certain permissions
-- [ ] Re-write /tools
+- [x] Check if redis.conf file needs certain permissions
+- [x] Re-write /tools
+- [ ] Make sure that `subscribedChannels` is fully returned from Redis
+- [ ] Work out why NGINX isn't connecting to infoWebServer
 - [ ] Don't show `r/SpaceX Discussion` line in information embed if there is no url
 - [ ] Show in launch information notifications what has changed since the last notification
 - [ ] Deal with errors that can occur from Redis (e.g. losing connection)
