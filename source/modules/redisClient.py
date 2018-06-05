@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class redisClient(StrictRedis):
     def __init__(self, unix_socket_path):
         super().__init__(unix_socket_path=unix_socket_path)
-        logger.info(f"Connected to {socketPath}")
+        logger.info(f"Connected to {unix_socket_path}")
 
     async def safeGet(self, key):
         try:
