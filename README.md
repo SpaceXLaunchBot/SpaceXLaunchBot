@@ -43,7 +43,12 @@ A launch notification message will be sent around 15 minutes (not exact, due to 
 Launch information:
 
 ![LaunchInfo](screenshots/launchInfo.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fr-spacex%2FSpaceX-Launch-Bot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fr-spacex%2FSpaceX-Launch-Bot?ref=badge_shield)
 
 Launch notification:
 
 ![LaunchNotif](screenshots/launchNotif.png)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fr-spacex%2FSpaceX-Launch-Bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fr-spacex%2FSpaceX-Launch-Bot?ref=badge_large)
