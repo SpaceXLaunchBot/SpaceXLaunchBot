@@ -13,7 +13,7 @@ with open("data.pkl", "rb") as f:
 
 async def doRedisStuff():
     print("Connecting to /tmp/redis.sock")
-    redisConn = StrictRedis(unix_socket_path="/tmp/redis.sock")
+    redisConn = StrictRedis(host="127.0.0.1", port=6379, db=0)
     print("Connected, flushing db")
     await redisConn.flushdb()
     print("Setting values")
