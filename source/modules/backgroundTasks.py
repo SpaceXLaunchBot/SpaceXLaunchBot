@@ -103,6 +103,8 @@ async def reaper(client):
     Every $reaperInterval check for non-existant (dead) channels in subbedChannelIDs
     and remove them
     Essentially garbage collection for the channel list
+    TODO: This only removes max ~15 items from the list then just stops (if
+    there are lots to be removed) - find out why and fix this
     """
     await client.wait_until_ready()
     logger.info("Started")
