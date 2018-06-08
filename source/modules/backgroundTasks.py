@@ -30,21 +30,32 @@ async def notificationTask(client):
     logger.info("Started")
     while not client.is_closed:
         
-        # Gather latest data from redis
-        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
-        # launchNotifSent is a string so it can be saved to and loaded from Redis easily
-        launchNotifSent = await redisConn.getLaunchNotifSent()
-        latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
+        """
+        Getting everything and then checking for errors probably isn't very
+        efficient but since this is run on a set time loop and runs in the
+        background, it shouldn't matter much...
+        """
 
-        if latestLaunchInfoEmbedDict == 0:
+        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+        latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
+        launchNotifSent = await redisConn.getLaunchNotifSent()
+        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
+        
+        if subbedChannelsDict["err"]:
+            logger.error("getSubscribedChannelIDs returned err, skipping this cycle")
+            pass
+        
+        elif latestLaunchInfoEmbedDict == 0:
+            logger.error("latestLaunchInfoEmbedDict is 0, skipping this cycle")
             pass
 
-        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
-        if nextLaunchJSON == 0:
+        elif nextLaunchJSON == 0:
             logger.error("nextLaunchJSON returned 0, skipping this cycle")
             pass  # Error, wait for next loop/cycle
         
         else:
+            subbedChannelIDs = subbedChannelsDict["list"]
+
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
@@ -96,7 +107,7 @@ async def reaper(client):
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed:
-        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
+        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()["list"]
         for channelID in subbedChannelIDs:
             # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
             if client.get_channel(channelID) == None:

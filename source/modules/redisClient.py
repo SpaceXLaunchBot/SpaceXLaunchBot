@@ -40,10 +40,18 @@ class redisClient(StrictRedis):
             return 0
     
     async def getSubscribedChannelIDs(self):
+        """
+        Returns a dict: {"list": list, "err": True/False}
+        This is so we can return & iterate a list even if there is an error,
+        which means in methods where it doesen't matter if there was an error or
+        not, we can just ignore it and iterate an empty list instead of having
+        to check for an error. e.g. the reaper doesen't care if there was an err
+        """
         channels = await self.safeGet("subscribedChannels")
         if channels:
-            return pickle.loads(channels)
-        return []  # Cannot get any subscribed channels so return empty
+            return {"list": pickle.loads(channels), "err": False}
+        # Cannot get any subscribed channels so return empty
+        return {"list": [], "err": True}
     
     async def getLaunchNotifSent(self):
         lns = await self.safeGet("launchNotifSent")

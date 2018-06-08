@@ -60,7 +60,12 @@ async def on_message(message):
         # Add channel ID to subbed channels
         replyMsg = "This channel has been added to the launch notification service"
 
-        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
+        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+        if subbedChannelsDict["err"]:
+            # return here so nothing else is executed
+            return await safeSend(client, message.channel, errors.dbErrorEmbed)
+
+        subbedChannelIDs = subbedChannelsDict["list"]
         if message.channel.id not in subbedChannelIDs:
             subbedChannelIDs.append(message.channel.id)
             await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
@@ -73,7 +78,12 @@ async def on_message(message):
         # Remove channel ID from subbed channels
         replyMsg = "This channel has been removed from the launch notification service"
 
-        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()
+        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+        if subbedChannelsDict["err"]:
+            # return here so nothing else is executed
+            return await safeSend(client, message.channel, errors.dbErrorEmbed)
+
+        subbedChannelIDs = subbedChannelsDict["list"]
         try:
             # No duplicate elements in the list so remove(value) will always work
             subbedChannelIDs.remove(message.channel.id)
@@ -95,7 +105,7 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    totalSubbed = len(await redisConn.getSubscribedChannelIDs())
+    totalSubbed = len(await redisConn.getSubscribedChannelIDs()["list"])
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:
