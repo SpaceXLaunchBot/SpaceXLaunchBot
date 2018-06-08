@@ -105,7 +105,8 @@ async def on_ready():
 
     await client.change_presence(game=discord.Game(name="with Elon"))
 
-    totalSubbed = len(await redisConn.getSubscribedChannelIDs()["list"])
+    subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+    totalSubbed = len(subbedChannelsDict["list"])
     totalServers = len(client.servers)
     totalClients = 0
     for server in client.servers:

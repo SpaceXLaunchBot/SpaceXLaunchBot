@@ -107,7 +107,8 @@ async def reaper(client):
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed:
-        subbedChannelIDs = await redisConn.getSubscribedChannelIDs()["list"]
+        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+        subbedChannelIDs = subbedChannelsDict["list"]
         for channelID in subbedChannelIDs:
             # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
             if client.get_channel(channelID) == None:
