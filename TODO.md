@@ -12,8 +12,9 @@ In order:
 - [x] Work out why NGINX isn't connecting to infoWebServer
 - [x] Deal with errors that can occur from Redis (e.g. losing connection)
 - [x] Send error embed when add/removechannel is called and Redis can't be connected to
-- [ ] Make sure that `subscribedChannels` is fully returned from Redis
+- [x] Make sure that `subscribedChannels` is fully returned from Redis
 - [ ] Fix permission error for Redis logging
+- [ ] Can Redis in socket mode handle >1 client?
 
 Not redis branch related:
 
