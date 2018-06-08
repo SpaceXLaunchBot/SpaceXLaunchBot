@@ -63,7 +63,7 @@ async def on_message(message):
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         if subbedChannelsDict["err"]:
             # return here so nothing else is executed
-            return await safeSend(client, message.channel, errors.dbErrorEmbed)
+            return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
 
         subbedChannelIDs = subbedChannelsDict["list"]
         if message.channel.id not in subbedChannelIDs:
@@ -81,7 +81,7 @@ async def on_message(message):
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         if subbedChannelsDict["err"]:
             # return here so nothing else is executed
-            return await safeSend(client, message.channel, errors.dbErrorEmbed)
+            return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
 
         subbedChannelIDs = subbedChannelsDict["list"]
         try:
