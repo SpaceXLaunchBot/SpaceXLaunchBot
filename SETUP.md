@@ -2,8 +2,6 @@
 
 This guide will install SpaceX-Launch-Bot and the accompanying infoWebServer on a clean install of Ubuntu 16+
 
-In all steps replace `YOUR-USERNAME` with the username that the service(s) will be run under
-
 ## Instructions
 
 SSH into your server as root, then execute the commands in the steps below. The commands are split into sections but should all be executed in order

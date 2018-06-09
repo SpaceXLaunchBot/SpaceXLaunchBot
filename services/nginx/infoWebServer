@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name SERVER-IP;
+    server_name spacex-launch-bot.gq www.spacex-launch-bot.gq;
 
     location / {
         include uwsgi_params;
