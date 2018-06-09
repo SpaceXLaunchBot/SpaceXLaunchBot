@@ -1,23 +1,39 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
-<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
-<title>SpaceX-Launch-Bot Log</title>
-<table class="highlight responsive-table">
-  <thead>
-    <tr>
-      <th>Time</th>
-      <th>Level</th>
-      <th>Route</th>
-      <th>Message</th>
-    </tr>
-  </thead>
-  <tbody>
-      {% for entry in logEntries %}
-      <tr class="{{entry.level.lower()}}">
-        <td>{{entry.time}}</td>
-        <td>{{entry.level}}</td>
-        <td>{{entry.route}}</td>
-        <td>{{entry.message}}</td>
-      </tr>
-      {% endfor %}
-  </tbody>
-</table>
+<!doctype html>
+
+<html lang="en">
+
+    <head>
+
+        <link rel="stylesheet" href="{{url_for('static', filename='css/mainStyle.css')}}">
+        <script src="{{url_for('static', filename='js/main.js')}}"></script>
+
+        <title>SpaceX-Launch-Bot</title>
+
+        <meta charset="utf-8">
+        <meta name="description" content="A bot for Discord">
+        <meta name="author" content="@thatguywiththatname">
+        
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![endif]-->
+   
+    </head>
+
+    <body>
+
+        <h1 id="title">SpaceX-Launch-Bot</h1>
+
+        <img class="circular_image" src="{{botAvatarURL}}"/>
+
+        <div id="stats">
+            <h2>Running in {{numServers}} servers</h2>
+            <h2>With {{subbedChannelCount}} subscribed channels</h2>
+        </div>
+
+        <br/>
+
+        <button type="button" onclick="goToInviteLink()">Server Invite</button> 
+
+    </body>
+
+</html>

@@ -35,7 +35,7 @@ def tailLog(n):
         with open(logFilePath, "r") as logFile:
             linesToRead = logFile.readlines()
     except FileNotFoundError:
-        return logEntry("", "CRITICAL", "", "Log file does not exist")
+        return [logEntry("", "CRITICAL", "", "Log file does not exist")]
 
     for line in reversed(linesToRead):
         # Get parts of log entry
