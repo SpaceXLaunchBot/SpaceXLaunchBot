@@ -3,5 +3,5 @@ aiohttp
 flask
 uwsgi
 aredis
-redis-py
+redis
 requests
