@@ -137,7 +137,7 @@ $ sudo cp -R services/redis/. /etc/redis
 ```bash
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 # Create a link so the web server is enabled but also still in the available dir
-$ sudo ln -s /etc/nginx/sites-available/webServer /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/SLB-webServer /etc/nginx/sites-enabled
 ```
 
 ### Before starting everything
