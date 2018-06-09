@@ -1,3 +1,0 @@
-sudo systemctl disable SLB-infoWebServer
-sudo systemctl stop SLB-infoWebServer
-sudo systemctl restart nginx

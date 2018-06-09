@@ -1,6 +1,6 @@
 # Setup
 
-This guide will install SpaceX-Launch-Bot and the accompanying infoWebServer on a clean install of Ubuntu 16+
+This guide will install SpaceX-Launch-Bot and the accompanying web server on a clean install of Ubuntu 16+
 
 ## Instructions
 
@@ -25,7 +25,7 @@ What these programs are for (reused programs are not repeated):
 
 - `fail2ban` for security
 
-- `nginx` acts as a reverse proxy for infoWebServer
+- `nginx` acts as a reverse proxy for webServer
 
 - `python3-distutils` for `get-pip`
 
@@ -132,12 +132,12 @@ $ sudo cp -R -p services/systemd/. /lib/systemd/system/.
 $ sudo cp -R services/redis/. /etc/redis
 ```
 
-### Setup infoWebServer
+### Setup the web server
 
 ```bash
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
-# Create a link so infoWebServer is enabled but also still in the available dir
-$ sudo ln -s /etc/nginx/sites-available/infoWebServer /etc/nginx/sites-enabled
+# Create a link so the web server is enabled but also still in the available dir
+$ sudo ln -s /etc/nginx/sites-available/webServer /etc/nginx/sites-enabled
 ```
 
 ### Before starting everything

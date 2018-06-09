@@ -8,8 +8,8 @@ After=network-online.target
 # Service stuff
 User=SLB
 Group=www-data
-WorkingDirectory=/opt/SpaceX-Launch-Bot/infoWebServer
-ExecStart=/usr/local/bin/uwsgi --ini infoWebServer.ini
+WorkingDirectory=/opt/SpaceX-Launch-Bot/webServer
+ExecStart=/usr/local/bin/uwsgi --ini webServer.ini
 Restart=always
 RestartSec=10
 StandardOutput=journal

@@ -9,7 +9,7 @@ In order:
 - [x] Re-write setup.py to use new service files (username not needed?)
 - [x] Check if redis.conf file needs certain permissions
 - [x] Re-write /tools
-- [x] Work out why NGINX isn't connecting to infoWebServer
+- [x] Work out why NGINX isn't connecting to webServer
 - [x] Deal with errors that can occur from Redis (e.g. losing connection)
 - [x] Send error embed when add/removechannel is called and Redis can't be connected to
 - [x] Make sure that `subscribedChannels` is fully returned from Redis

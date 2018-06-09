@@ -1,4 +1,4 @@
-# infoWebServer
+# Web Server
 
 A simple webserver for showing information about SpaceX-Launch-Bot. Written in Python+Flask using uWSGI to host, and using NGINX as a reverse proxy. Currently just parses the bots log file into HTML and then serves it over HTTP
 
