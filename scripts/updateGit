@@ -1,0 +1,4 @@
+# Pull latest updates from git repo
+# For some reason it doesen't like just `git pull`
+git fetch --all
+git reset --hard origin/master
