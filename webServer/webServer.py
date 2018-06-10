@@ -3,28 +3,34 @@ Main server code
 """
 
 from flask import Flask, render_template
-from logParser import tailLog
+from datetime import timedelta
 import requests
-import pickle
-import redis
 import json
+
+from modules.redisClient import redisClient
+from modules.logParser import tailLog
+from modules.cache import cache
 
 # Get bot info from Discord bot list API (num servers, etc.)
 botInfoURL = "https://discordbots.org/api/bots/411618411169447950"
+def getDBLData():
+    resp = requests.get(botInfoURL)
+    return json.loads(resp.text)
 
-# TODO: Subclass StrictRedis and make the db requests safe
-redisConn = redis.StrictRedis(unix_socket_path="/tmp/redis.sock", db=0)
-
+redisConn = redisClient(unix_socket_path="/tmp/redis.sock", db=0)
+botDataCache = cache(getDBLData, timedelta(hours=1))
 app = Flask(__name__)
 
 @app.route("/")
 def showLandingPage():
 
-    subbedChannelCount = len(pickle.loads(redisConn.get("subscribedChannels")))
+    subbedChannels = redisConn.safeGet("subscribedChannels", True)
+    if subbedChannels != 0:
+        subbedChannelCount = len(subbedChannels)
+    else:
+        subbedChannelCount = "(unknown)"
 
-    # TODO: Some form of caching for this request
-    resp = requests.get(botInfoURL)
-    botData = json.loads(resp.text)
+    botData = botDataCache.get()
 
     # Using the Discord image CDN, get avatar using info from the DBL data
     botAvatarURL = f"https://images.discordapp.net/avatars/{botData['clientid']}/{botData['avatar']}.png?size=128"
