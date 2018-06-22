@@ -77,16 +77,17 @@ async def notificationTask(client):
                 
                 launchTime = int(launchTime)
 
-                # Get timestamp for the time $LAUNCH_NOTIF_DELTA minutes from now
+                # Get timestamp for the time $LAUNCH_NOTIF_DELTA from now
                 nextHour = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next hour
                 if nextHour > launchTime:
                     if launchNotifSent == "False":
 
-                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA} minutes, sending notification")
+                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchNotifSent = "True"
 
+                        # TODO: Show the user(s) why this was sent (new time, etc.)
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)

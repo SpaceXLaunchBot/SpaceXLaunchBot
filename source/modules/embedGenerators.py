@@ -15,7 +15,7 @@ rocketIDImages = {
     "falcon1": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/logo.jpg"
 }
 
-# TODO: Add checks for empty fields in Embeds: empty fields = HTTPException
+# TODO: Add checks for empty fields in Embeds: empty fields cause HTTPException
 
 async def getLaunchInfoEmbed(nextLaunchJSON):
     # No need to do the same thing twice
@@ -59,9 +59,13 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     # small is used to determine whether this is going to be used to make the bigger embed,
     # or actually needs to contain less content
 
+    embedTitle = "r/SpaceX Discussion"
+    if nextLaunchJSON["links"]["reddit_campaign"] == None:
+        embedTitle = "No discussion URL"
+
     launchEmbed = Embed(
-        title="r/SpaceX Discussion",
-        url = nextLaunchJSON["links"]["reddit_campaign"],
+        title=embedTitle,
+        url=nextLaunchJSON["links"]["reddit_campaign"],  # URL can be None
         description="This information has been reduced as the data is too large to contain in this embed",
         color=hexColours["falconRed"]
     )
