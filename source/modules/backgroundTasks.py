@@ -93,6 +93,9 @@ async def notificationTask(client):
                             channel = client.get_channel(channelID)
                             await safeSend(client, channel, embed=notifEmbed)
 
+                    else:
+                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
+                        
         # Save any changed data to redis
         await redisConn.safeSet("launchNotifSent", launchNotifSent)
         await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
