@@ -46,7 +46,7 @@ def showLandingPage():
 
 @app.route("/log")
 def showLog():
-    logEntries = tailLog(15)
+    logEntries = tailLog(30)
     return render_template("log.html", logEntries=logEntries)
 
 if __name__ == "__main__":
