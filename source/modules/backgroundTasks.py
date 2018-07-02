@@ -79,10 +79,10 @@ async def notificationTask(client):
                 launchTime = int(launchTime)
 
                 # Get timestamp for the time $LAUNCH_NOTIF_DELTA from now
-                nextHour = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
+                soon = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next hour
-                if nextHour > launchTime:
+                if soon > launchTime:
                     if launchNotifSent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
