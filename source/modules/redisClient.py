@@ -10,6 +10,8 @@ launchNotifSent           | string: True / False
 latestLaunchInfoEmbedDict | string: pickled( launchInfoEmbedDict )
 """
 
+# TODO: Explicitly encode and decode - https://stackoverflow.com/a/25745079
+
 from aredis import StrictRedis
 import logging
 import pickle
@@ -56,7 +58,8 @@ class redisClient(StrictRedis):
     async def getLaunchNotifSent(self):
         lns = await self.safeGet("launchNotifSent")
         if lns:
-            return lns
+            # get returns a byteString
+            return lns.decode("UTF-8")
         return "False"
     
     async def getLatestLaunchInfoEmbedDict(self):
