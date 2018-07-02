@@ -68,6 +68,7 @@ async def notificationTask(client):
                 latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
                 # new launch found, send all "subscribed" channel the embed
+                # TODO: Show the user(s) why this was sent (new time, etc.)
                 for channelID in subbedChannelIDs:
                     channel = client.get_channel(channelID)
                     await safeSendLaunchInfo(client, channel, [launchInfoEmbed, launchInfoEmbedLite])
@@ -87,7 +88,6 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchNotifSent = "True"
 
-                        # TODO: Show the user(s) why this was sent (new time, etc.)
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)

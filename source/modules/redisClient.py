@@ -6,7 +6,7 @@ Redis structure:
 Key                       | Value
 --------------------------|------------------------------------------
 subscribedChannels        | string: pickled( subscribedChannelList )
-launchNotifSent           | string: true / false
+launchNotifSent           | string: True / False
 latestLaunchInfoEmbedDict | string: pickled( launchInfoEmbedDict )
 """
 
