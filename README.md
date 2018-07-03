@@ -3,6 +3,16 @@
 </p>
 
 <p align="center">
+    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896
+" alt="Discord Invite">
+        <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg"/>
+    </a>
+    <a href="http://spacex-launch-bot.gq" alt="Website Link">
+        <img src="https://img.shields.io/badge/Official%20Website--orange.svg"/>
+    </a>
+</p>
+
+<p align="center">
 A Discord bot for providing news and information about upcoming SpaceX launches
 </p>
 
@@ -10,7 +20,6 @@ A Discord bot for providing news and information about upcoming SpaceX launches
 The bot also provides a notification service for updating you with the latest launch information, and reminders for launches that will be happening soon
 </p>
 
-<p align="center"><b><a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896">Add this bot to your server</a> | <a href="https://discordbots.org/bot/411618411169447950">View on discordbots.org</a></b></p>
 
 # What does this bot do?
 

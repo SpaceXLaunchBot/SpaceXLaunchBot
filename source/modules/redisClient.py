@@ -10,7 +10,7 @@ launchNotifSent           | string: True / False
 latestLaunchInfoEmbedDict | string: pickled( launchInfoEmbedDict )
 """
 
-# TODO: Explicitly encode and decode - https://stackoverflow.com/a/25745079
+# TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079
 
 from aredis import StrictRedis
 import logging
