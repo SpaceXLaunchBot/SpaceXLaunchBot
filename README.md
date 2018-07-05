@@ -16,17 +16,17 @@
 
 <p align="center">
 A Discord bot for providing news and information about upcoming SpaceX launches
-</p>
 
-<p align="center">
 The bot also provides a notification service for updating you with the latest launch information, and reminders for launches that will be happening soon
 </p>
 
-- A launch information message shows detailed information about the next upcoming launch. This is sent through the notification service as well as when the `!nextlaunch` command is used
+## Usage
+
+A launch information message shows detailed information about the next upcoming launch. This is sent through the notification service as well as when the `!nextlaunch` command is used
 
 ![LaunchInfo](screenshots/launchInfo.png)
 
-- A launch notification message that provides useful links to things such as the livestream and press kit. This message is only sent through the notification service (more details below)
+A launch notification message that provides useful links to things such as the livestream and press kit. This message is only sent through the notification service (more details below)
 
 ![LaunchNotif](screenshots/launchNotif.png)
 
