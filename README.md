@@ -3,12 +3,14 @@
 </p>
 
 <p align="center">
-    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896
-" alt="Discord Invite">
+    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896" alt="Discord Invite">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg"/>
     </a>
     <a href="http://spacex-launch-bot.gq" alt="Website Link">
-        <img src="https://img.shields.io/badge/Official%20Website--orange.svg"/>
+        <img src="https://img.shields.io/badge/Official%20Website--green.svg"/>
+    </a>
+    <a href="https://ko-fi.com/M4M18XB1">
+        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg"/>
     </a>
 </p>
 
@@ -20,14 +22,13 @@ A Discord bot for providing news and information about upcoming SpaceX launches
 The bot also provides a notification service for updating you with the latest launch information, and reminders for launches that will be happening soon
 </p>
 
-
-# What does this bot do?
-
-This bot mainly sends 2 types of messages:
-
 - A launch information message shows detailed information about the next upcoming launch. This is sent through the notification service as well as when the `!nextlaunch` command is used
 
+![LaunchInfo](screenshots/launchInfo.png)
+
 - A launch notification message that provides useful links to things such as the livestream and press kit. This message is only sent through the notification service (more details below)
+
+![LaunchNotif](screenshots/launchNotif.png)
 
 ## Commands
 
@@ -46,13 +47,3 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 This means the bot will send a new launch information message to the subscribed channel every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different
 
 A launch notification message will be sent around 15 minutes (not exact, due to technical reasons) before a launch actually happens
-
-## Message examples
-
-Launch information:
-
-![LaunchInfo](screenshots/launchInfo.png)
-
-Launch notification:
-
-![LaunchNotif](screenshots/launchNotif.png)
