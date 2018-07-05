@@ -1,9 +1,8 @@
 """
-Main server code
+Main web server
 """
 
 from flask import Flask, render_template
-from datetime import timedelta
 from imtfc import imtfc_cache
 import requests
 import json
@@ -48,7 +47,3 @@ def showLandingPage():
 def showLog():
     logEntries = tailLog(30)
     return render_template("log.html", logEntries=logEntries)
-
-if __name__ == "__main__":
-    print("RUNNING IN DEBUG MODE")
-    app.run(host="127.0.0.1", port=8080, debug=True)
