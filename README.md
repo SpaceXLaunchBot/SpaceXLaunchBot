@@ -16,7 +16,7 @@
 
 <p align="center">
 A Discord bot for providing news and information about upcoming SpaceX launches
-
+<br/>
 The bot also provides a notification service for updating you with the latest launch information, and reminders for launches that will be happening soon
 </p>
 
