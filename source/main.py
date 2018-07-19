@@ -104,7 +104,7 @@ async def on_ready():
     global dbl  # Can't define this until client is ready
     dbl = dblAPI.dblClient(client)
 
-    await client.change_presence(game=discord.Game(name="with Rockets"))
+    await client.change_presence(game=discord.Game(name="with rockets"))
 
     subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
     totalSubbed = len(subbedChannelsDict["list"])
