@@ -52,4 +52,4 @@ def showLog():
 def getCount():
     # temp route to see how metrics go
     nlrc = redisConn.safeGet("nextlaunchRequestCount")
-    return jsonify({"nextlaunchRequestCount": nlrc})
+    return jsonify(nextlaunchRequestCount=nlrc)
