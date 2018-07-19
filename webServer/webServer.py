@@ -2,7 +2,7 @@
 Main web server
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from imtfc import imtfc_cache
 import requests
 import json
@@ -47,3 +47,9 @@ def showLandingPage():
 def showLog():
     logEntries = tailLog(30)
     return render_template("log.html", logEntries=logEntries)
+
+@app.route("/nlrc")
+def getCount():
+    # temp route to see how metrics go
+    nlrc = redisConn.safeGet("nextlaunchRequestCount")
+    return jsonify({"nextlaunchRequestCount": nlrc})
