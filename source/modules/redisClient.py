@@ -5,9 +5,10 @@ Redis structure:
 
 Key                       | Value
 --------------------------|------------------------------------------
-subscribedChannels        | string: pickled( subscribedChannelList )
-launchNotifSent           | string: True / False
-latestLaunchInfoEmbedDict | string: pickled( launchInfoEmbedDict )
+subscribedChannels        | pickled( subscribedChannelList )
+launchNotifSent           | True / False as a string
+latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
+infoRequestCount          | number
 """
 
 # TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079

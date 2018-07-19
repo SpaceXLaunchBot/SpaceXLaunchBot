@@ -55,6 +55,7 @@ async def on_message(message):
         else:
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
         await safeSendLaunchInfo(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+        await redisConn.incr("infoRequestCount", 1)
 
     elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
         # Add channel ID to subbed channels
