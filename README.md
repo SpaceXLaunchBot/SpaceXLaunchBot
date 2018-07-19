@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=248896" alt="Discord Invite">
+    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456" alt="Discord Invite">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg"/>
     </a>
     <a href="http://spacex-launch-bot.gq" alt="Website Link">
