@@ -8,7 +8,7 @@ Key                       | Value
 subscribedChannels        | pickled( subscribedChannelList )
 launchNotifSent           | True / False as a string
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
-infoRequestCount          | number
+nextlaunchRequestCount    | number
 """
 
 # TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079
