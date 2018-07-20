@@ -10,9 +10,9 @@ from modules.utils import UTCFromTimestamp
 from modules.colours import hexColours
 
 rocketIDImages = {
-    "falcon9": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falcon9.png",
-    "falconheavy": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/falconHeavy.png",
-    "falcon1": "https://raw.githubusercontent.com/thatguywiththatname/SpaceX-Launch-Bot/master/source/resources/images/logo.jpg"
+    "falcon9": "http://spacex-launch-bot.gq/static/images/falcon9.png",
+    "falconheavy": "http://spacex-launch-bot.gq/static/images/falconHeavy.png",
+    "falcon1": "http://spacex-launch-bot.gq/static/images/logo.jpg"
 }
 
 # TODO: Add checks for empty fields in Embeds: empty fields cause HTTPException
