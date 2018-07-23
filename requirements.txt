@@ -1,5 +1,4 @@
-discord.py
-aiohttp
+git+https://github.com/Rapptz/discord.py@rewriteaiohttp
 flask
 uwsgi
 aredis

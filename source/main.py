@@ -2,12 +2,6 @@
 Run the bot and start everything
 """
 
-# Script has started, get time (for startup time) and show user we have started
-# Do this before other imports as they can take a few seconds
-from time import time
-startupTime = time()
-print("Init started")
-
 # Built-ins and 3rd party modules
 import logging
 import discord
@@ -18,8 +12,8 @@ from modules import logSetup
 logSetup.setup()
 
 # Setup and start redis connection
-from modules.redisClient import startRedisConnection
-redisConn = startRedisConnection()
+from modules import redisClient
+redisConn = redisClient.startRedisConnection()
 
 # Import everything else (once logging is set up)
 from modules import fs, utils, errors, dblAPI, spacexAPI, staticMessages, embedGenerators, backgroundTasks
@@ -31,111 +25,107 @@ logger.info("Starting bot")
 # Important vars
 PREFIX = fs.config["commandPrefix"]
 discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
-client = discord.Client()
 
-@client.event
-async def on_message(message):
-    if message.author.bot:
-        # Don't reply to bots (includes self)
-        return
-
-    try:
-        userIsAdmin = message.author.permissions_in(message.channel).administrator
-    except AttributeError:
-        # Happens if user has no roles
-        userIsAdmin = False
-
-    # Commands can be in any case
-    message.content = message.content.lower()
+class SpaceXLaunchBotClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Setup background tasks
+        self.loop.create_task(backgroundTasks.notificationTask(client))
+        self.loop.create_task(backgroundTasks.reaper(client))
     
-    if message.content.startswith(PREFIX + "nextlaunch"):
-        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
-        if nextLaunchJSON == 0:
-            launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
-        else:
-            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-        await safeSendLaunchInfo(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
-        await redisConn.incr("nextlaunchRequestCount", 1)
+    async def on_ready(self):
+        global dbl  # Can't define this until client is ready
+        dbl = dblAPI.dblClient(client)
 
-    elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
-        # Add channel ID to subbed channels
-        replyMsg = "This channel has been added to the launch notification service"
+        await client.change_presence(game=discord.Game(name="with rockets"))
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
-        if subbedChannelsDict["err"]:
-            # return here so nothing else is executed
-            return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
+        totalSubbed = len(subbedChannelsDict["list"])
+        totalGuilds = len(client.guilds)
+        totalClients = 0
+        for guild in client.guilds:
+            totalClients += len(guild.members)   
+        
+        logger.info(f"Username: {client.user.name}")
+        logger.info(f"ClientID: {client.user.id}")
+        logger.info(f"Connected to {totalGuilds} guilds")
+        logger.info(f"Connected to {totalSubbed} subscribed channels")
+        logger.info(f"Serving {totalClients} clients")
+        logger.info("Bot ready")
 
-        subbedChannelIDs = subbedChannelsDict["list"]
-        if message.channel.id not in subbedChannelIDs:
-            subbedChannelIDs.append(message.channel.id)
-            await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
-        else:
-            replyMsg = "This channel is already subscribed to the launch notification service"
+        await dbl.updateGuildCount(totalGuilds)
 
-        await safeSend(client, message.channel, text=replyMsg)
-    
-    elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
-        # Remove channel ID from subbed channels
-        replyMsg = "This channel has been removed from the launch notification service"
+    async def on_server_join(self, server):
+        await dbl.updateGuildCount(len(client.guilds))
 
-        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
-        if subbedChannelsDict["err"]:
-            # return here so nothing else is executed
-            return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
+    async def on_server_remove(self, server):
+        await dbl.updateGuildCount(len(client.guilds))
 
-        subbedChannelIDs = subbedChannelsDict["list"]
+    async def on_message(self, message):
+        if message.author.bot:
+            # Don't reply to bots (includes self)
+            return
+
         try:
-            # No duplicate elements in the list so remove(value) will always work
-            subbedChannelIDs.remove(message.channel.id)
-            await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
-        except ValueError:
-            replyMsg = "This channel was not previously subscribed to the launch notification service"
+            userIsAdmin = message.author.permissions_in(message.channel).administrator
+        except AttributeError:
+            # Happens if user has no roles
+            userIsAdmin = False
 
-        await safeSend(client, message.channel, text=replyMsg)
+        # Commands can be in any case
+        message.content = message.content.lower()
+        
+        if message.content.startswith(PREFIX + "nextlaunch"):
+            nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
+            if nextLaunchJSON == 0:
+                launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
+            else:
+                launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
+            await safeSendLaunchInfo(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+            await redisConn.incr("nextlaunchRequestCount", 1)
 
-    elif message.content.startswith(PREFIX + "info"):
-        await safeSend(client, message.channel, embed=staticMessages.infoEmbed)
-    elif message.content.startswith(PREFIX + "help"):
-        await safeSend(client, message.channel, embed=staticMessages.helpEmbed)
+        elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
+            # Add channel ID to subbed channels
+            replyMsg = "This channel has been added to the launch notification service"
 
-@client.event
-async def on_ready():
-    global dbl  # Can't define this until client is ready
-    dbl = dblAPI.dblClient(client)
+            subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+            if subbedChannelsDict["err"]:
+                # return here so nothing else is executed
+                return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
 
-    await client.change_presence(game=discord.Game(name="with rockets"))
+            subbedChannelIDs = subbedChannelsDict["list"]
+            if message.channel.id not in subbedChannelIDs:
+                subbedChannelIDs.append(message.channel.id)
+                await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+            else:
+                replyMsg = "This channel is already subscribed to the launch notification service"
 
-    subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
-    totalSubbed = len(subbedChannelsDict["list"])
-    totalServers = len(client.servers)
-    totalClients = 0
-    for server in client.servers:
-        totalClients += len(server.members)   
-    
-    logger.info(f"Username: {client.user.name}")
-    logger.info(f"ClientID: {client.user.id}")
-    logger.info(f"Connected to {totalServers} servers")
-    logger.info(f"Connected to {totalSubbed} subscribed channels")
-    logger.info(f"Serving {totalClients} clients")
+            await safeSend(client, message.channel, text=replyMsg)
+        
+        elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
+            # Remove channel ID from subbed channels
+            replyMsg = "This channel has been removed from the launch notification service"
 
-    formattedTime = str(time() - startupTime)[0:4]
-    print(f"Bot ready\nStarted in: {formattedTime}s")
-    logger.info(f"Started in: {formattedTime}s")
+            subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
+            if subbedChannelsDict["err"]:
+                # return here so nothing else is executed
+                return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
 
-    await dbl.updateServerCount(totalServers)
+            subbedChannelIDs = subbedChannelsDict["list"]
+            try:
+                # No duplicate elements in the list so remove(value) will always work
+                subbedChannelIDs.remove(message.channel.id)
+                await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+            except ValueError:
+                replyMsg = "This channel was not previously subscribed to the launch notification service"
 
-@client.event
-async def on_server_join(server):
-    await dbl.updateServerCount(len(client.servers))
+            await safeSend(client, message.channel, text=replyMsg)
 
-@client.event
-async def on_server_remove(server):
-    await dbl.updateServerCount(len(client.servers))
-
-# Setup background tasks
-client.loop.create_task(backgroundTasks.notificationTask(client))
-client.loop.create_task(backgroundTasks.reaper(client))
+        elif message.content.startswith(PREFIX + "info"):
+            await safeSend(client, message.channel, embed=staticMessages.infoEmbed)
+        elif message.content.startswith(PREFIX + "help"):
+            await safeSend(client, message.channel, embed=staticMessages.helpEmbed)
 
 # Run bot
+client = SpaceXLaunchBotClient()
 client.run(discordToken)
