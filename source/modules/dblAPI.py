@@ -23,4 +23,4 @@ class dblClient(object):
                 try:
                     await session.post(self.dblURL, json={"server_count": guildCount}, headers=dblHeaders)
                 except Exception as e:
-                    logger.error(f"Failed to post server count: {type(e).__name__}: {e}")
+                    logger.error(f"Failed to post guild count: {type(e).__name__}: {e}")
