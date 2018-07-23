@@ -1,4 +1,4 @@
-git+https://github.com/Rapptz/discord.py@rewriteaiohttp
+git+https://github.com/Rapptz/discord.py@rewrite
 flask
 uwsgi
 aredis
