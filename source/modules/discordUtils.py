@@ -6,22 +6,22 @@ from discord import errors
 
 from modules.errors import generalErrorEmbed
 
-async def safeSend(client, channel, text=None, embed=None):
+async def safeSend(channel, text=None, embed=None):
     """
     Send a text / embed message (one or the other, not both) to a
-    client, and if an error occurs, safely supress it
+    user, and if an error occurs, safely supress it
     On failure, returns:
         -1 : Nothing to send (text & embed are `None`)
         -2 : HTTPException
         -3 : Forbidden
         -4 : InvalidArgument
-    On success returns what the client.send_message method returns
+    On success returns what the channel.send method returns
     """
     try:
         if text:
-            return await client.send_message(channel, text)
+            return await channel.send(text)
         elif embed:
-            return await client.send_message(channel, embed=embed)
+            return await channel.send(embed=embed)
         else:
             return -1
     except errors.HTTPException:
@@ -31,7 +31,7 @@ async def safeSend(client, channel, text=None, embed=None):
     except errors.InvalidArgument:
         return -4  # Invalid channel ID (channel deleted)
 
-async def safeSendLaunchInfo(client, channel, embeds):
+async def safeSendLaunchInfo(channel, embeds):
     """
     Specifically for sending 2 launch embeds, a full-detail one,
     and failing that, a "lite" version of the embed
@@ -47,7 +47,7 @@ async def safeSendLaunchInfo(client, channel, embeds):
     Returns 0 if neither embeds are sent
     """
     for embed in embeds:
-        v = await safeSend(client, channel, embed=embed)
+        v = await safeSend(channel, embed=embed)
         if v == -2:
             pass  # Embed might be too big, try lite version
         elif v == -3 or v == -4:
@@ -55,5 +55,5 @@ async def safeSendLaunchInfo(client, channel, embeds):
         else:
             return v
     # Both failed to send, try to let user know something went wrong
-    await safeSend(client, channel, embed=generalErrorEmbed)
+    await safeSend(channel, embed=generalErrorEmbed)
     return 0

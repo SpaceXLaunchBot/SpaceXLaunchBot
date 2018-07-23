@@ -37,29 +37,27 @@ class SpaceXLaunchBotClient(discord.Client):
         global dbl  # Can't define this until client is ready
         dbl = dblAPI.dblClient(client)
 
-        await client.change_presence(game=discord.Game(name="with rockets"))
+        await self.change_presence(game=discord.Game(name="with rockets"))
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         totalSubbed = len(subbedChannelsDict["list"])
-        totalGuilds = len(client.guilds)
-        totalClients = 0
-        for guild in client.guilds:
-            totalClients += len(guild.members)   
+        totalGuilds = len(self.guilds)
+        totalUsers = len(self.users)   
         
-        logger.info(f"Username: {client.user.name}")
-        logger.info(f"ClientID: {client.user.id}")
+        logger.info(f"Username: {self.user.name}")
+        logger.info(f"ClientID: {self.user.id}")
         logger.info(f"Connected to {totalGuilds} guilds")
         logger.info(f"Connected to {totalSubbed} subscribed channels")
-        logger.info(f"Serving {totalClients} clients")
+        logger.info(f"Serving {totalUsers} users")
         logger.info("Bot ready")
 
         await dbl.updateGuildCount(totalGuilds)
 
-    async def on_server_join(self, server):
-        await dbl.updateGuildCount(len(client.guilds))
+    async def on_guild_join(self, guild):
+        await dbl.updateGuildCount(len(self.guilds))
 
-    async def on_server_remove(self, server):
-        await dbl.updateGuildCount(len(client.guilds))
+    async def on_guild_remove(self, guild):
+        await dbl.updateGuildCount(len(self.guilds))
 
     async def on_message(self, message):
         if message.author.bot:
@@ -81,7 +79,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 launchInfoEmbed, launchInfoEmbedLite = errors.apiErrorEmbed, errors.apiErrorEmbed
             else:
                 launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-            await safeSendLaunchInfo(client, message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+            await safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedLite])
             await redisConn.incr("nextlaunchRequestCount", 1)
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
@@ -91,7 +89,7 @@ class SpaceXLaunchBotClient(discord.Client):
             subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
             if subbedChannelsDict["err"]:
                 # return here so nothing else is executed
-                return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
+                return await safeSend(message.channel, embed=errors.dbErrorEmbed)
 
             subbedChannelIDs = subbedChannelsDict["list"]
             if message.channel.id not in subbedChannelIDs:
@@ -100,7 +98,7 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
 
-            await safeSend(client, message.channel, text=replyMsg)
+            await safeSend(message.channel, text=replyMsg)
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             # Remove channel ID from subbed channels
@@ -109,7 +107,7 @@ class SpaceXLaunchBotClient(discord.Client):
             subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
             if subbedChannelsDict["err"]:
                 # return here so nothing else is executed
-                return await safeSend(client, message.channel, embed=errors.dbErrorEmbed)
+                return await safeSend(message.channel, embed=errors.dbErrorEmbed)
 
             subbedChannelIDs = subbedChannelsDict["list"]
             try:
@@ -119,12 +117,12 @@ class SpaceXLaunchBotClient(discord.Client):
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
 
-            await safeSend(client, message.channel, text=replyMsg)
+            await safeSend(message.channel, text=replyMsg)
 
         elif message.content.startswith(PREFIX + "info"):
-            await safeSend(client, message.channel, embed=staticMessages.infoEmbed)
+            await safeSend(message.channel, embed=staticMessages.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
-            await safeSend(client, message.channel, embed=staticMessages.helpEmbed)
+            await safeSend(message.channel, embed=staticMessages.helpEmbed)
 
 # Run bot
 client = SpaceXLaunchBotClient()
