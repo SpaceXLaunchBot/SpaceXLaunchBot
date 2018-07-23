@@ -30,12 +30,13 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Setup background tasks
-        self.loop.create_task(backgroundTasks.notificationTask(client))
-        self.loop.create_task(backgroundTasks.reaper(client))
+        # Will func(self) work?
+        self.loop.create_task(backgroundTasks.notificationTask(self))
+        self.loop.create_task(backgroundTasks.reaper(self))
     
     async def on_ready(self):
         global dbl  # Can't define this until client is ready
-        dbl = dblAPI.dblClient(client)
+        dbl = dblAPI.dblClient(self)
 
         await self.change_presence(game=discord.Game(name="with rockets"))
 
