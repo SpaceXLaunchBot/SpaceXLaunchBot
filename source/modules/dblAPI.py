@@ -18,9 +18,9 @@ class dblClient(object):
     def __init__(self, discordClient):
         self.dblURL = f"https://discordbots.org/api/bots/{discordClient.user.id}/stats"
 
-    async def updateServerCount(self, serverCount):
+    async def updateGuildCount(self, guildCount):
         async with aiohttp.ClientSession() as session:
                 try:
-                    await session.post(self.dblURL, json={"server_count": serverCount}, headers=dblHeaders)
+                    await session.post(self.dblURL, json={"server_count": guildCount}, headers=dblHeaders)
                 except Exception as e:
-                    logger.error(f"Failed to post server count: {type(e).__name__}: {e}")
+                    logger.error(f"Failed to post guild count: {type(e).__name__}: {e}")
