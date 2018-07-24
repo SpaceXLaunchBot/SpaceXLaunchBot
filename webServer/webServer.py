@@ -10,7 +10,7 @@ import json
 from modules.redisClient import redisClient
 from modules.logParser import tailLog
 
-# Use the Discord bot list API for num servers, avatar URL, etc.
+# Use the Discord bot list API for num guilds, avatar URL, etc.
 botInfoURL = "https://discordbots.org/api/bots/411618411169447950"
 
 # Setup time-based caching for the function so we don't spam the API
@@ -38,7 +38,7 @@ def showLandingPage():
 
     return render_template(
         "index.html",
-        numServers = botData["server_count"],
+        numGuilds = botData["server_count"],
         subbedChannelCount = subbedChannelCount,
         botAvatarURL = botAvatarURL
     )
