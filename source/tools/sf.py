@@ -23,7 +23,7 @@ async def doRedisStuff():
     
     print("setting in Redis")
 
-    await r.set("subscribedChannels", pickle.dumps(value))  
+    await r.set("subscribedChannels", pickle.dumps(idList))  
 
     print(idList)
     print("now of type:", type(idList[0]))
