@@ -13,20 +13,20 @@ async def doRedisStuff():
     
     print("Getting subscribedChannels")
     idList = pickle.loads(await r.get("subscribedChannels"))
+    newList = []
 
     print(idList)
     
     for x in idList:
-        idList.remove(x)
-        idList.append(int(x))
+        newList.append(int(x))
         print("Processed", x)
     
     print("setting in Redis")
 
-    await r.set("subscribedChannels", pickle.dumps(idList))  
+    await r.set("subscribedChannels", pickle.dumps(newList))  
 
-    print(idList)
-    print("now of type:", type(idList[0]))
+    print(newList)
+    print("now of type:", type(newList[0]))
 
     print("Done")
 
