@@ -38,7 +38,7 @@ class SpaceXLaunchBotClient(discord.Client):
         global dbl  # Can't define this until client is ready
         dbl = dblAPI.dblClient(self)
 
-        await self.change_presence(game=discord.Game(name="with rockets"))
+        await self.change_presence(activity=discord.Game(name="with rockets"))
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         totalSubbed = len(subbedChannelsDict["list"])
