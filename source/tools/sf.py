@@ -5,13 +5,14 @@ of integers
 
 import asyncio
 from aredis import StrictRedis
+import pickle
 
 async def doRedisStuff():
     print("Connecting to /tmp/redis.sock")
     r = StrictRedis(unix_socket_path="/tmp/redis.sock", db=0)
     
     print("Getting subscribedChannels")
-    idList = await redisConn0.get("subscribedChannels")
+    idList = pickle.loads(await r.get("subscribedChannels"))
 
     print(idList)
     
@@ -20,6 +21,10 @@ async def doRedisStuff():
         idList.append(int(x))
         print("Processed", x)
     
+    print("setting in Redis")
+
+    await r.set("subscribedChannels", pickle.dumps(value))  
+
     print(idList)
     print("now of type:", type(idList[0]))
 
