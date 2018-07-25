@@ -28,7 +28,7 @@ async def notificationTask(client):
     """
     await client.wait_until_ready()
     logger.info("Started")
-    while not client.is_closed:
+    while not client.is_closed():
         
         """
         Getting everything and then checking for errors probably isn't very
@@ -113,7 +113,7 @@ async def reaper(client):
     """
     await client.wait_until_ready()
     logger.info("Started")
-    while not client.is_closed:
+    while not client.is_closed():
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         subbedChannelIDs = subbedChannelsDict["list"]
         for channelID in subbedChannelIDs:
