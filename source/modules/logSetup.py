@@ -15,5 +15,5 @@ def setup():
     handler.setFormatter(logging.Formatter(config["logFormat"]))
     logging.basicConfig(level=logging.INFO, handlers=[handler])
 
-    # Change discord to only log WARNING level and above
-    logging.getLogger("discord").setLevel(logging.WARNING)
+    # Change discord to only log ERROR level and above
+    logging.getLogger("discord").setLevel(logging.ERROR)
