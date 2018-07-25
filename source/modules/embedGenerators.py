@@ -78,7 +78,10 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     set properly / show up properly
     """
     launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
-    launchEmbed.set_author(name="Launch #{}".format(nextLaunchJSON["flight_number"]))
+    launchEmbed.set_author(name="Launch #{} - {}".format(
+        nextLaunchJSON["flight_number"],
+        nextLaunchJSON["mission_name"]
+    ))
 
     # Actually making a lite embed, so add reduced info here
     if small:
