@@ -81,7 +81,6 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             await safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedLite])
-            await redisConn.incr("nextlaunchRequestCount", 1)
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
             # Add channel ID to subbed channels
