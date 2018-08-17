@@ -51,6 +51,11 @@ $ sudo ufw allow 'Nginx HTTP'
 $ sudo ufw enable
 ```
 
+### Install and run netdata
+```bash
+bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+```
+
 ### Install Redis
 
 ```bash
@@ -130,14 +135,18 @@ $ sudo cp -R -p services/systemd/. /lib/systemd/system/.
 
 # Copy Redis stuff over
 $ sudo cp -R services/redis/. /etc/redis
+
+# Copy netdata stuff over
+$ sudo cp -R services/netdata/. /opt/netdata/etc/netdata
 ```
 
-### Setup the web server
+### Setup the web server(s)
 
 ```bash
 $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 # Create a link so the web server is enabled but also still in the available dir
 $ sudo ln -s /etc/nginx/sites-available/SLB-webServer /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/netdata-webServer /etc/nginx/sites-enabled
 ```
 
 ### Before starting everything
