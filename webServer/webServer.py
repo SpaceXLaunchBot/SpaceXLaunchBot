@@ -44,15 +44,7 @@ def showLandingPage():
         botAvatarURL = botAvatarURL
     )
 
-@app.route("/api/log")
-def showLog():
-    """
-    Serves the latest $count entries in the SLB log
-    """
-    n = request.args.get("count", default=30, type=int)
-    logEntries = tailLog(n)
-    return jsonify(logEntries)
-
 @app.route("/", subdomain="status")
 def showStatusPage():
-    return render_template("status.html")
+    logEntries = tailLog(30)
+    return render_template("status.html", logEntries=logEntries)

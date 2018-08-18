@@ -7,27 +7,26 @@ logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "..", "logs"
 dateTimeFormat = re.compile("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}),(\d{3})")
 logFileSplitter = " : "
 
-# Currently not used
-# class logEntry(object):
-#     def __init__(self, time, level, route, message):
-#         self.time    : str = time
-#         self.level   : str = level
-#         self.route   : str = route
-#         self.message : str = message
+class logEntry(object):
+    def __init__(self, time, level, route, message):
+        self.time    : str = time
+        self.level   : str = level
+        self.route   : str = route
+        self.message : str = message
 
 def tailLog(n):
     """
-    Get the last $n lines of the log and parse into logEntries as a list
-    of lists
+    Get the last $n lines of the log and parse into
+    logEntry objects
     """
-    logEntries = []
+    logObjects = []
 
     """
     Since we are reading the log in reverse order, logs that have multi-line
     entries will need to be built up over the lines they span, then added into
-    a log entry when the start of that log entry is found. currentMessage will
-    hold all of the lines in that multi-line entry until the start of the entry
-    is found, it is then join()ed into the logEntry obj and reset to []
+    a logEntry object when the start of that log entry is found. currentMessage
+    will hold all of the lines in that multi-line entry until the start of the
+    entry is found, it is then join()ed into the logEntry obj and reset to []
     """
     currentMessage = []
     entriesRead = 0  # The amount of individual log entries read
@@ -36,7 +35,7 @@ def tailLog(n):
         with open(logFilePath, "r") as logFile:
             linesToRead = logFile.readlines()
     except FileNotFoundError:
-        return [["", "CRITICAL", "", "Log file does not exist"]]
+        return [logEntry("", "CRITICAL", "", "Log file does not exist")]
 
     for line in reversed(linesToRead):
         # Get parts of log entry
@@ -55,7 +54,7 @@ def tailLog(n):
             lineInfo[-1] += " " + " ".join(currentMessage)
             currentMessage = []
 
-            logEntries.append(lineInfo)
+            logObjects.append(logEntry(*lineInfo))
             entriesRead += 1
         
         # Else this line is part of the next upcoming log entry
@@ -71,4 +70,4 @@ def tailLog(n):
     We read in reverse order to get the last $n entries, so now reverse back
     into chronological order
     """
-    return list(reversed(logEntries))
+    return reversed(logObjects)

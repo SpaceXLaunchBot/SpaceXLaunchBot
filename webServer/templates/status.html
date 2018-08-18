@@ -13,10 +13,7 @@
 
         <script type="text/javascript">var netdataTheme = "slate";</script>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script type="text/javascript" src="http://netdata.spacex-launch-bot.gq/dashboard.js"></script>
-        <script src="{{url_for('static', filename='js/logTableUpdater.js')}}"></script>
-
         <script type="text/javascript">
             // Always update the charts, even if focus is lost
             NETDATA.options.current.stop_updates_when_focus_is_lost = false;
@@ -49,7 +46,14 @@
                 </tr>
             </thead>
             <tbody id="logTableBody">
-                <!-- Rows are added through JS -->
+                {% for entry in logEntries %}
+                <tr class="{{entry.level.lower()}}">
+                    <td class="t-time">{{entry.time}}</td>
+                    <td class="t-level">{{entry.level}}</td>
+                    <td class="t-route">{{entry.route}}</td>
+                    <td class="t-message">{{entry.message}}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
 
