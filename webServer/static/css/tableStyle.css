@@ -8,8 +8,8 @@
 
 .t-time {position: relative; width: 10%}
 .t-level {position: relative; width: 10%}
-.t-route {position: relative; width: 27%}
-.t-message {position: relative; width: 53%}
+.t-route {position: relative; width: 30%}
+.t-message {position: relative; width: 50%}
 
 .critical {background-color: darkred;}
 .error {background-color: darkred;}
