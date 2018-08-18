@@ -12,7 +12,10 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
         <script type="text/javascript">var netdataTheme = "slate";</script>
+        
         <script type="text/javascript" src="http://netdata.spacex-launch-bot.gq/dashboard.js"></script>
+        <script src="{{url_for('static', filename='js/logTableUpdater.js')}}"></script>
+
         <script type="text/javascript">
             // Always update the charts, even if focus is lost
             NETDATA.options.current.stop_updates_when_focus_is_lost = false;
@@ -72,15 +75,6 @@
                 </tr>
             </thead>
             <tbody>
-
-                <!-- {% for entry in logEntries %} -->
-                <!-- <tr class="{{entry.level.lower()}}">
-                    <td>{{entry.time}}</td>
-                    <td>{{entry.level}}</td>
-                    <td>{{entry.route}}</td>
-                    <td>{{entry.message}}</td>
-                </tr> -->
-                <!-- {% endfor %} -->
 
                 <tr class="info">
                     <td class="t-time">2018-08-15 08:09:35,339</td>

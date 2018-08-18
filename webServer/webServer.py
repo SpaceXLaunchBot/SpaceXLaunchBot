@@ -54,4 +54,4 @@ def showLog():
 
 @app.route("/", subdomain="status")
 def showStatusPage():
-    return app.send_static_file("status.html")
+    return render_template("status.html")
