@@ -17,6 +17,26 @@ $ sudo apt update
 $ sudo apt upgrade -y
 ```
 
+### Dissalow root login
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+Find the following line:
+
+`# PermitRootLogin yes`
+
+Change it to "no" and un-comment (if it isn't already)
+
+`PermitRootLogin no`
+
+Restart the SSHD service
+
+```bash
+service sshd restart
+```
+
 ### Install things
 
 What these programs are for (reused programs are not repeated):
