@@ -51,3 +51,7 @@ def showLog():
     n = request.args.get("count", default=30, type=int)
     logEntries = tailLog(n)
     return jsonify(logEntries)
+
+@app.route("/", subdomain="status")
+def showStatusPage():
+    return app.send_static_file("status.html")
