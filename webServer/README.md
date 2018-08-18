@@ -6,8 +6,12 @@ Everywhere else (systemd config, NGINX config, etc.) this is refered to as `SLB-
 
 See [here](https://www.nginx.com/resources/glossary/reverse-proxy-server/) for why NGINX is used
 
-This allows me to easily see what is happening with the bot without having to SSH into my server
+## Pages
 
-It currently does not require authentication to view as nothing personal, private or important is logged
+(all pages are currently `HTTP`)
 
-Read `../SETUP.md` to install this correctly
+URL|Description
+-|-
+`spacex-launch-bot.gq`|A basic landing page for people to see info & the invite for SLB
+`status.spacex-launch-bot.gq`|A basic page to show various metrics and statuses from the server
+`m.status.spacex-launch-bot.gq`|The same as `status` but for mobile (WIP)

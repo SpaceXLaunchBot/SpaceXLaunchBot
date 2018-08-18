@@ -2,7 +2,7 @@
 Main web server
 """
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from imtfc import imtfc_cache
 import requests
 import json
@@ -43,7 +43,11 @@ def showLandingPage():
         botAvatarURL = botAvatarURL
     )
 
-@app.route("/log")
+@app.route("/api/log")
 def showLog():
-    logEntries = tailLog(30)
-    return render_template("log.html", logEntries=logEntries)
+    """
+    Serves the latest $count entries in the SLB log
+    """
+    n = request.args.get("count", default=30, type=int)
+    logEntries = tailLog(n)
+    return jsonify(logEntries)
