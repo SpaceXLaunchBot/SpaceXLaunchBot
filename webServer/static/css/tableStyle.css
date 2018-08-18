@@ -6,10 +6,10 @@
     height: 100px;
 }
 
-.t-time {position: relative; width: 10%}
-.t-level {position: relative; width: 10%}
-.t-route {position: relative; width: 30%}
-.t-message {position: relative; width: 50%}
+.t-time {position: relative; width: 10%; padding: 10px}
+.t-level {position: relative; width: 5%; padding: 10px}
+.t-route {position: relative; width: 35%; padding: 10px}
+.t-message {position: relative; width: 50%; padding: 10px}
 
 .critical {background-color: darkred;}
 .error {background-color: darkred;}
