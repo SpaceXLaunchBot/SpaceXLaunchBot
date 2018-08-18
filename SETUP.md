@@ -147,6 +147,7 @@ $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 # Create a link so the web server is enabled but also still in the available dir
 $ sudo ln -s /etc/nginx/sites-available/SLB-webServer /etc/nginx/sites-enabled
 $ sudo ln -s /etc/nginx/sites-available/netdata-webServer /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/SLB-webServer-status /etc/nginx/sites-enabled
 ```
 
 ### Before starting everything

@@ -21,6 +21,7 @@ def getDBLData():
 
 redisConn = redisClient(unix_socket_path="/tmp/redis.sock", db=0)
 app = Flask(__name__)
+app.config["SERVER_NAME"] = "spacex-launch-bot.gq"
 
 @app.route("/")
 def showLandingPage():
