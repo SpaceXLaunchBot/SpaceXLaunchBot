@@ -170,6 +170,12 @@ $ sudo ln -s /etc/nginx/sites-available/netdata-webServer /etc/nginx/sites-enabl
 $ sudo ln -s /etc/nginx/sites-available/SLB-webServer-status /etc/nginx/sites-enabled
 ```
 
+### Move fail2ban config to correct directory
+
+```bash
+$ sudo cp -R services/fail2ban/. /etc/fail2ban/.
+```
+
 ### Before starting everything
 
 - If you are re-using a previously dumped Redis database, remember to load it up now
