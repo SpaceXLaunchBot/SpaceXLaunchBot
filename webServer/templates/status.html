@@ -11,8 +11,8 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+        <!-- Have to be done in this order to work, hence the 3 script tags -->
         <script type="text/javascript">var netdataTheme = "slate";</script>
-
         <script type="text/javascript" src="http://netdata.spacex-launch-bot.gq/dashboard.js"></script>
         <script type="text/javascript">
             // Always update the charts, even if focus is lost
@@ -78,6 +78,11 @@
 
         <div data-netdata="fail2ban.jails_in_jail" data-title="fail2ban jailed" data-chart-library="dygraph" data-height="180px" data-after="-1800"></div>
 
+        <script type="text/javascript">
+            // Auto scroll table to the bottom
+            var objDiv = document.getElementById("logTableBody");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        </script>
     </body>
 
 </html>
