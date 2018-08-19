@@ -38,32 +38,34 @@
 
         <!--
             TODO:
-            Make table headers same width as table rows
             Make table expand to fit the correct height
             Make table scroll down automatically on page load
             Dynamically update table?
         -->
-        <table id="logTable">
-            <thead id="logTableHead">
-                <tr>
-                    <th class="t-time">Time</th>
-                    <th class="t-level">Level</th>
-                    <th class="t-route">Route</th>
-                    <th class="t-message">Message</th>
-                </tr>
-            </thead>
-            <tbody id="logTableBody">
-                {% for entry in logEntries %}
-                <tr class="{{entry.level.lower()}}">
-                    <td class="t-time">{{entry.time}}</td>
-                    <td class="t-level">{{entry.level}}</td>
-                    <td class="t-route">{{entry.route}}</td>
-                    <td class="t-message">{{entry.message}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+        <div id="logTableContainer">
+            <h2>SpaceX-Launch-Bot Log</h2>
+            <table id="logTable">
+                <thead id="logTableHead">
+                    <tr>
+                        <th class="t-time">Time</th>
+                        <th class="t-level">Level</th>
+                        <th class="t-route">Route</th>
+                        <th class="t-message">Message</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody">
+                    {% for entry in logEntries %}
+                    <tr class="{{entry.level.lower()}}">
+                        <td class="t-time">{{entry.time}}</td>
+                        <td class="t-level">{{entry.level}}</td>
+                        <td class="t-route">{{entry.route}}</td>
+                        <td class="t-message">{{entry.message}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
         <br/><br/>
 
         <div data-netdata="system.load" data-title="System load" data-chart-library="dygraph" data-height="180px" data-after="-1800"></div>

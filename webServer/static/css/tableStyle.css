@@ -6,17 +6,16 @@
     height: 100px;
 }
 
-.t-time {position: relative; width: 10%; padding: 10px}
-.t-level {position: relative; width: 5%; padding: 10px}
-.t-route {position: relative; width: 35%; padding: 10px}
-.t-message {position: relative; width: 50%; padding: 10px}
+.t-time {position: relative; width: 8em; padding: 10px}
+.t-level {position: relative; width: 5em; padding: 10px}
+.t-route {position: relative; width: 21em; padding: 10px}
+.t-message {position: relative; padding: 10px}
 
 .critical {background-color: darkred;}
 .error {background-color: darkred;}
 .warning {background-color: darkslategrey;}
 
-#logTable {
-    height: 20%;
-    width: 65%;
-    float: right;
+#logTableContainer {
+    position: absolute;
+    display: inline;
 }
