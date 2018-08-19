@@ -80,8 +80,9 @@
 
         <script type="text/javascript">
             // Auto scroll table to the bottom
-            var objDiv = document.getElementById("logTableBody");
-            objDiv.scrollTop = objDiv.scrollHeight;
+            // TODO: This doesen't scroll all the way to the bottom?
+            var logTableBody = document.getElementById("logTableBody");
+            logTableBody.scrollTop = objDiv.scrollHeight;
         </script>
     </body>
 
