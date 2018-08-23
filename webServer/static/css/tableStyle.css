@@ -24,6 +24,6 @@
 .error {background-color: darkred;}
 .warning {background-color: darkslategrey;}
 
-.nsgraph {
+.netdata-container-with-legend {
     width: 32%;
 }
