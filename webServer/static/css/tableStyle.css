@@ -1,21 +1,31 @@
+#leftSection {
+    position: absolute;
+    display: block;
+    float: left;
+    width: 50%;
+}
+#rightSection {
+    position: absolute;
+    display: block;
+    float: right;
+    width: 50%;
+    margin-left: 50%;
+    height: 100%;
+}
+
 #logTableContainer {
     position: absolute;
-    display: inline;
     height: 100%;
-    width: 65%;
-    padding-left: 30px;
+}
+#logTable {
+    display: block;
+    height: 100%;
 }
 #logTableHead, #logTableBody {
     display: block;
 }
-#logTable {
-    display: block;
-    height: 90%;
-}
 #logTableBody {
-    position: relative;
     overflow: auto;
-    height: 95%;
 }
 
 .t-time {position: relative; width: 8em; padding: 10px}
