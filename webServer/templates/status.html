@@ -19,11 +19,9 @@
             NETDATA.options.current.stop_updates_when_focus_is_lost = false;
         </script>
 
-        <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/tableStyle.css')}}"> -->
-        <link rel="stylesheet" href="../static/css/tableStyle.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/tableStyle.css')}}">
 
-        <!-- <script type="text/javascript" src="../static/js/tableFixer.js"></script> -->
-        <script type="text/javascript" src="../static/js/tableFixer.js"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/tableFixer.js')}}"></script>
 
     </head>
 
@@ -73,223 +71,14 @@
                         </tr>
                     </thead>
                     <tbody id="logTableBody">
-                        <!-- {% for entry in logEntries %}
+                        {% for entry in logEntries %}
                         <tr class="{{entry.level.lower()}}">
                             <td class="t-time">{{entry.time}}</td>
                             <td class="t-level">{{entry.level}}</td>
                             <td class="t-route">{{entry.route}}</td>
                             <td class="t-message">{{entry.message}}</td>
                         </tr>
-                        {% endfor %} -->
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:19:00,901</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 149 guilds </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:19:00,901</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 92 subscribed channels </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:19:00,901</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Serving 56964 users </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:19:00,901</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Bot ready </td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-22 21:56:52,868</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">discord.client.connect</td>
-                            <td class="t-message">Attempting a reconnect in 0.05s Traceback (most recent call last): File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/connector.py&#34;, line 843, in _create_direct_connection traces=traces), loop=self._loop) File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/connector.py&#34;, line 730, in _resolve_host self._resolver.resolve(host, port, family=self._family) File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/resolver.py&#34;, line 30, in resolve host, port, type=socket.SOCK_STREAM, family=family) File &#34;/usr/lib/python3.6/concurrent/futures/thread.py&#34;, line 56, in run result = self.fn(*self.args, **self.kwargs) File &#34;/usr/lib/python3.6/socket.py&#34;, line 745, in getaddrinfo for res in _socket.getaddrinfo(host, port, family, type, proto, flags): socket.gaierror: [Errno -3] Temporary failure in name resolution  The above exception was the direct cause of the following exception:  Traceback (most recent call last): File &#34;/usr/local/lib/python3.6/dist-packages/discord/client.py&#34;, line 405, in connect await self._connect() File &#34;/usr/local/lib/python3.6/dist-packages/discord/client.py&#34;, line 375, in _connect self.ws = await asyncio.wait_for(coro, timeout=180.0, loop=self.loop) File &#34;/usr/lib/python3.6/asyncio/tasks.py&#34;, line 358, in wait_for return fut.result() File &#34;/usr/local/lib/python3.6/dist-packages/discord/gateway.py&#34;, line 198, in from_client gateway = await client.http.get_gateway() File &#34;/usr/local/lib/python3.6/dist-packages/discord/http.py&#34;, line 745, in get_gateway data = await self.request(Route(&#39;GET&#39;, &#39;/gateway&#39;)) File &#34;/usr/local/lib/python3.6/dist-packages/discord/http.py&#34;, line 154, in request async with self._session.request(method, url, **kwargs) as r: File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/client.py&#34;, line 843, in __aenter__ self._resp = await self._coro File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/client.py&#34;, line 366, in _request timeout=timeout File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/connector.py&#34;, line 445, in connect proto = await self._create_connection(req, traces, timeout) File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/connector.py&#34;, line 757, in _create_connection req, traces, timeout) File &#34;/usr/local/lib/python3.6/dist-packages/aiohttp/connector.py&#34;, line 847, in _create_direct_connection raise ClientConnectorError(req.connection_key, exc) from exc aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host discordapp.com:443 ssl:None [Temporary failure in name resolution]</td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Username: SpaceX-Launch-Bot </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">ClientID: 411618411169447950 </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 149 guilds </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 92 subscribed channels </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Serving 56978 users </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-22 21:59:24,136</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Bot ready </td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-22 22:17:20,144</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">modules.spacexAPI.getNextLaunchJSON</td>
-                            <td class="t-message">Failed to get data from SpaceX API: ClientConnectorError: Cannot connect to host api.spacexdata.com:443 ssl:None [Temporary failure in name resolution] </td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-22 22:17:20,145</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">modules.backgroundTasks.notificationTask</td>
-                            <td class="t-message">nextLaunchJSON returned 0, skipping this cycle </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 12:44:12,915</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.reaper</td>
-                            <td class="t-message">448130663854505984 is not a valid ID, removing from db </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 16:17:39,153</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.notificationTask</td>
-                            <td class="t-message">Launch info changed, sending notifications </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 16:44:12,949</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.reaper</td>
-                            <td class="t-message">431861800368341020 is not a valid ID, removing from db </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 16:44:12,950</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.reaper</td>
-                            <td class="t-message">469854503458308096 is not a valid ID, removing from db </td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-23 18:22:11,258</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">asyncio.default_exception_handler</td>
-                            <td class="t-message">Task was destroyed but it is pending! task: &lt;Task pending coro=&lt;reaper() running at /opt/SpaceX-Launch-Bot/source/modules/backgroundTasks.py:126&gt; wait_for=&lt;Future pending cb=[&lt;TaskWakeupMethWrapper object at 0x7f25c13868b8&gt;()]&gt;&gt;</td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-23 18:22:11,258</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">asyncio.default_exception_handler</td>
-                            <td class="t-message">Task was destroyed but it is pending! task: &lt;Task pending coro=&lt;notificationTask() running at /opt/SpaceX-Launch-Bot/source/modules/backgroundTasks.py:103&gt; wait_for=&lt;Future pending cb=[&lt;TaskWakeupMethWrapper object at 0x7f25c2408168&gt;()]&gt;&gt;</td>
-                        </tr>
-                        
-                        <tr class="error">
-                            <td class="t-time">2018-08-23 18:22:11,262</td>
-                            <td class="t-level">ERROR</td>
-                            <td class="t-route">asyncio.default_exception_handler</td>
-                            <td class="t-message">Task was destroyed but it is pending! task: &lt;Task pending coro=&lt;Client.close() done, defined at /usr/local/lib/python3.6/dist-packages/discord/client.py:438&gt; wait_for=&lt;Future pending cb=[&lt;TaskWakeupMethWrapper object at 0x7f25c11d4798&gt;()]&gt; cb=[Client._do_cleanup.&lt;locals&gt;.when_future_is_done() at /usr/local/lib/python3.6/dist-packages/discord/client.py:501]&gt;</td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:38,687</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.redisClient.__init__</td>
-                            <td class="t-message">Connected to /tmp/redis.sock on db num 0 </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:38,695</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.&lt;module&gt;</td>
-                            <td class="t-message">Starting bot </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,855</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.notificationTask</td>
-                            <td class="t-message">Started </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,856</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">modules.backgroundTasks.reaper</td>
-                            <td class="t-message">Started </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,890</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Username: SpaceX-Launch-Bot </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,890</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">ClientID: 411618411169447950 </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,891</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 146 guilds </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,891</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Connected to 89 subscribed channels </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,891</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Serving 57030 users </td>
-                        </tr>
-                        
-                        <tr class="info">
-                            <td class="t-time">2018-08-23 18:22:49,891</td>
-                            <td class="t-level">INFO</td>
-                            <td class="t-route">__main__.on_ready</td>
-                            <td class="t-message">Bot ready </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
