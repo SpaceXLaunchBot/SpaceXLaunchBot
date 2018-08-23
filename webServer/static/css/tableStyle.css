@@ -23,7 +23,3 @@
 .critical {background-color: darkred;}
 .error {background-color: darkred;}
 .warning {background-color: darkslategrey;}
-
-.netdata-container-with-legend {
-    width: 32%;
-}
