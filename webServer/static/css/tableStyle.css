@@ -2,12 +2,15 @@
     position: absolute;
     display: inline;
     height: 100%;
-}
-#logTable {
-    height: 100%;
+    width: 65%;
+    padding-left: 30px;
 }
 #logTableHead, #logTableBody {
     display: block;
+}
+#logTable {
+    display: block;
+    height: 100%;
 }
 #logTableBody {
     position: relative;
