@@ -26,7 +26,3 @@
 .critical {background-color: darkred;}
 .error {background-color: darkred;}
 .warning {background-color: darkslategrey;}
-
-#cpu-gauge #ram-gauge {
-    top: 10px;
-}
