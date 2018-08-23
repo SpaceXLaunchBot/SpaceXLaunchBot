@@ -1,9 +1,18 @@
+#logTableContainer {
+    position: absolute;
+    display: inline;
+    height: 100%;
+}
+#logTable {
+    height: 100%;
+}
 #logTableHead, #logTableBody {
     display: block;
 }
 #logTableBody {
+    position: relative;
     overflow: auto;
-    height: 100px;
+    height: 100%;
 }
 
 .t-time {position: relative; width: 8em; padding: 10px}
@@ -15,7 +24,6 @@
 .error {background-color: darkred;}
 .warning {background-color: darkslategrey;}
 
-#logTableContainer {
-    position: absolute;
-    display: inline;
+.nsgraph {
+    width: 32%;
 }
