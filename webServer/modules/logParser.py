@@ -2,7 +2,7 @@ from time import time
 from os import path
 import re
 
-logFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "..", "logs", "bot.log")
+logFilePath = "/var/log/SLB/bot.log"
 # Regex for yyyy:mm:dd hh:mm:ss,ms
 dateTimeFormat = re.compile("^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}),(\d{3})")
 logFileSplitter = " : "
