@@ -22,6 +22,7 @@ $ sudo adduser --system --group --no-create-home SLB
 $ sudo adduser --system --group --no-create-home redis
 
 # We want to be able to update SLB files manually
+# So add yourself to the SLB group
 $ usermod -aG SLB YOUR-USERNAME
 ```
 
