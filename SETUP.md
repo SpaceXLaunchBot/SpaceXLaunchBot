@@ -136,6 +136,10 @@ $ sudo adduser --system --group --no-create-home SLB
 # Everyone can read and write
 # TODO: https://security.stackexchange.com/a/192198
 $ sudo chmod -R 777 /opt/SpaceX-Launch-Bot
+
+# Create log directory
+$ sudo mkdir /var/log/SLB
+$ sudo chown SLB /var/log/SLB
 ```
 
 ### Setup SpaceX-Launch-Bot
