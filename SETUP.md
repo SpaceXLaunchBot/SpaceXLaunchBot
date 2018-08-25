@@ -6,13 +6,28 @@ This guide will install SpaceX-Launch-Bot and the accompanying web server on a c
 
 SSH into your server as root, then execute the commands in the steps below. The commands are split into sections but should all be executed in order
 
-### User and package list setup
+### User setup
 
 ```bash
+# Setup your username (for example: user1)
 $ adduser YOUR-USERNAME
+# We want to be able to use sudo
 $ usermod -aG sudo YOUR-USERNAME
-# Switch to user
+
+# Switch to your user
 $ su - YOUR-USERNAME
+
+# SLB stands for SpaceX-Launch-Bot
+$ sudo adduser --system --group --no-create-home SLB
+$ sudo adduser --system --group --no-create-home redis
+
+# We want to be able to update SLB files manually
+$ usermod -aG SLB YOUR-USERNAME
+```
+
+### Update and upgrade
+
+```bash
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
@@ -96,9 +111,6 @@ $ rm -rf redis-stable redis-stable.tar.gz
 # For putting Redis .conf file(s) in
 $ sudo mkdir /etc/redis
 
-# Set Redis user
-$ sudo adduser --system --group --no-create-home redis
-
 # This is where we dump the DB to 
 $ sudo mkdir /var/lib/redis
 $ sudo chown redis:redis /var/lib/redis
@@ -130,12 +142,11 @@ $ cd SpaceX-Launch-Bot
 Now you can edit `source/config/config.json` with your chosen settings
 
 ```bash
-# SLB stands for SpaceX-Launch-Bot, currently used just for service files
-$ sudo adduser --system --group --no-create-home SLB
-
-# Everyone can read and write
-# TODO: https://security.stackexchange.com/a/192198
-$ sudo chmod -R 777 /opt/SpaceX-Launch-Bot
+# Setup permissions
+$ sudo chown -R SLB:SLB /opt/SpaceX-Launch-Bot
+# https://superuser.com/a/91966
+$ sudo chmod -R u+rwX,go+rX,go-w SpaceX-Launch-Bot/
+$ sudo chmod 0774 /opt/SpaceX-Launch-Bot/scripts/*.sh
 
 # Create log directory
 $ sudo mkdir /var/log/SLB
