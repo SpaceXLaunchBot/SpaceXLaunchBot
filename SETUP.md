@@ -146,12 +146,12 @@ Now you can edit `source/config/config.json` with your chosen settings
 # Setup permissions
 $ sudo chown -R SLB:SLB /opt/SpaceX-Launch-Bot
 # https://superuser.com/a/91966
-$ sudo chmod -R u+rwX,go+rX,go-w SpaceX-Launch-Bot/
+$ sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceX-Launch-Bot
 $ sudo chmod 0774 /opt/SpaceX-Launch-Bot/scripts/*.sh
 
 # Create log directory
 $ sudo mkdir /var/log/SLB
-$ sudo chown SLB /var/log/SLB
+$ sudo chown SLB:SLB /var/log/SLB
 ```
 
 ### Setup SpaceX-Launch-Bot
