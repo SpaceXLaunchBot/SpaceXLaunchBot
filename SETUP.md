@@ -134,6 +134,7 @@ Now you can edit `source/config/config.json` with your chosen settings
 $ sudo adduser --system --group --no-create-home SLB
 
 # Everyone can read and write
+# TODO: https://security.stackexchange.com/a/192198
 $ sudo chmod -R 777 /opt/SpaceX-Launch-Bot
 ```
 

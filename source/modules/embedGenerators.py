@@ -71,12 +71,6 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     )
 
     # Set thumbnail depending on rocket ID
-    """
-    TODO: Test why thumbnail sometimes isn't set
-    Sometimes a thumbnail is not set (or atleast not shown?) in the embed, causing a notification to be sent
-    out about new launch info, when actually the only thing that is different is that the thumbnail did not
-    set properly / show up properly
-    """
     launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     launchEmbed.set_author(name="Launch #{} - {}".format(
         nextLaunchJSON["flight_number"],
@@ -119,7 +113,6 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     notifEmbed.add_field(name="Launch date", value=UTCDate)
 
     if nextLaunchJSON["links"]["reddit_launch"] != None:
-        # TODO: Shorten this to just reddit.com/ID instead of the whole link (looks better)
         notifEmbed.add_field(name="r/SpaceX Launch Thread", value=nextLaunchJSON["links"]["reddit_launch"])
 
     if nextLaunchJSON["links"]["presskit"] != None:
