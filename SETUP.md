@@ -2,6 +2,8 @@
 
 This guide will install SpaceX-Launch-Bot and the accompanying web server on a clean install of Ubuntu 16+
 
+See REMOVE.md for instructions on how to remove the components installed here
+
 ## Instructions
 
 SSH into your server as root, then execute the commands in the steps below. The commands are split into sections but should all be executed in order
@@ -15,7 +17,7 @@ $ adduser YOUR-USERNAME
 $ usermod -aG sudo YOUR-USERNAME
 
 # Switch to your user
-$ su - YOUR-USERNAME
+$ su YOUR-USERNAME
 
 # SLB stands for SpaceX-Launch-Bot
 $ sudo adduser --system --group --no-create-home SLB
