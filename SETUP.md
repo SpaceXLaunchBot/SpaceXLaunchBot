@@ -2,8 +2,6 @@
 
 This guide will install SpaceX-Launch-Bot and the accompanying web server on a clean install of Ubuntu 16+
 
-See REMOVE.md for instructions on how to remove the components installed here
-
 ## Instructions
 
 SSH into your server as root, then execute the commands in the steps below. The commands are split into sections but should all be executed in order
@@ -11,57 +9,14 @@ SSH into your server as root, then execute the commands in the steps below. The 
 ### User setup
 
 ```bash
-# Setup your username (for example: user1)
-$ adduser YOUR-USERNAME
-# We want to be able to use sudo
-$ usermod -aG sudo YOUR-USERNAME
-
-# Switch to your user
-$ su YOUR-USERNAME
-
 # SLB stands for SpaceX-Launch-Bot
 $ sudo adduser --system --group --no-create-home SLB
 $ sudo adduser --system --group --no-create-home redis
-
-# We want to be able to update SLB files manually
-# So add yourself to the SLB group
-$ usermod -aG SLB YOUR-USERNAME
-```
-
-### Update and upgrade
-
-```bash
-$ sudo apt update
-$ sudo apt upgrade -y
-```
-
-### Dissalow root login
-
-```bash
-sudo nano /etc/ssh/sshd_config
-```
-
-Find the following line:
-
-`# PermitRootLogin yes`
-
-Change it to "no" and un-comment (if it isn't already)
-
-`PermitRootLogin no`
-
-Restart the SSHD service
-
-```bash
-service sshd restart
 ```
 
 ### Install things
 
 What these programs are for (reused programs are not repeated):
-
-- `git` for Github cloning
-
-- `fail2ban` for security
 
 - `nginx` acts as a reverse proxy for webServer
 
@@ -69,10 +24,10 @@ What these programs are for (reused programs are not repeated):
 
 - `gcc` and `python3-dev` to build `uWSGI`
 
-- `make`, and `tcl` for building Redis & running tests
+- `make` and `tcl` for building Redis & running tests
 
 ```bash
-$ sudo apt install git fail2ban nginx python3-distutils python3-dev gcc make tcl -y
+$ sudo apt install nginx python3-distutils python3-dev gcc make tcl -y
 
 # Install Digital Ocean monitoring (if using DO as hosting)
 $ curl -sSL https://agent.digitalocean.com/install.sh | sh
@@ -83,9 +38,9 @@ $ curl -sSL https://agent.digitalocean.com/install.sh | sh
 ```bash
 # Make sure SSH connections are allowed in the firewall
 $ sudo ufw allow ssh
-# Make sure NGINX HTTP connections are allowed
+# Make sure NGINX HTTP connections are allowed (or HTTPS and set that up later)
 $ sudo ufw allow 'Nginx HTTP'
-# Turn on the firewall (you may need to reconnect)
+# Turn on the firewall (you may need to reconnect if you are using SSH)
 $ sudo ufw enable
 ```
 
@@ -187,12 +142,6 @@ $ sudo cp -R services/nginx/. /etc/nginx/sites-available/.
 $ sudo ln -s /etc/nginx/sites-available/SLB-webServer /etc/nginx/sites-enabled
 $ sudo ln -s /etc/nginx/sites-available/netdata-webServer /etc/nginx/sites-enabled
 $ sudo ln -s /etc/nginx/sites-available/SLB-webServer-status /etc/nginx/sites-enabled
-```
-
-### Move fail2ban config to correct directory
-
-```bash
-$ sudo cp -R services/fail2ban/. /etc/fail2ban/.
 ```
 
 ### Before starting everything
