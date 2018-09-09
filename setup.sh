@@ -12,9 +12,10 @@ while true; do
 done
 
 echo "Installing apt dependencies"
-sudo apt install redis-server
+sudo apt install redis-server -y
 
 echo "Setting correct owner and permissions for /opt/SpaceX-Launch-Bot"
+sudo adduser --system --group --no-create-home SLB
 sudo chown -R SLB:SLB /opt/SpaceX-Launch-Bot
 sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceX-Launch-Bot
 
@@ -25,20 +26,30 @@ sudo chown SLB:SLB /var/log/SLB
 echo "Install Python3 requirements through pip3"
 sudo pip3 install -r requirements.txt
 
-echo "This script will now open SLB.service for you to input your Discord and DLB tokens into"
-echo "SLB will not work without you doing this"
-read -p "Press enter to continue"
+echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system/.
-sudo nano /etc/systemd/system/SLB.service
+while true; do
+    read -p "Edit SLB.service now? This will have to be done before running it [Yy/Nn]" yn
+    case $yn in
+        [Yy]* ) sudo nano /etc/systemd/system/SLB.service; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer y or n";;
+    esac
+done
 
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
-sudo systemctl reload redis
+sudo systemctl restart redis
 
-echo "This script will now open config.json for you to fill out"
-read -p "Press enter to continue"
-sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json
+while true; do
+    read -p "Fill out config.json now? [Yy/Nn]" yn
+    case $yn in
+        [Yy]* ) sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer y or n";;
+    esac
+done
 
 while true; do
     read -p "Start SLB service now? [Yy/Nn]" yn
