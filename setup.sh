@@ -37,12 +37,10 @@ while true; do
     esac
 done
 
-echo "Stopping Redis"
-sudo systemctl stop redis
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
-sudo systemctl start redis
+sudo systemctl restart redis
 
 while true; do
     read -p "Fill out config.json now? [Yy/Nn]" yn
