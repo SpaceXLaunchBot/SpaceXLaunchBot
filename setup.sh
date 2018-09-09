@@ -40,7 +40,6 @@ done
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
-# TODO: This doesen't work? It just hangs
 sudo systemctl restart redis
 
 while true; do
