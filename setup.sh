@@ -32,7 +32,7 @@ while true; do
     read -p "Edit SLB.service now? This will have to be done before running it [Yy/Nn]" yn
     case $yn in
         [Yy]* ) sudo nano /etc/systemd/system/SLB.service; break;;
-        [Nn]* ) exit;;
+        [Nn]* ) break;;
         * ) echo "Please answer y or n";;
     esac
 done
@@ -40,22 +40,17 @@ done
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
+# TODO: This doesen't work? It just hangs
 sudo systemctl restart redis
 
 while true; do
     read -p "Fill out config.json now? [Yy/Nn]" yn
     case $yn in
         [Yy]* ) sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json; break;;
-        [Nn]* ) exit;;
+        [Nn]* ) break;;
         * ) echo "Please answer y or n";;
     esac
 done
 
-while true; do
-    read -p "Start SLB service now? [Yy/Nn]" yn
-    case $yn in
-        [Yy]* ) sudo systemctl enable SLB; sudo systemctl start SLB; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer y or n";;
-    esac
-done
+echo ""
+echo "Setup finished, setup the Redis database and then enable and run the SLB service"
