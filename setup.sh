@@ -27,7 +27,7 @@ echo "Install Python3 requirements through pip3"
 sudo pip3 install -r requirements.txt
 
 echo "Copying over systemd file(s)"
-sudo cp -R -p services/systemd/. /etc/systemd/system/.
+sudo cp -R -p services/systemd/. /etc/systemd/system
 while true; do
     read -p "Edit SLB.service now? This will have to be done before running it [Yy/Nn]" yn
     case $yn in
