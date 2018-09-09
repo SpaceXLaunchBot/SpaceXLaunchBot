@@ -21,9 +21,10 @@ from modules import errors
 logger = logging.getLogger(__name__)
 
 class redisClient(StrictRedis):
-    def __init__(self, unix_socket_path, dbNum=0):
-        super().__init__(unix_socket_path=unix_socket_path, db=dbNum)
-        logger.info(f"Connected to {unix_socket_path} on db num {dbNum}")
+    def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
+        # Uses redis default host, port, and dbnum by default
+        super().__init__(host=host, port=port, db=dbNum)
+        logger.info(f"Connected to {host}:{port} on db num {dbNum}")
 
     async def safeGet(self, key):
         try:
@@ -71,5 +72,5 @@ class redisClient(StrictRedis):
 def startRedisConnection():
     # Global so it can be imported after being set to a redisClient instance
     global redisConn
-    redisConn = redisClient("/tmp/redis.sock")
+    redisConn = redisClient()
     return redisConn

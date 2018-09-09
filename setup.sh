@@ -38,7 +38,6 @@ while true; do
 done
 
 echo "Copying redis config to /etc/redis"
-# TODO: Using our own redis.conf breaks redis
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
@@ -53,4 +52,7 @@ while true; do
 done
 
 echo ""
-echo "Setup finished, setup the Redis database and then enable and run the SLB service"
+echo "Setup finished"
+echo "If you have a dump.rdb, move it to /var/lib/redis"
+echo "To start SLB enable and start it using systemd"
+echo "For the backup script to work, add your username to the redis group"
