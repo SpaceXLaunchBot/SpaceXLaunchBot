@@ -1,7 +1,7 @@
 echo "For this script to work, these things need to be true:"
 echo "SLB should exist in /opt/SpaceX-Launch-Bot"
 echo "pip3 should be installed"
-echo "You have your Discord bot token and Discord-bot-list token ready"
+echo "You have a Discord bot token and a Discord-bot-list token for that bot"
 while true; do
     read -p "Is this correct? [Yy/Nn]" yn
     case $yn in
