@@ -38,6 +38,7 @@ while true; do
 done
 
 echo "Copying redis config to /etc/redis"
+# TODO: Using our own redis.conf breaks redis
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
