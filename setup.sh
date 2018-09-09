@@ -1,3 +1,4 @@
+echo "This script will erase your current redis config if you have one"
 echo "For this script to work, these things need to be true:"
 echo "SLB should exist in /opt/SpaceX-Launch-Bot"
 echo "pip3 should be installed"
@@ -53,6 +54,7 @@ done
 
 echo ""
 echo "Setup finished"
-echo "If you have a dump.rdb, move it to /var/lib/redis"
+echo "If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again"
 echo "To start SLB enable and start it using systemd"
 echo "For the backup script to work, add your username to the redis group"
+echo ""
