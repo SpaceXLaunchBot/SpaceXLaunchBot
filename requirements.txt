@@ -1,7 +1,4 @@
 git+https://github.com/Rapptz/discord.py@rewrite
-flask
-uwsgi
 aredis
 redis
-requests
-imtfc
+aiohttp

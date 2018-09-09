@@ -5,9 +5,7 @@ After=systemd-user-sessions.service
 After=network-online.target
 
 [Service]
-# Env var
 Environment="SpaceXLaunchBotToken=DISCORD-TOKEN" "dblToken=DBL-TOKEN"
-# Service stuff
 User=SLB
 Type=idle
 WorkingDirectory=/opt/SpaceX-Launch-Bot/source
