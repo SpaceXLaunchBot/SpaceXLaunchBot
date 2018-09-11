@@ -8,6 +8,7 @@ Key                       | Value
 subscribedChannels        | pickled( subscribedChannelList )
 launchNotifSent           | True / False as a string
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
+server snowflake          | The snowflake as a string
 """
 
 # TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079
@@ -30,7 +31,7 @@ class redisClient(StrictRedis):
         try:
             return await self.get(key)
         except Exception as e:
-            logger.error(f"Failed to safeGet data from Redis: {type(e).__name__}: {e}")
+            logger.error(f"Failed to safeGet data from Redis:  key: {key} error: {type(e).__name__}: {e}")
             return 0
 
     async def safeSet(self, key, value, serialize=False):
@@ -39,7 +40,7 @@ class redisClient(StrictRedis):
                 return await self.set(key, pickle.dumps(value))    
             return await self.set(key, value)
         except Exception as e:
-            logger.error(f"Failed to safeSet data in Redis: {type(e).__name__}: {e}")
+            logger.error(f"Failed to safeSet data in Redis: key: {key} error: {type(e).__name__}: {e}")
             return 0
     
     async def getSubscribedChannelIDs(self):
@@ -68,6 +69,21 @@ class redisClient(StrictRedis):
         if llied:
             return pickle.loads(llied)
         return 0
+
+    async def setServerPing(self, serverSnowflake, roleToPing):
+        serverSnowflake = str(serverSnowflake)
+        return self.safeSet(serverSnowflake, roleToPing, True)
+    
+    async def getServerPing(self, serverSnowflake):
+        serverSnowflake = str(serverSnowflake)
+        # TODO: An error in safeGet will log, but if we can't find a snowflake
+        # we don't want to log that, as that is expected, so rewrite this bit
+        # to deal with an error if the key doesen't exist
+        return self.safeGet(serverSnowflake)
+
+    async def removeServerPing(self, serverSnowflake):
+        serverSnowflake = str(serverSnowflake)
+        return self.delete(serverSnowflake)
 
 def startRedisConnection():
     # Global so it can be imported after being set to a redisClient instance

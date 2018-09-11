@@ -119,6 +119,11 @@ class SpaceXLaunchBotClient(discord.Client):
 
             await safeSend(message.channel, text=replyMsg)
 
+        elif message.content.startswith(PREFIX + "addPing"):
+            pass
+        elif message.content.startswith(PREFIX + "removePing"):
+            pass
+            
         elif message.content.startswith(PREFIX + "info"):
             await safeSend(message.channel, embed=staticMessages.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
