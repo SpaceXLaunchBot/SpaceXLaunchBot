@@ -120,9 +120,9 @@ class SpaceXLaunchBotClient(discord.Client):
             await safeSend(message.channel, text=replyMsg)
 
         elif message.content.startswith(PREFIX + "addPing"):
-            pass
+            guildID = message.guild  # TODO: Deal with: does not exist if a PM
         elif message.content.startswith(PREFIX + "removePing"):
-            pass
+            guildID = message.guild
             
         elif message.content.startswith(PREFIX + "info"):
             await safeSend(message.channel, embed=staticMessages.infoEmbed)

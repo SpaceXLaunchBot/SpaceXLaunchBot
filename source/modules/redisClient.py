@@ -8,7 +8,7 @@ Key                       | Value
 subscribedChannels        | pickled( subscribedChannelList )
 launchNotifSent           | True / False as a string
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
-server snowflake          | The snowflake as a string
+Guild snowflake          | The snowflake as a string
 """
 
 # TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079
@@ -70,20 +70,20 @@ class redisClient(StrictRedis):
             return pickle.loads(llied)
         return 0
 
-    async def setServerPing(self, serverSnowflake, roleToPing):
-        serverSnowflake = str(serverSnowflake)
-        return self.safeSet(serverSnowflake, roleToPing, True)
+    async def setguildPing(self, guildSnowflake, roleToPing):
+        guildSnowflake = str(guildSnowflake)
+        return self.safeSet(guildSnowflake, roleToPing, True)
     
-    async def getServerPing(self, serverSnowflake):
-        serverSnowflake = str(serverSnowflake)
+    async def getguildPing(self, guildSnowflake):
+        guildSnowflake = str(guildSnowflake)
         # TODO: An error in safeGet will log, but if we can't find a snowflake
         # we don't want to log that, as that is expected, so rewrite this bit
         # to deal with an error if the key doesen't exist
-        return self.safeGet(serverSnowflake)
+        return self.safeGet(guildSnowflake)
 
-    async def removeServerPing(self, serverSnowflake):
-        serverSnowflake = str(serverSnowflake)
-        return self.delete(serverSnowflake)
+    async def removeguildPing(self, guildSnowflake):
+        guildSnowflake = str(guildSnowflake)
+        return self.delete(guildSnowflake)
 
 def startRedisConnection():
     # Global so it can be imported after being set to a redisClient instance
