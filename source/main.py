@@ -139,7 +139,7 @@ class SpaceXLaunchBotClient(discord.Client):
             if rolesToMention.strip() == "":
                 replyMsg = "Invalid input for addPing command"
             else:
-                replyMsg = "Added ping for tag(s): {rolesToMention}"
+                replyMsg = f"Added ping for tag(s): {rolesToMention}"
                 ret = await redisConn.safeSet(guildID, rolesToMention, True)
                 if not ret:
                     return await safeSend(message.channel, embed=errors.dbErrorEmbed)
