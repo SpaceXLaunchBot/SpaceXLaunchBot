@@ -2,6 +2,7 @@
 For dealing with file system interactions, currently just config file(s)
 """
 
+from modules.errors import fatalError
 from os import path
 import json
 

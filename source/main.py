@@ -137,9 +137,9 @@ class SpaceXLaunchBotClient(discord.Client):
             rolesToMention = " ".join(message.content.split("addping")[1:])
             
             if rolesToMention.strip() == "":
-                replyMsg = "Invalid input for addPing command"
+                replyMsg = "Invalid input for addping command"
             else:
-                replyMsg = f"Added ping for tag(s): {rolesToMention}"
+                replyMsg = f"Added launch notification ping for tag(s): {rolesToMention}"
                 ret = await redisConn.safeSet(guildID, rolesToMention, True)
                 if not ret:
                     return await safeSend(message.channel, embed=errors.dbErrorEmbed)
@@ -150,8 +150,7 @@ class SpaceXLaunchBotClient(discord.Client):
             guildID = str(message.guild.id)
             ret = await redisConn.delete(guildID)
             if not ret:
-                # TODO: Word this better
-                return await safeSend(message.channel, text="No pings were found to be removed")
+                return await safeSend(message.channel, text="This server has no pings to be removed")
             await safeSend(message.channel, text="Removed ping succesfully")
             
 

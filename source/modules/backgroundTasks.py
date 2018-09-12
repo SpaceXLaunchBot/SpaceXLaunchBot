@@ -106,9 +106,11 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
                         
         # Save any changed data to redis
-        # TODO: Grab the return value from safeSet and log an error if it didn't set properly
-        await redisConn.safeSet("launchNotifSent", launchNotifSent)
-        await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
+        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
+        e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
+        if not e1 or not e2:
+            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
+            logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
 
@@ -131,6 +133,9 @@ async def reaper(client):
                 # No duplicate elements in the list so remove(value) will always work
                 subbedChannelIDs.remove(channelID)
                 logger.info(f"{channelID} is not a valid ID, removing from db")
-        # TODO: Grab the return value from safeSet and log an error if it didn't set properly
-        await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+
+        ret = await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+        if not ret:
+            logger.error(f"safeSet subscribedChannels failed, returned {ret}")
+
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)
