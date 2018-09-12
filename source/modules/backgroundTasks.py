@@ -67,8 +67,7 @@ async def notificationTask(client):
                 launchNotifSent = "False"
                 latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
-                # new launch found, send all "subscribed" channel the embed
-                # TODO: Show the user(s) why this was sent (new time, etc.)
+                # New launch found, send all "subscribed" channel the embed
                 for channelID in subbedChannelIDs:
                     channel = client.get_channel(channelID)
                     await safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
