@@ -12,8 +12,8 @@ async def safeSend(channel, text=None, embed=None):
     user, and if an error occurs, safely supress it
     On failure, returns:
         -1 : Nothing to send (text & embed are `None`)
-        -2 : HTTPException
-        -3 : Forbidden
+        -2 : Forbidden
+        -3 : HTTPException
         -4 : InvalidArgument
     On success returns what the channel.send method returns
     """
