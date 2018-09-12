@@ -131,7 +131,7 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 replyMsg = f"addPing recieved with server: {guildID} and role: {rolesToMention}"
                 logger.info(replyMsg)
-                logger.info(f"message.channel.guild: {message.channel.guild}")
+                logger.info(f"message.channel.guild.id: {message.channel.guild.id}")
             
             await safeSend(message.channel, text=replyMsg) 
 
