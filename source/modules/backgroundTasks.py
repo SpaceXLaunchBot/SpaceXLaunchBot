@@ -95,13 +95,13 @@ async def notificationTask(client):
 
                             guildID = channel.guild.id
                             tags = await redisConn.safeGet(guildID)
+                            
+                            await safeSend(channel, embed=notifEmbed)
                             if tags:
                                 # Tag the roles/users requested
                                 tags = pickle.loads(tags)
-                                await channel.send(tags, embed=notifEmbed)
-                            else:
-                                await safeSend(channel, embed=notifEmbed)
-
+                                await safeSend(channel, text=tags)
+                            
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
                         
