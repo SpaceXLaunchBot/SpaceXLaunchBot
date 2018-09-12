@@ -61,8 +61,9 @@ class SpaceXLaunchBotClient(discord.Client):
         await dbl.updateGuildCount(len(self.guilds))
 
     async def on_message(self, message):
-        if message.author.bot:
+        if message.author.bot or not message.guild:
             # Don't reply to bots (includes self)
+            # Don't reply to PM's
             return
 
         try:
@@ -120,9 +121,20 @@ class SpaceXLaunchBotClient(discord.Client):
             await safeSend(message.channel, text=replyMsg)
 
         elif message.content.startswith(PREFIX + "addPing"):
+            replyMsg: str
             guildID = message.guild  # TODO: Deal with: does not exist if a PM
-        elif message.content.startswith(PREFIX + "removePing"):
-            guildID = message.guild
+            roleToMention = " ".join(message.content.split("addPing")[1:])
+            
+            if roleToMention.strip() == "":
+                replyMsg = "Invalid role for addPing command"
+            else:
+                replyMsg = f"addPing recieved with server: {guildID} and role: {roleToMention}"
+                print(replyMsg)
+            
+            await safeSend(message.channel, text=replyMsg) 
+
+        # elif message.content.startswith(PREFIX + "removePing"):
+        #     guildID = message.guild
             
         elif message.content.startswith(PREFIX + "info"):
             await safeSend(message.channel, embed=staticMessages.infoEmbed)
