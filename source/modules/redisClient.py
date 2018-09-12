@@ -31,6 +31,7 @@ class redisClient(StrictRedis):
         """
         Returns 0 if get(key) fails
         """
+        # TODO: De-serialize here?
         try:
             return await self.get(key)
         except Exception as e:

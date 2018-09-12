@@ -134,13 +134,12 @@ class SpaceXLaunchBotClient(discord.Client):
         elif message.content.startswith(PREFIX + "addping"):
             replyMsg: str
             guildID = str(message.guild.id)
-            # Can be multiple: "addping @role1 @role2"
             rolesToMention = " ".join(message.content.split("addping")[1:])
             
             if rolesToMention.strip() == "":
-                replyMsg = "Invalid role for addPing command"
+                replyMsg = "Invalid input for addPing command"
             else:
-                replyMsg = "Added ping for role(s): {rolesToMention}"
+                replyMsg = "Added ping for tag(s): {rolesToMention}"
                 ret = await redisConn.safeSet(guildID, rolesToMention, True)
                 if not ret:
                     return await safeSend(message.channel, embed=errors.dbErrorEmbed)

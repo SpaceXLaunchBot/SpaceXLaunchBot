@@ -3,8 +3,10 @@ Async tasks to run in the background
 """
 
 from datetime import datetime, timedelta
+from copy import deepcopy
 import asyncio
 import logging
+import pickle
 
 from modules.redisClient import redisConn
 
@@ -87,11 +89,24 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchNotifSent = "True"
 
-                        # TODO: Get roles to ping from Redis
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)
-                            await safeSend(channel, embed=notifEmbed)
+
+                            """TODO:
+                            If channel.guild.id is in redis, get roles, create
+                            new embed object and deep copy notifEmbed, then add
+                            a new field with the tags
+                            """
+                            guildID = channel.guild.id
+                            tags = await redisConn.safeGet(guildID)
+                            if tags:
+                                tags = pickle.loads(tags)
+                                notifEmbedWithRoles = deepcopy(notifEmbed)
+                                notifEmbedWithRoles.add_field(name="Ping", value=tags)
+                                await safeSend(channel, embed=notifEmbedWithRoles)
+                            else:
+                                await safeSend(channel, embed=notifEmbed)
 
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
