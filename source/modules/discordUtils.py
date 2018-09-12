@@ -24,9 +24,9 @@ async def safeSend(channel, text=None, embed=None):
             return await channel.send(embed=embed)
         else:
             return -1
-    except errors.HTTPException:
-        return -2  # API down, Message too big, etc.
     except errors.Forbidden:
+        return -2  # API down, Message too big, etc.
+    except errors.HTTPException:
         return -3  # No permission to message this channel
     except errors.InvalidArgument:
         return -4  # Invalid channel ID (channel deleted)
@@ -48,9 +48,9 @@ async def safeSendLaunchInfo(channel, embeds):
     """
     for embed in embeds:
         v = await safeSend(channel, embed=embed)
-        if v == -2:
+        if v == -3:
             pass  # Embed might be too big, try lite version
-        elif v == -3 or v == -4:
+        elif v == -2 or v == -4:
             return 0
         else:
             return v

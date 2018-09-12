@@ -98,9 +98,7 @@ async def notificationTask(client):
                             if tags:
                                 # Tag the roles/users requested
                                 tags = pickle.loads(tags)
-                                notifEmbedWithTags = deepcopy(notifEmbed)
-                                notifEmbedWithTags.add_field(name="Ping", value=tags)
-                                await safeSend(channel, embed=notifEmbedWithTags)
+                                await channel.send(tags, embed=notifEmbed)
                             else:
                                 await safeSend(channel, embed=notifEmbed)
 
