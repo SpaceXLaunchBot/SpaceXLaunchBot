@@ -123,7 +123,7 @@ class SpaceXLaunchBotClient(discord.Client):
         elif message.content.startswith(PREFIX + "addping"):
             replyMsg: str
             guildID = message.guild  # TODO: Deal with: does not exist if a PM
-            roleToMention = " ".join(message.content.split("addPing")[1:])
+            roleToMention = " ".join(message.content.split("addping")[1:])
             
             if roleToMention.strip() == "":
                 replyMsg = "Invalid role for addPing command"
