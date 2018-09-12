@@ -93,18 +93,14 @@ async def notificationTask(client):
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)
 
-                            """TODO:
-                            If channel.guild.id is in redis, get roles, create
-                            new embed object and deep copy notifEmbed, then add
-                            a new field with the tags
-                            """
                             guildID = channel.guild.id
                             tags = await redisConn.safeGet(guildID)
                             if tags:
+                                # Tag the roles/users requested
                                 tags = pickle.loads(tags)
-                                notifEmbedWithRoles = deepcopy(notifEmbed)
-                                notifEmbedWithRoles.add_field(name="Ping", value=tags)
-                                await safeSend(channel, embed=notifEmbedWithRoles)
+                                notifEmbedWithTags = deepcopy(notifEmbed)
+                                notifEmbedWithTags.add_field(name="Ping", value=tags)
+                                await safeSend(channel, embed=notifEmbedWithTags)
                             else:
                                 await safeSend(channel, embed=notifEmbed)
 
@@ -112,6 +108,7 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
                         
         # Save any changed data to redis
+        # TODO: Grab the return value from safeSet and log an error if it didn't set properly
         await redisConn.safeSet("launchNotifSent", launchNotifSent)
         await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
 
@@ -122,9 +119,8 @@ async def reaper(client):
     Every $reaperInterval check for non-existant (dead) channels in subbedChannelIDs
     and remove them
     Essentially garbage collection for the channel list
-    TODO: If the subscribed channel IDs are all fake, reaper only deals with
-    half at a time. e.g. 32 fake IDs = 16 removed in 1 reaper interval - find
-    out why this is hapenning and fix it
+    TODO: If parts of the Discord API goes down, this can sometimes trigger the
+    removal of channels that do exist but Discord can't find them
     """
     await client.wait_until_ready()
     logger.info("Started")
@@ -137,5 +133,6 @@ async def reaper(client):
                 # No duplicate elements in the list so remove(value) will always work
                 subbedChannelIDs.remove(channelID)
                 logger.info(f"{channelID} is not a valid ID, removing from db")
+        # TODO: Grab the return value from safeSet and log an error if it didn't set properly
         await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
         await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)

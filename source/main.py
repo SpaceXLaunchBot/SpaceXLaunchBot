@@ -150,7 +150,8 @@ class SpaceXLaunchBotClient(discord.Client):
             guildID = str(message.guild.id)
             ret = await redisConn.delete(guildID)
             if not ret:
-                return await safeSend(message.channel, embed=errors.dbErrorEmbed)
+                # TODO: Word this better
+                return await safeSend(message.channel, text="No pings were found to be removed")
             await safeSend(message.channel, text="Removed ping succesfully")
             
 
