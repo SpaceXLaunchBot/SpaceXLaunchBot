@@ -87,6 +87,7 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchNotifSent = "True"
 
+                        # TODO: Get roles to ping from Redis
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)

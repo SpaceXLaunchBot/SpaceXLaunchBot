@@ -28,13 +28,19 @@ class redisClient(StrictRedis):
         logger.info(f"Connected to {host}:{port} on db num {dbNum}")
 
     async def safeGet(self, key):
+        """
+        Returns 0 if get(key) fails
+        """
         try:
             return await self.get(key)
         except Exception as e:
-            logger.error(f"Failed to safeGet data from Redis:  key: {key} error: {type(e).__name__}: {e}")
+            logger.error(f"Failed to safeGet data from Redis: key: {key} error: {type(e).__name__}: {e}")
             return 0
 
     async def safeSet(self, key, value, serialize=False):
+        """
+        Returns True is successful, else returns 0
+        """
         try:
             if serialize:
                 return await self.set(key, pickle.dumps(value))    
@@ -69,21 +75,6 @@ class redisClient(StrictRedis):
         if llied:
             return pickle.loads(llied)
         return 0
-
-    async def setguildPing(self, guildSnowflake, roleToPing):
-        guildSnowflake = str(guildSnowflake)
-        return self.safeSet(guildSnowflake, roleToPing, True)
-    
-    async def getguildPing(self, guildSnowflake):
-        guildSnowflake = str(guildSnowflake)
-        # TODO: An error in safeGet will log, but if we can't find a snowflake
-        # we don't want to log that, as that is expected, so rewrite this bit
-        # to deal with an error if the key doesen't exist
-        return self.safeGet(guildSnowflake)
-
-    async def removeguildPing(self, guildSnowflake):
-        guildSnowflake = str(guildSnowflake)
-        return self.delete(guildSnowflake)
 
 def startRedisConnection():
     # Global so it can be imported after being set to a redisClient instance

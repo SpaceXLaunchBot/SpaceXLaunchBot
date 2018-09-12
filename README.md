@@ -32,6 +32,8 @@ Command|Description|Permissions needed
 `!nextlaunch`|Send the latest launch information message to the current channel|None
 `!addchannel`|Add the current channel to the launch notification service|Admin
 `!removechannel`|Remove the current channel from the launch notification service|Admin
+`!addping @role`|Add a role to be pinged when the "launching soon" (launch notification) message is sent. Can also be formatted with multiple roles like this: `!addping @role1 @role2`|Admin
+`!removeping`|Stop any roles being pinged when the "launching soon" (launch notification) message is sent|Admin
 `!info`|Show information about the bot|None
 `!help`|List these commands|None
 

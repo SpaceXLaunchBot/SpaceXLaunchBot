@@ -75,6 +75,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # Commands can be in any case
         message.content = message.content.lower()
         
+
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == 0:
@@ -82,6 +83,9 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             await safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+
+
+        # Add/remove channel commands
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
             # Add channel ID to subbed channels
@@ -95,7 +99,9 @@ class SpaceXLaunchBotClient(discord.Client):
             subbedChannelIDs = subbedChannelsDict["list"]
             if message.channel.id not in subbedChannelIDs:
                 subbedChannelIDs.append(message.channel.id)
-                await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+                ret = await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+                if not ret:
+                    return await safeSend(message.channel, embed=errors.dbErrorEmbed)
             else:
                 replyMsg = "This channel is already subscribed to the launch notification service"
 
@@ -114,30 +120,43 @@ class SpaceXLaunchBotClient(discord.Client):
             try:
                 # No duplicate elements in the list so remove(value) will always work
                 subbedChannelIDs.remove(message.channel.id)
-                await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+                ret = await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
+                if not ret:
+                    return await safeSend(message.channel, embed=errors.dbErrorEmbed)
             except ValueError:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
 
             await safeSend(message.channel, text=replyMsg)
 
+
+        # Add/remove ping commands
+
         elif message.content.startswith(PREFIX + "addping"):
             replyMsg: str
-            guildID = message.guild.id
-            # Can be multiple: "@role1 @role2"
+            guildID = str(message.guild.id)
+            # Can be multiple: "addping @role1 @role2"
             rolesToMention = " ".join(message.content.split("addping")[1:])
             
             if rolesToMention.strip() == "":
                 replyMsg = "Invalid role for addPing command"
             else:
-                replyMsg = f"addPing recieved with server: {guildID} and role: {rolesToMention}"
-                logger.info(replyMsg)
-                logger.info(f"message.channel.guild.id: {message.channel.guild.id}")
+                replyMsg = "Added ping for role(s): {rolesToMention}"
+                ret = await redisConn.safeSet(guildID, rolesToMention, True)
+                if not ret:
+                    return await safeSend(message.channel, embed=errors.dbErrorEmbed)
             
-            await safeSend(message.channel, text=replyMsg) 
+            await safeSend(message.channel, text=replyMsg)
 
-        # elif message.content.startswith(PREFIX + "removeping"):
-        #     guildID = message.guild
+        elif message.content.startswith(PREFIX + "removeping"):
+            guildID = str(message.guild.id)
+            ret = await redisConn.delete(guildID)
+            if not ret:
+                return await safeSend(message.channel, embed=errors.dbErrorEmbed)
+            await safeSend(message.channel, text="Removed ping succesfully")
             
+
+        # Misc
+
         elif message.content.startswith(PREFIX + "info"):
             await safeSend(message.channel, embed=staticMessages.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
