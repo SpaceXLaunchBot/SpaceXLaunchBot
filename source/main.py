@@ -120,7 +120,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
             await safeSend(message.channel, text=replyMsg)
 
-        elif message.content.startswith(PREFIX + "addPing"):
+        elif message.content.startswith(PREFIX + "addping"):
             replyMsg: str
             guildID = message.guild  # TODO: Deal with: does not exist if a PM
             roleToMention = " ".join(message.content.split("addPing")[1:])
@@ -133,7 +133,7 @@ class SpaceXLaunchBotClient(discord.Client):
             
             await safeSend(message.channel, text=replyMsg) 
 
-        # elif message.content.startswith(PREFIX + "removePing"):
+        # elif message.content.startswith(PREFIX + "removeping"):
         #     guildID = message.guild
             
         elif message.content.startswith(PREFIX + "info"):
