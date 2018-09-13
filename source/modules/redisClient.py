@@ -27,19 +27,23 @@ class redisClient(StrictRedis):
 
     async def safeGet(self, key, deserialize=False):
         """
-        Returns 0 if get(key) fails
+        Returns 0 if get(key) fails or a value does not exist for that key
         """
         try:
-            if deserialize:
-                return pickle.loads(await self.get(key))
-            return (await self.get(key)).decode("UTF-8")
+            value = await self.get(key)
+            if not value:
+                return 0
+            elif deserialize:
+                return pickle.loads(value)
+            else:
+                return value.decode("UTF-8")
         except Exception as e:
             logger.error(f"Failed to safeGet data from Redis: key: {key} error: {type(e).__name__}: {e}")
             return 0
 
     async def safeSet(self, key, value, serialize=False):
         """
-        Returns True is successful, else returns 0
+        Returns 0 if set() fails
         """
         try:
             if serialize:
