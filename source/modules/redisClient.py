@@ -27,12 +27,13 @@ class redisClient(StrictRedis):
         super().__init__(host=host, port=port, db=dbNum)
         logger.info(f"Connected to {host}:{port} on db num {dbNum}")
 
-    async def safeGet(self, key):
+    async def safeGet(self, key, deserialize=False):
         """
         Returns 0 if get(key) fails
         """
-        # TODO: De-serialize here?
         try:
+            if deserialize:
+                return pickle.loads(await self.get(key))
             return await self.get(key)
         except Exception as e:
             logger.error(f"Failed to safeGet data from Redis: key: {key} error: {type(e).__name__}: {e}")
@@ -58,9 +59,9 @@ class redisClient(StrictRedis):
         not, we can just ignore it and iterate an empty list instead of having
         to check for an error. e.g. the reaper doesen't care if there was an err
         """
-        channels = await self.safeGet("subscribedChannels")
+        channels = await self.safeGet("subscribedChannels", deserialize="True")
         if channels:
-            return {"list": pickle.loads(channels), "err": False}
+            return {"list": channels, "err": False}
         # Cannot get any subscribed channels so return empty
         return {"list": [], "err": True}
     
@@ -72,9 +73,9 @@ class redisClient(StrictRedis):
         return "False"
     
     async def getLatestLaunchInfoEmbedDict(self):
-        llied = await self.safeGet("latestLaunchInfoEmbedDict")
+        llied = await self.safeGet("latestLaunchInfoEmbedDict", deserialize="True")
         if llied:
-            return pickle.loads(llied)
+            return llied
         return 0
 
 def startRedisConnection():

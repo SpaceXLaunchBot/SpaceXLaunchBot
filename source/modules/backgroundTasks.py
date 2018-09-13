@@ -94,12 +94,11 @@ async def notificationTask(client):
                             channel = client.get_channel(channelID)
 
                             guildID = channel.guild.id
-                            tags = await redisConn.safeGet(guildID)
+                            tags = await redisConn.safeGet(guildID, deserialize=True)
                             
                             await safeSend(channel, embed=notifEmbed)
                             if tags:
-                                # Tag the roles/users requested
-                                tags = pickle.loads(tags)
+                                # Ping the roles/users (tags) requested
                                 await safeSend(channel, text=tags)
                             
                     else:
