@@ -29,9 +29,6 @@ discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Setup background tasks
-        self.loop.create_task(backgroundTasks.notificationTask(self))
-        self.loop.create_task(backgroundTasks.reaper(self))
     
     async def on_ready(self):
 
@@ -43,6 +40,10 @@ class SpaceXLaunchBotClient(discord.Client):
             await redisConn.safeSet("launchNotifSent", "False")
         if not await redisConn.exists("latestLaunchInfoEmbedDict"):
             await redisConn.safeSet("latestLaunchInfoEmbedDict", errors.generalErrorEmbed, True)
+
+        # Run background tasks after initializing database
+        self.loop.create_task(backgroundTasks.notificationTask(self))
+        self.loop.create_task(backgroundTasks.reaper(self))
 
         global dbl  # Can't define this until client (self) is ready
         dbl = dblAPI.dblClient(self)
