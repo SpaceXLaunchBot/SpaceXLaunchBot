@@ -34,6 +34,15 @@ class SpaceXLaunchBotClient(discord.Client):
         self.loop.create_task(backgroundTasks.reaper(self))
     
     async def on_ready(self):
+
+        # Initialise needed keys with default values if they do not exist
+        if not await redisConn.exists("subscribedChannels"):
+            await redisConn.safeSet("subscribedChannels", [], True)
+        if not await redisConn.exists("launchNotifSent"):
+            await redisConn.safeSet("launchNotifSent", "False")
+        if not await redisConn.exists("latestLaunchInfoEmbedDict"):
+            await redisConn.safeSet("latestLaunchInfoEmbedDict", errors.generalErrorEmbed, True)
+
         global dbl  # Can't define this until client (self) is ready
         dbl = dblAPI.dblClient(self)
 
