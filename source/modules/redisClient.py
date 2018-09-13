@@ -62,7 +62,8 @@ class redisClient(StrictRedis):
         to check for an error. e.g. the reaper doesen't care if there was an err
         """
         channels = await self.safeGet("subscribedChannels", deserialize="True")
-        if channels:
+        if channels or channels == []:
+            # An empty list isn't an err
             return {"list": channels, "err": False}
         # Cannot get any subscribed channels so return empty
         return {"list": [], "err": True}
