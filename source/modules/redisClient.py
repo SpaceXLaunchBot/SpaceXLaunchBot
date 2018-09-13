@@ -4,11 +4,11 @@ Async Redis stuff
 Redis structure:
 
 Key                       | Value
---------------------------|------------------------------------------
+--------------------------|-----------------------------------------------------
 subscribedChannels        | pickled( subscribedChannelList )
 launchNotifSent           | True / False as a string
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
-Guild snowflake          | The snowflake as a string
+Guild snowflake as a str  | Mentions to ping when a "launching soon" msg is sent
 """
 
 # TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079

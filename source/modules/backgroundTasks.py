@@ -94,12 +94,12 @@ async def notificationTask(client):
                             channel = client.get_channel(channelID)
 
                             guildID = channel.guild.id
-                            tags = await redisConn.safeGet(guildID, deserialize=True)
+                            mentions = await redisConn.safeGet(guildID, deserialize=True)
                             
                             await safeSend(channel, embed=notifEmbed)
-                            if tags:
-                                # Ping the roles/users (tags) requested
-                                await safeSend(channel, text=tags)
+                            if mentions:
+                                # Ping the roles/users (mentions) requested
+                                await safeSend(channel, text=mentions)
                             
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
