@@ -30,12 +30,11 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Setup background tasks
-        # Will func(self) work?
         self.loop.create_task(backgroundTasks.notificationTask(self))
         self.loop.create_task(backgroundTasks.reaper(self))
     
     async def on_ready(self):
-        global dbl  # Can't define this until client is ready
+        global dbl  # Can't define this until client (self) is ready
         dbl = dblAPI.dblClient(self)
 
         await self.change_presence(activity=discord.Game(name="with rockets"))
@@ -56,9 +55,11 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_guild_join(self, guild):
         await dbl.updateGuildCount(len(self.guilds))
+        logger.info(f"Joined guild, ID: {guild.id}")
 
     async def on_guild_remove(self, guild):
         await dbl.updateGuildCount(len(self.guilds))
+        logger.info(f"Removed from guild, ID: {guild.id}")
 
     async def on_message(self, message):
         if message.author.bot or not message.guild:

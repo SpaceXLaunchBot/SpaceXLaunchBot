@@ -18,7 +18,7 @@ async def getNextLaunchJSON():
         try:
             async with session.get(upcomingLaunchesURL) as response:
                 if response.status != 200:
-                    logger.error("response.status != 200")
+                    logger.error("Failed to get data from SpaceX API: response.status != 200")
                     return 0
                 return (await response.json())[0]
         except Exception as e:
