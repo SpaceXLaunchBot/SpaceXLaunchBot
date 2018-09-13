@@ -11,8 +11,6 @@ latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
 Guild snowflake as a str  | Mentions to ping when a "launching soon" msg is sent
 """
 
-# TODO: Explicitly encode / decode - https://stackoverflow.com/a/25745079
-
 from aredis import StrictRedis
 import logging
 import pickle
@@ -34,7 +32,7 @@ class redisClient(StrictRedis):
         try:
             if deserialize:
                 return pickle.loads(await self.get(key))
-            return await self.get(key)
+            return (await self.get(key)).decode("UTF-8")
         except Exception as e:
             logger.error(f"Failed to safeGet data from Redis: key: {key} error: {type(e).__name__}: {e}")
             return 0
@@ -46,7 +44,7 @@ class redisClient(StrictRedis):
         try:
             if serialize:
                 return await self.set(key, pickle.dumps(value))    
-            return await self.set(key, value)
+            return await self.set(key, value.encode("UTF-8"))
         except Exception as e:
             logger.error(f"Failed to safeSet data in Redis: key: {key} error: {type(e).__name__}: {e}")
             return 0
@@ -69,7 +67,7 @@ class redisClient(StrictRedis):
         lns = await self.safeGet("launchNotifSent")
         if lns:
             # get returns a byteString
-            return lns.decode("UTF-8")
+            return lns
         return "False"
     
     async def getLatestLaunchInfoEmbedDict(self):
