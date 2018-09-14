@@ -55,9 +55,11 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
     return launchEmbed, originalLaunchEmbedLite
 
 async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
-    # A "lite" version of the embed that should never reach the embed size limit
-    # small is used to determine whether this is going to be used to make the bigger embed,
-    # or actually needs to contain less content
+    """
+    A "lite" version of the embed that should never reach the embed size limit
+    small is used to determine whether this is going to be used to make the
+    bigger embed, or actually needs to contain less content
+    """
 
     embedTitle = "r/SpaceX Discussion"
     if nextLaunchJSON["links"]["reddit_campaign"] == None:

@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/upcoming?order=asc"
+upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/next"
 
 async def getNextLaunchJSON():
     """
@@ -20,7 +20,7 @@ async def getNextLaunchJSON():
                 if response.status != 200:
                     logger.error("Failed to get data from SpaceX API: response.status != 200")
                     return 0
-                return (await response.json())[0]
+                return await response.json()
         except Exception as e:
             logger.error(f"Failed to get data from SpaceX API: {type(e).__name__}: {e}")
             return 0
