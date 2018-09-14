@@ -9,10 +9,12 @@ from discord import Embed
 from modules.utils import UTCFromTimestamp
 from modules.colours import hexColours
 
+# Use Github as image hosting
+logoBaseURL = "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"
 rocketIDImages = {
-    "falcon9": "http://spacex-launch-bot.gq/static/images/falcon9.png",
-    "falconheavy": "http://spacex-launch-bot.gq/static/images/falconHeavy.png",
-    "falcon1": "http://spacex-launch-bot.gq/static/images/logo.jpg"
+    "falcon9": f"{logoBaseURL}/falcon9.png",
+    "falconheavy": f"{logoBaseURL}/falconHeavy.png",
+    "falcon1": f"{logoBaseURL}/logo.jpg"
 }
 
 # TODO: Add checks for empty fields in Embeds: empty fields cause HTTPException
