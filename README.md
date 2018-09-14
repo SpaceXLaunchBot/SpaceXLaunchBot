@@ -19,11 +19,11 @@ A Discord bot for providing news and information about upcoming SpaceX launches.
 
 A launch information message shows detailed information about the next upcoming launch. This is sent through the notification service as well as when the `!nextlaunch` command is used
 
-![LaunchInfo](screenshots/launchInfo.png)
+![LaunchInfo](images/screenshots/launchInfo.png)
 
 A launch notification message that provides useful links to things such as the livestream and press kit. This message is only sent through the notification service (more details below)
 
-![LaunchNotif](screenshots/launchNotif.png)
+![LaunchNotif](images/screenshots/launchNotif.png)
 
 ## Commands
 
