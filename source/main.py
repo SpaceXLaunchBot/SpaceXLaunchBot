@@ -88,6 +88,8 @@ class SpaceXLaunchBotClient(discord.Client):
         message.content = message.content.lower()
         
 
+        # Info command
+
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == 0:
@@ -155,7 +157,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 ret = await redisConn.safeSet(guildID, rolesToMention, True)
                 if not ret:
                     return await safeSend(message.channel, embed=errors.dbErrorEmbed)
-            
+                            
             await safeSend(message.channel, text=replyMsg)
 
         elif message.content.startswith(PREFIX + "removeping"):
