@@ -33,7 +33,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
 
         # Initialise needed keys with default values if they do not exist
-        # TODO: Use this as a chance to test if connected to redis properly
+        # Only needed when running for the first time / new db
         if not await redisConn.exists("subscribedChannels"):
             await redisConn.safeSet("subscribedChannels", [], True)
         if not await redisConn.exists("launchNotifSent"):
