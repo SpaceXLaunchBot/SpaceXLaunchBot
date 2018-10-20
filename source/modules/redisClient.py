@@ -6,7 +6,7 @@ Redis structure:
 Key                       | Value
 --------------------------|-----------------------------------------------------
 subscribedChannels        | pickled( subscribedChannelList )
-launchNotifSent           | True / False as a string
+launchNotifSent           | "True" / "False" (str not bool)
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
 Guild snowflake as a str  | Mentions to ping when a "launching soon" msg is sent
 """
