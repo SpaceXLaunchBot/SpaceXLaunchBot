@@ -2,14 +2,11 @@
 Async tasks to run in the background
 """
 
-from datetime import datetime, timedelta
-from copy import deepcopy
 import asyncio
 import logging
-import pickle
+from datetime import datetime, timedelta
 
 from modules.redisClient import redisConn
-
 from modules import embedGenerators, spacexAPI, utils, fs
 from modules.discordUtils import safeSend, safeSendLaunchInfo
 

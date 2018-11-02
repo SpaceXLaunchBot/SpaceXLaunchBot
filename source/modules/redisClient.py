@@ -15,8 +15,6 @@ from aredis import StrictRedis
 import logging
 import pickle
 
-from modules import errors
-
 logger = logging.getLogger(__name__)
 
 class redisClient(StrictRedis):

@@ -2,8 +2,6 @@
 Handles interactions with the discordbots.org API
 """
 
-from asyncio import sleep
-from os import environ
 import aiohttp
 import logging
 

@@ -5,7 +5,6 @@ Run the bot and start everything
 # Built-ins and 3rd party modules
 import logging
 import discord
-from os import path
 
 # Setup logging stuff
 from modules import logSetup

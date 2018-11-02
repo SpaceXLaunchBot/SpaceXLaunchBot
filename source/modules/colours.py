@@ -1,6 +1,6 @@
 """
-Currently just for storing hexColours in a seperate file away
-from import conflicts
+Currently just for storing hexColours in a seperate file away from import
+conflicts
 """
 
 hexColours = {

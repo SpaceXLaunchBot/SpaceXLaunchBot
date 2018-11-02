@@ -3,7 +3,6 @@ Setup logging realted stuff
 """
 
 import logging
-from os import path
 
 from modules.fs import config
 
