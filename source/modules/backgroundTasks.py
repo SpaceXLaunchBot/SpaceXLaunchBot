@@ -58,6 +58,7 @@ async def notificationTask(client):
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
+            # Launch information message
             if latestLaunchInfoEmbedDict == launchInfoEmbedDict:
                 pass
             else:
@@ -66,11 +67,12 @@ async def notificationTask(client):
                 launchNotifSent = "False"
                 latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
-                # New launch found, send all "subscribed" channel the embed
+                # New launch found, send all "subscribed" channels the embed
                 for channelID in subbedChannelIDs:
                     channel = client.get_channel(channelID)
                     await safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
+            # Launch notification message
             launchTime = nextLaunchJSON["launch_date_unix"]
             if await utils.isInt(launchTime):
                 
@@ -104,8 +106,9 @@ async def notificationTask(client):
         # Save any changed data to redis
         e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
         e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
-        if not e1 or not e2:
+        if not e1:
             logger.error(f"safeSet launchNotifSent failed, returned {e1}")
+        elif not e2:
             logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
