@@ -120,6 +120,7 @@ async def reaper(client):
     Essentially garbage collection for the channel list
     TODO: If parts of the Discord API goes down, this can sometimes trigger the
     removal of channels that do exist but Discord can't find them
+    TODO: Clean Redis server of unused key/values
     """
     await client.wait_until_ready()
     logger.info("Started")
