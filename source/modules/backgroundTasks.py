@@ -130,7 +130,6 @@ async def reaper(client):
         for channelID in subbedChannelIDs:
             # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
             if client.get_channel(channelID) == None:
-                # No duplicate elements in the list so remove(value) will always work
                 subbedChannelIDs.remove(channelID)
                 logger.info(f"{channelID} is not a valid ID, removing from db")
 
