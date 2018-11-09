@@ -44,3 +44,14 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 This means the bot will send a new launch information message to the subscribed channel every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different
 
 A launch notification message will be sent around 15 minutes (not exact, due to technical reasons) before a launch actually happens
+
+---
+
+## Planned Updates / Improvments
+
+- Make this readme better (easier to read, understand, etc.)
+- Allow more per-server settings (such as prefix, types of notifs, etc.)
+- Improve `info` command (more info, better formatting)
+- Add a voting command or some way of insetivising / integrating DBL voting
+- Generally clean up code
+- "Allowing a mention as the prefix ("@MyBot help") or adding a way to find the bot's prefix with only a mention ("@MyBot" or "@MyBot, what's your prefix?") will help users who are new to your bot in getting started. (Make sure that whatever the message is, it's easily found. A great way to do this is by including it in your bot's presence.)"
