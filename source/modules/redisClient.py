@@ -32,7 +32,7 @@ class redisClient(StrictRedis):
             if not value:
                 return 0
             elif deserialize:
-                return pickle.loads(value)
+                return pickle.loads(value, protocol=pickle.HIGHEST_PROTOCOL)
             else:
                 return value.decode("UTF-8")
         except Exception as e:
@@ -45,7 +45,7 @@ class redisClient(StrictRedis):
         """
         try:
             if serialize:
-                return await self.set(key, pickle.dumps(value))    
+                return await self.set(key, pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL))    
             return await self.set(key, value.encode("UTF-8"))
         except Exception as e:
             logger.error(f"Failed to safeSet data in Redis: key: {key} error: {type(e).__name__}: {e}")
