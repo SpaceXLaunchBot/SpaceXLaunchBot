@@ -1,19 +1,29 @@
-<p align="center">
-<img width="400" src="https://discordbots.org/api/widget/411618411169447950.svg" href='https://discordbots.org/bot/411618411169447950'>
-</p>
+<h1 align="center" style="font-weight: bold">SpaceX Launch Bot</h1>
 
 <p align="center">
+    <a href="https://discordbots.org/bot/411618411169447950" >
+        <img src="https://discordbots.org/api/widget/status/411618411169447950.svg?noavatar=true" alt="SpaceX-Launch-Bot" />
+    </a>
+    <a href="https://discordbots.org/bot/411618411169447950" >
+        <img src="https://discordbots.org/api/widget/servers/411618411169447950.svg?noavatar=true" alt="SpaceX-Launch-Bot" />
+    </a>
+    <a href="https://discordbots.org/bot/411618411169447950" >
+        <img src="https://discordbots.org/api/widget/upvotes/411618411169447950.svg?noavatar=true" alt="SpaceX-Launch-Bot" />
+    </a>
+    <br/>
     <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456" alt="Discord Invite">
-        <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg"/>
+        <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat-square&colorA=35383d"/>
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
-        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg"/>
+        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg?style=flat-square&colorA=35383d"/>
+    </a>
+    <br/>
+    <a href="https://discordbots.org/bot/411618411169447950" >
+        <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceX-Launch-Bot" />
     </a>
 </p>
 
-<p align="center">
 A Discord bot for providing news and information about upcoming SpaceX launches. The bot also provides a notification service for updating you with the latest launch information, and reminders for launches that will be happening soon
-</p>
 
 ## Usage
 
