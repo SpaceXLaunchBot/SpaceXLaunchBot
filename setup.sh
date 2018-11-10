@@ -1,16 +1,21 @@
+function askyn {
+    while true; do
+        read -p "$1 [Yy/Nn]" yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please answer y or n";;
+        esac
+    done
+}
+
 echo "This script will erase your current redis config if you have one"
 echo "For this script to work, these things need to be true:"
 echo "SLB should exist in /opt/SpaceX-Launch-Bot"
 echo "pip3 should be installed"
 echo "You have a Discord bot token and a Discord-bot-list token for that bot"
-while true; do
-    read -p "Is this correct? [Yy/Nn]" yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer y or n";;
-    esac
-done
+
+askyn "Is this correct?" || exit
 
 echo "Installing apt dependencies"
 sudo apt install redis-server -y
@@ -29,28 +34,14 @@ sudo pip3 install -r requirements.txt
 
 echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
-while true; do
-    read -p "Edit SLB.service now? This will have to be done before running it [Yy/Nn]" yn
-    case $yn in
-        [Yy]* ) sudo nano /etc/systemd/system/SLB.service; break;;
-        [Nn]* ) break;;
-        * ) echo "Please answer y or n";;
-    esac
-done
+askyn "Skip editing SLB.service? This will have to be done before running it" || sudo nano /etc/systemd/system/SLB.service
 
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
 
-while true; do
-    read -p "Fill out config.json now? [Yy/Nn]" yn
-    case $yn in
-        [Yy]* ) sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json; break;;
-        [Nn]* ) break;;
-        * ) echo "Please answer y or n";;
-    esac
-done
+askyn "Skip editing config.json?" || sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json
 
 echo ""
 echo "Setup finished"
