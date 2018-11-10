@@ -16,6 +16,7 @@ async def isInt(possiblyInteger):
     except ValueError:
         return False
 
+# TODO: Rename this to be more specific to launch-time timestamps
 async def UTCFromTimestamp(timestamp):
     dateIsInt = await isInt(timestamp)
     if dateIsInt:

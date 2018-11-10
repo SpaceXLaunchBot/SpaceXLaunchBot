@@ -54,4 +54,7 @@ A launch notification message will be sent around 15 minutes (not exact, due to 
 - Improve `info` command (more info, better formatting)
 - Add a voting command or some way of insetivising / integrating DBL voting
 - Generally clean up code
+    + Clean up `/modules`, seperate into more meaningful dirs
+    + Store settings, data, etc. in objects instead of dicts (where appropriate)
 - "Allowing a mention as the prefix ("@MyBot help") or adding a way to find the bot's prefix with only a mention ("@MyBot" or "@MyBot, what's your prefix?") will help users who are new to your bot in getting started. (Make sure that whatever the message is, it's easily found. A great way to do this is by including it in your bot's presence.)"
+- Complete in-code TODOs
