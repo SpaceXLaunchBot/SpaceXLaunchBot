@@ -12,10 +12,10 @@
     </a>
     <br/>
     <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456" alt="Discord Invite">
-        <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat-square&colorA=35383d"/>
+        <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d"/>
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
-        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg?style=flat-square&colorA=35383d"/>
+        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg?style=flat&colorA=35383d"/>
     </a>
     <br/>
     <a href="https://discordbots.org/bot/411618411169447950" >
