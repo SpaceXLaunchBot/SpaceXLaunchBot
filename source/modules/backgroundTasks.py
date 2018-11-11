@@ -100,13 +100,13 @@ async def notificationTask(client):
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
                         
-        # Save any changed data to redis
-        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
-        e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
-        if not e1:
-            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
-        if not e2:
-            logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
+            # Save any changed data to redis
+            e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
+            e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
+            if not e1:
+                logger.error(f"safeSet launchNotifSent failed, returned {e1}")
+            if not e2:
+                logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
 
