@@ -9,11 +9,13 @@ function askyn {
     done
 }
 
-echo "This script will erase your current redis config if you have one"
-echo "For this script to work, these things need to be true:"
-echo "SLB should exist in /opt/SpaceX-Launch-Bot"
-echo "pip3 should be installed"
-echo "You have a Discord bot token and a Discord-bot-list token for that bot"
+cat << EndOfMsg
+This script will erase your current redis config if you have one
+For this script to work, these things need to be true:
+SLB should exist in /opt/SpaceX-Launch-Bot
+pip3 should be installed
+You have a Discord bot token and a Discord-bot-list token for that bot
+EndOfMsg
 
 askyn "Is this correct?" || exit
 
@@ -34,17 +36,21 @@ sudo pip3 install -r requirements.txt
 
 echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
-askyn "Skip editing SLB.service? This will have to be done before running it" || sudo nano /etc/systemd/system/SLB.service
+if askyn "Edit SLB.service now? This will have to be done before running it";
+then sudo nano /etc/systemd/system/SLB.service; fi
 
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
 
-askyn "Skip editing config.json?" || sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json
+if askyn "Edit config.json now?";
+then sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json; fi
 
-echo ""
-echo "Setup finished"
-echo "If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again"
-echo "To start SLB enable and start it using systemd"
-echo ""
+cat << EndOfMsg
+
+Setup finished
+If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again"
+To start SLB enable and start it using systemd"
+
+EndOfMsg
