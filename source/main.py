@@ -40,8 +40,8 @@ class SpaceXLaunchBotClient(discord.Client):
         # Only needed when running for the first time / new db
         if not await redisConn.exists("subscribedChannels"):
             await redisConn.safeSet("subscribedChannels", [], True)
-        if not await redisConn.exists("launchNotistructent"):
-            await redisConn.safeSet("launchNotistructent", "False")
+        if not await redisConn.exists("launchNotifSent"):
+            await redisConn.safeSet("launchNotifSent", "False")
         if not await redisConn.exists("latestLaunchInfoEmbedDict"):
             await redisConn.safeSet("latestLaunchInfoEmbedDict", statics.generalErrorEmbed, True)
 

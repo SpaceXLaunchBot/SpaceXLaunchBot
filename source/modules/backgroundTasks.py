@@ -36,7 +36,7 @@ async def notificationTask(client):
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
-        launchNotistructent = await redisConn.getLaunchNotistructent()
+        launchNotifSent = await redisConn.getlaunchNotifSent()
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
         if subbedChannelsDict["err"]:
@@ -63,7 +63,7 @@ async def notificationTask(client):
             else:
                 logger.info("Launch info changed, sending notifications")
 
-                launchNotistructent = "False"
+                launchNotifSent = "False"
                 latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
                 # New launch found, send all "subscribed" channels the embed
@@ -82,10 +82,10 @@ async def notificationTask(client):
 
                 # If the launch time is within the next hour
                 if soon > launchTime:
-                    if launchNotistructent == "False":
+                    if launchNotifSent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
-                        launchNotistructent = "True"
+                        launchNotifSent = "True"
 
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
@@ -100,13 +100,13 @@ async def notificationTask(client):
                                 await client.safeSend(channel, text=mentions)
                             
                     else:
-                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotistructent is {launchNotistructent}")
+                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
                         
         # Save any changed data to redis
-        e1 = await redisConn.safeSet("launchNotistructent", launchNotistructent)
+        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
         e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
         if not e1:
-            logger.error(f"safeSet launchNotistructent failed, returned {e1}")
+            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
         elif not e2:
             logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
