@@ -26,6 +26,7 @@ class redisClient(StrictRedis):
     async def safeGet(self, key, deserialize=False):
         """
         Returns 0 if get(key) fails or a value does not exist for that key
+        If deserialize is False, the returned value is decoded using UTF-8
         """
         try:
             value = await self.get(key)
@@ -42,6 +43,7 @@ class redisClient(StrictRedis):
     async def safeSet(self, key, value, serialize=False):
         """
         Returns 0 if set() fails
+        If serialize is False, the set value is encoded using UTF-8
         """
         try:
             if serialize:
@@ -69,7 +71,6 @@ class redisClient(StrictRedis):
     async def getLaunchNotifSent(self):
         lns = await self.safeGet("launchNotifSent")
         if lns:
-            # get returns a byteString
             return lns
         return "False"
     
@@ -79,8 +80,8 @@ class redisClient(StrictRedis):
             return llied
         return 0
 
-def startRedisConnection():
-    # Global so it can be imported after being set to a redisClient instance
-    global redisConn
-    redisConn = redisClient()
-    return redisConn
+"""
+When this is imported for the first time, set up our Redis connection and save
+to a variable so anything importing this can access it
+"""
+redisConn = redisClient()

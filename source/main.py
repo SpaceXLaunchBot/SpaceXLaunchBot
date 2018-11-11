@@ -20,11 +20,10 @@ logger.info("Starting bot")
 
 # Import everything else now logging is set up
 import discord
-from modules import redisClient, utils, statics, apis, backgroundTasks, \
-                    embedGenerators
+from modules import embedGenerators, utils, statics, apis, backgroundTasks                    
 
-# Setup and start redis connection
-redisConn = redisClient.startRedisConnection()
+# Automaticallu sets up and starts redis connection when imported
+from modules.redisClient import redisConn
 
 # Important vars
 PREFIX = fs.config["commandPrefix"]
