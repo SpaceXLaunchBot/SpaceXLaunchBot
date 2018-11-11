@@ -7,14 +7,14 @@ import logging
 from datetime import datetime, timedelta
 
 from modules.redisClient import redisConn
-from modules import embedGenerators, utils, fs, apis
+from modules import embedGenerators, struct, struct, apis
 
 logger = logging.getLogger(__name__)
 
 ONE_MINUTE = 60  # Just makes things a little more readable
-API_CHECK_INTERVAL = fs.config["apiCheckInterval"]
-LAUNCH_NOTIF_DELTA = timedelta(minutes = fs.config["launchNotificationDelta"])
-REAPER_INTERVAL = fs.config["reaperInterval"]
+API_CHECK_INTERVAL = struct.config["apiCheckInterval"]
+LAUNCH_NOTIF_DELTA = timedelta(minutes = struct.config["launchNotificationDelta"])
+REAPER_INTERVAL = struct.config["reaperInterval"]
 
 async def notificationTask(client):
     """
@@ -36,7 +36,7 @@ async def notificationTask(client):
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
-        launchNotifSent = await redisConn.getLaunchNotifSent()
+        launchNotistructent = await redisConn.getLaunchNotistructent()
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
         if subbedChannelsDict["err"]:
@@ -63,7 +63,7 @@ async def notificationTask(client):
             else:
                 logger.info("Launch info changed, sending notifications")
 
-                launchNotifSent = "False"
+                launchNotistructent = "False"
                 latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
                 # New launch found, send all "subscribed" channels the embed
@@ -73,7 +73,7 @@ async def notificationTask(client):
 
             # Launch notification message
             launchTime = nextLaunchJSON["launch_date_unix"]
-            if await utils.isInt(launchTime):
+            if await struct.isInt(launchTime):
                 
                 launchTime = int(launchTime)
 
@@ -82,10 +82,10 @@ async def notificationTask(client):
 
                 # If the launch time is within the next hour
                 if soon > launchTime:
-                    if launchNotifSent == "False":
+                    if launchNotistructent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
-                        launchNotifSent = "True"
+                        launchNotistructent = "True"
 
                         notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
@@ -100,13 +100,13 @@ async def notificationTask(client):
                                 await client.safeSend(channel, text=mentions)
                             
                     else:
-                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
+                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotistructent is {launchNotistructent}")
                         
         # Save any changed data to redis
-        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
+        e1 = await redisConn.safeSet("launchNotistructent", launchNotistructent)
         e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
         if not e1:
-            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
+            logger.error(f"safeSet launchNotistructent failed, returned {e1}")
         elif not e2:
             logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 

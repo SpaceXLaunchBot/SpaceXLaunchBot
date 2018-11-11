@@ -4,13 +4,13 @@ Run the bot and start everything
 
 # Things that need importing for logging to be setup
 import logging
-from modules import fs
+from modules import struct
 
 # Setup logging (direct logging to file, only log INFO level and above)
 # Do this before other imports as some local modules use logging when imported
-logFilePath = fs.config["logFilePath"]
+logFilePath = struct.config["logFilePath"]
 handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
-handler.setFormatter(logging.Formatter(fs.config["logFormat"]))
+handler.setFormatter(logging.Formatter(struct.config["logFormat"]))
 logging.basicConfig(level=logging.INFO, handlers=[handler])
 # Change discord to only log ERROR level and above
 logging.getLogger("discord").setLevel(logging.ERROR)
@@ -20,15 +20,15 @@ logger.info("Starting bot")
 
 # Import everything else now logging is set up
 import discord
-from modules import embedGenerators, utils, statics, apis, backgroundTasks                    
+from modules import embedGenerators, struct, statics, apis, backgroundTasks                    
 
 # Automaticallu sets up and starts redis connection when imported
 from modules.redisClient import redisConn
 
 # Important vars
-PREFIX = fs.config["commandPrefix"]
-discordToken = utils.loadEnvVar("SpaceXLaunchBotToken")
-dblToken = utils.loadEnvVar("dblToken")
+PREFIX = struct.config["commandPrefix"]
+discordToken = struct.loadEnvVar("SpaceXLaunchBotToken")
+dblToken = struct.loadEnvVar("dblToken")
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -40,8 +40,8 @@ class SpaceXLaunchBotClient(discord.Client):
         # Only needed when running for the first time / new db
         if not await redisConn.exists("subscribedChannels"):
             await redisConn.safeSet("subscribedChannels", [], True)
-        if not await redisConn.exists("launchNotifSent"):
-            await redisConn.safeSet("launchNotifSent", "False")
+        if not await redisConn.exists("launchNotistructent"):
+            await redisConn.safeSet("launchNotistructent", "False")
         if not await redisConn.exists("latestLaunchInfoEmbedDict"):
             await redisConn.safeSet("latestLaunchInfoEmbedDict", statics.generalErrorEmbed, True)
 

@@ -6,7 +6,7 @@ Note: f-strings aren't used in this module as .format is nicer for lots of forma
 from copy import deepcopy
 from discord import Embed
 
-from modules.utils import UTCFromTimestamp
+from modules.struct import launchTimeFromTS
 from modules.statics import falconRed
 
 # Use Github as image hosting
@@ -16,8 +16,6 @@ rocketIDImages = {
     "falconheavy": f"{logoBaseURL}/falconHeavy.png",
     "falcon1": f"{logoBaseURL}/logo.jpg"
 }
-
-# TODO: Add checks for empty fields in Embeds: empty fields cause HTTPException
 
 async def getLaunchInfoEmbed(nextLaunchJSON):
     # No need to do the same thing twice
@@ -91,7 +89,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
         ))
 
     # Add a field for the launch date  
-    UTCDate = await UTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    UTCDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
     launchEmbed.add_field(name="Launch date", value=UTCDate)
 
     return launchEmbed
@@ -113,7 +111,7 @@ async def getLaunchNotifEmbed(nextLaunchJSON):
     else:
         notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
 
-    UTCDate = await UTCFromTimestamp(nextLaunchJSON["launch_date_unix"])
+    UTCDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
     notifEmbed.add_field(name="Launch date", value=UTCDate)
 
     if nextLaunchJSON["links"]["reddit_launch"] != None:

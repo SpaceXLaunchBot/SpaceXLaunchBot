@@ -5,7 +5,7 @@ colour objects, help message, and the various error messages
 
 from discord import Embed, Colour
 
-from modules.fs import config
+from modules.struct import config
 
 # Convert chosen RGB values into usable Colour objects
 errRGBValues = config["colours"]["errorRed"]
