@@ -1,6 +1,5 @@
 """
-Contains functions for generating/creating embeds about launches to send to users
-Note: f-strings aren't used in this module as .format is nicer for lots of formatting
+Stuff for generating/creating embeds about launches to send to users
 """
 
 from copy import deepcopy

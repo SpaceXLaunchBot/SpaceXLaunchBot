@@ -1,8 +1,5 @@
 """
-Async Redis stuff
-
 Redis structure:
-
 Key                       | Value
 --------------------------|-----------------------------------------------------
 subscribedChannels        | pickled( subscribedChannelList )

@@ -1,7 +1,3 @@
-"""
-Contains stuff for dealing with various APIs
-"""
-
 import aiohttp
 import logging
 
