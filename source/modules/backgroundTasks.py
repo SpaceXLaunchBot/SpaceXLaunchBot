@@ -36,7 +36,7 @@ async def notificationTask(client):
 
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
-        launchNotifSent = await redisConn.getlaunchNotifSent()
+        launchNotifSent = await redisConn.getLaunchNotifSent()
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
         if subbedChannelsDict["err"]:
