@@ -33,7 +33,7 @@ class redisClient(StrictRedis):
             if not value:
                 return 0
             elif deserialize:
-                return pickle.loads(value, protocol=pickle.HIGHEST_PROTOCOL)
+                return pickle.loads(value)
             else:
                 return value.decode("UTF-8")
         except Exception as e:
