@@ -8,10 +8,8 @@ from discord import Embed, Colour
 from modules.struct import config
 
 # Convert chosen RGB values into usable Colour objects
-errRGBValues = config["colours"]["errorRed"]
-FRRGBValues = config["colours"]["falconRed"]
-errorRed = Colour.from_rgb(errRGBValues[0], errRGBValues[1], errRGBValues[2])
-falconRed = Colour.from_rgb(FRRGBValues[0], FRRGBValues[1], FRRGBValues[2])
+errorRed = Colour.from_rgb(*config["colours"]["errorRed"])
+falconRed = Colour.from_rgb(*config["colours"]["falconRed"])
 
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
@@ -19,7 +17,7 @@ infoEmbed = Embed(
     color=falconRed
 )
 infoEmbed.add_field(name="Github", value="https://github.com/r-spacex/SpaceX-Launch-Bot")
-infoEmbed.add_field(name="Contact", value="If you have any questions or suggestions, you can message my owner, <@263412940869206027>, or raise an issue in the Github repo")
+infoEmbed.add_field(name="Contact", value=f"If you have any questions or suggestions, you can message my owner, {config['ownerTag']}, or raise an issue in the Github repo")
 
 helpEmbed = Embed(
     title="SpaceX-Launch-Bot Commands",
@@ -34,7 +32,7 @@ helpEmbed.add_field(name="removeping", value="Stop any roles/users on the server
 helpEmbed.add_field(name="info", value="Information about this bot\n*Any user can use this command*")
 helpEmbed.add_field(name="help", value="List these commands\n*Any user can use this command*")
 
-nextLaunchErrorEmbed = Embed(title="Error", description="An launchInfoEmbed error occurred, contact <@263412940869206027>", color=errorRed)
-apiErrorEmbed = Embed(title="Error", description="An API error occurred, contact <@263412940869206027>", color=errorRed)
-generalErrorEmbed = Embed(title="Error", description="An error occurred, contact <@263412940869206027>", color=errorRed)
-dbErrorEmbed  = Embed(title="Error", description="A database error occurred, contact <@263412940869206027>", color=errorRed)
+nextLaunchErrorEmbed = Embed(title="Error", description=f"An launchInfoEmbed error occurred, contact {config['ownerTag']}", color=errorRed)
+apiErrorEmbed = Embed(title="Error", description=f"An API error occurred, contact {config['ownerTag']}", color=errorRed)
+generalErrorEmbed = Embed(title="Error", description=f"An error occurred, contact {config['ownerTag']}", color=errorRed)
+dbErrorEmbed  = Embed(title="Error", description=f"A database error occurred, contact {config['ownerTag']}", color=errorRed)

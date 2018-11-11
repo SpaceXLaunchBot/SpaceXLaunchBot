@@ -100,6 +100,5 @@ ENV/
 # mypy
 .mypy_cache/
 
-# SpaceX-Launch-Bot
+# SLB
 *.pkl
-source/tools/data.json
