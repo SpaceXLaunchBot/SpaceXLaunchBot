@@ -42,15 +42,13 @@ async def notificationTask(client):
         if subbedChannelsDict["err"]:
             logger.error("getSubscribedChannelIDs returned err, skipping this cycle")
             pass
-        
-        elif latestLaunchInfoEmbedDict == 0:
+        elif not latestLaunchInfoEmbedDict:
             logger.error("latestLaunchInfoEmbedDict is 0, skipping this cycle")
             pass
-
-        elif nextLaunchJSON == 0:
+        elif not nextLaunchJSON:
             logger.error("nextLaunchJSON returned 0, skipping this cycle")
             pass  # Error, wait for next loop/cycle
-        
+
         else:
             subbedChannelIDs = subbedChannelsDict["list"]
 
@@ -107,7 +105,7 @@ async def notificationTask(client):
         e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
         if not e1:
             logger.error(f"safeSet launchNotifSent failed, returned {e1}")
-        elif not e2:
+        if not e2:
             logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
