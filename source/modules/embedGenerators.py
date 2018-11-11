@@ -35,10 +35,10 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
     for component in nextLaunchJSON["reuse"]:
         if nextLaunchJSON["reuse"][component]:
             reusing.append(component)
-    if reusing == []:
-        reusing = ["None"]  # Can't have empty fields
-    launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
-
+    if reusing != []:
+        # Only add this field if there are reused components
+        launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
+    
     # Add a field for each payload, with basic information
     for payload in nextLaunchJSON["rocket"]["second_stage"]["payloads"]:
         launchEmbed.add_field(
