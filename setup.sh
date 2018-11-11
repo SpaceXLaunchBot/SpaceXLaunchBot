@@ -1,4 +1,4 @@
-function askyn {
+askyn() {
     while true; do
         read -p "$1 [Yy/Nn]" yn
         case $yn in
