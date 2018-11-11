@@ -7,7 +7,7 @@ from copy import deepcopy
 from discord import Embed
 
 from modules.utils import UTCFromTimestamp
-from modules.colours import hexColours
+from modules.statics import falconRed
 
 # Use Github as image hosting
 logoBaseURL = "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"
@@ -71,7 +71,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
         title=embedTitle,
         url=nextLaunchJSON["links"]["reddit_campaign"],  # URL can be None
         description="This information has been reduced as the data is too large to contain in this embed",
-        color=hexColours["falconRed"]
+        color=falconRed
     )
 
     # Set thumbnail depending on rocket ID
@@ -97,7 +97,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
     return launchEmbed
 
 async def getLaunchNotifEmbed(nextLaunchJSON):
-    notifEmbed = Embed(color=hexColours["falconRed"])
+    notifEmbed = Embed(color=falconRed)
 
     notifEmbed.set_author(name="{} is launching soon!".format(nextLaunchJSON["mission_name"]))
     

@@ -7,8 +7,7 @@ import logging
 from datetime import datetime, timedelta
 
 from modules.redisClient import redisConn
-from modules import embedGenerators, spacexAPI, utils, fs
-from modules.discordUtils import safeSend, safeSendLaunchInfo
+from modules import embedGenerators, utils, fs, apis
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ async def notificationTask(client):
         subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
         launchNotifSent = await redisConn.getLaunchNotifSent()
-        nextLaunchJSON = await spacexAPI.getNextLaunchJSON()
+        nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
         if subbedChannelsDict["err"]:
             logger.error("getSubscribedChannelIDs returned err, skipping this cycle")
@@ -70,7 +69,7 @@ async def notificationTask(client):
                 # New launch found, send all "subscribed" channels the embed
                 for channelID in subbedChannelIDs:
                     channel = client.get_channel(channelID)
-                    await safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
+                    await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             # Launch notification message
             launchTime = nextLaunchJSON["launch_date_unix"]
@@ -95,10 +94,10 @@ async def notificationTask(client):
                             guildID = channel.guild.id
                             mentions = await redisConn.safeGet(guildID, deserialize=True)
                             
-                            await safeSend(channel, embed=notifEmbed)
+                            await client.safeSend(channel, embed=notifEmbed)
                             if mentions:
                                 # Ping the roles/users (mentions) requested
-                                await safeSend(channel, text=mentions)
+                                await client.safeSend(channel, text=mentions)
                             
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")

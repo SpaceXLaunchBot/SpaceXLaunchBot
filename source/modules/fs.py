@@ -2,9 +2,10 @@
 For dealing with file system interactions, currently just config file(s)
 """
 
-from modules.errors import fatalError
 from os import path
 import json
+
+from modules.errors import fatalError
 
 """
 Load local config file and create a dictionary that can be accessed by everything
