@@ -11,11 +11,18 @@ Planned new Redis structure:
 Key                       | Value
 --------------------------|-----------------------------------------------------
 Guild snowflake           | pickled ( A dictionary containing server options )
-                          | Also use this to replace subscribedChannels, read
-                          | the warning https://redis.io/commands/keys here and
-                          | decide how to use (or maybe use sets?)
-launchingSoonNotifSent    | "True" / "False" (str not bool)
-latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
+                          | This replaces "subscribedChannels"
+                          | TODO: Read the warnings at
+                          | https://redis.io/commands/keys and decide how to use
+notificationTaskStore     | A pickled() dictionary containing variables that
+                          | need to persist between runs of the notification
+                          | background task. This currently includes:
+                          | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
+                          | "latestLaunchInfoEmbedDict" = launchInfoEmbedDict
+metricsStore              | Used for bot metrics. Currently the value is a Redis
+                          | set that contains unix timestamps of when a command
+                          | was recieved (TODO: Don't just keep growing the set,
+                          | maybe limit to a certain timeframe?)
 """
 
 from aredis import StrictRedis
