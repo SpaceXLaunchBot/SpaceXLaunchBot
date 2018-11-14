@@ -6,6 +6,16 @@ subscribedChannels        | pickled( subscribedChannelList )
 launchNotifSent           | "True" / "False" (str not bool)
 latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
 Guild snowflake as a str  | Mentions to ping when a "launching soon" msg is sent
+
+Planned new Redis structure:
+Key                       | Value
+--------------------------|-----------------------------------------------------
+Guild snowflake           | pickled ( A dictionary containing server options )
+                          | Also use this to replace subscribedChannels, read
+                          | the warning https://redis.io/commands/keys here and
+                          | decide how to use (or maybe use sets?)
+launchingSoonNotifSent    | "True" / "False" (str not bool)
+latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
 """
 
 from aredis import StrictRedis

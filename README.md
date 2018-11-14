@@ -57,6 +57,7 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 - [ ] Allow more per-server settings (such as prefix, types of notifs, etc.)
 - [ ] Improve `info` command (more info, better formatting)
 - [ ] Add a voting command or some way of insetivising / integrating DBL voting
+- [ ] Restructure Redis
 - [ ] Generally clean up code
   - [x] Clean up `/modules`, seperate into more meaningful dirs
   - [ ] Store settings, data, etc. in objects instead of dicts (where appropriate0)
