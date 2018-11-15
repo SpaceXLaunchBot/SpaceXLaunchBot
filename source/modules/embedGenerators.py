@@ -6,15 +6,7 @@ from copy import deepcopy
 from discord import Embed
 
 from modules.struct import launchTimeFromTS
-from modules.statics import falconRed
-
-# Use Github as image hosting
-logoBaseURL = "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"
-rocketIDImages = {
-    "falcon9": f"{logoBaseURL}/falcon9.png",
-    "falconheavy": f"{logoBaseURL}/falconHeavy.png",
-    "falcon1": f"{logoBaseURL}/logo.jpg"
-}
+from modules.statics import falconRed, rocketIDImages
 
 async def getLaunchInfoEmbed(nextLaunchJSON):
     # No need to do the same thing twice
@@ -24,9 +16,11 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
     originalLaunchEmbedLite = deepcopy(launchEmbed)
     
     # Update with longer description
-    launchEmbed.description = "A {} rocket carrying {} payload(s), launching from {}".format(
+    numPayloads = len(nextLaunchJSON["rocket"]["second_stage"]["payloads"])
+    launchEmbed.description = "A {} rocket carrying {} payload{}, launching from {}".format(
         nextLaunchJSON["rocket"]["rocket_name"],
-        len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
+        numPayloads,
+        "" if numPayloads < 2 else "s",
         nextLaunchJSON["launch_site"]["site_name_long"]
     )
 
@@ -93,7 +87,7 @@ async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
 
     return launchEmbed
 
-async def getLaunchNotifEmbed(nextLaunchJSON):
+async def getLaunchingSoonEmbed(nextLaunchJSON):
     notifEmbed = Embed(color=falconRed)
 
     notifEmbed.set_author(name="{} is launching soon!".format(nextLaunchJSON["mission_name"]))

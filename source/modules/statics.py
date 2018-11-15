@@ -1,11 +1,20 @@
 """
 Messages / embeds / variables that won't be dynamically changing, such as the
-colour objects, help message, and the various error messages
+colour objects, help message, and the various error messages. These are then
+imported into other files
 """
 
 from discord import Embed, Colour
 
 from modules.struct import config
+
+# Use Github as image hosting
+logoBaseURL = "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"
+rocketIDImages = {
+    "falcon9": f"{logoBaseURL}/falcon9.png",
+    "falconheavy": f"{logoBaseURL}/falconHeavy.png",
+    "falcon1": f"{logoBaseURL}/logo.jpg"
+}
 
 # Convert chosen RGB values into usable Colour objects
 errorRed = Colour.from_rgb(*config["colours"]["errorRed"])

@@ -85,14 +85,14 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchNotifSent = "True"
 
-                        notifEmbed = await embedGenerators.getLaunchNotifEmbed(nextLaunchJSON)
+                        launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)
 
                             guildID = channel.guild.id
                             mentions = await redisConn.safeGet(guildID, deserialize=True)
                             
-                            await client.safeSend(channel, embed=notifEmbed)
+                            await client.safeSend(channel, embed=launchingSoonEmbed)
                             if mentions:
                                 # Ping the roles/users (mentions) requested
                                 await client.safeSend(channel, text=mentions)
