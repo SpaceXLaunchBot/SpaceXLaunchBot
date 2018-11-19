@@ -97,7 +97,6 @@ class redisClient(StrictRedis):
             return -1
         return 1
 
-
 """
 When this is imported for the first time, set up our Redis connection and save
 to a variable so anything importing this can access it
