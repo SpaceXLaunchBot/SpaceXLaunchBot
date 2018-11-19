@@ -2,14 +2,6 @@
 Redis structure:
 Key                       | Value
 --------------------------|-----------------------------------------------------
-subscribedChannels        | pickled( subscribedChannelList )
-launchNotifSent           | "True" / "False" (str not bool)
-latestLaunchInfoEmbedDict | pickled( launchInfoEmbedDict )
-Guild snowflake as a str  | Mentions to ping when a "launching soon" msg is sent
-
-Planned new Redis structure:
-Key                       | Value
---------------------------|-----------------------------------------------------
 subscribedChannels        | A Redis SET of channel IDs that are subscribed to the
                           | notification service
 str( Guild snowflake )    | A Redis hash containing server options
@@ -19,7 +11,7 @@ notificationTaskStore     | A Redis hash containing variables that need to
                           | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
                           | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
 metricsStore              | Used for bot metrics, currently unsure of structure
-                          | Not implemented yet
+                          | Currently this key is used just for addping, etc.
 """
 
 from aredis import StrictRedis

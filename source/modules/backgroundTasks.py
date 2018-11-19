@@ -97,7 +97,7 @@ async def notificationTask(client):
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}")
                         
             # Save any changed data to redis
-            # TODO: Error checking?
+            # Error checking happens inside the function
             await redisConn.setNotificationTaskStore(launchingSoonNotifSent, latestLaunchInfoEmbedDict)
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
