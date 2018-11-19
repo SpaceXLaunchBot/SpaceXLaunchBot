@@ -54,7 +54,7 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 ## Planned Updates / Improvments
 
 - [x] Make this readme better (easier to read, understand, etc.)
-- [ ] Allow more per-server settings (such as prefix, types of notifs, etc.)
+- [ ] Allow more per-server settings (such as types of notifs, etc.)
 - [ ] Improve `info` command (more info, better formatting)
 - [ ] Add a voting command or some way of insetivising / integrating DBL voting
 - [ ] Restructure Redis

@@ -6,7 +6,7 @@ imported into other files
 
 from discord import Embed, Colour
 
-from modules.struct import config
+from modules.structure import config
 
 # Use Github as image hosting
 logoBaseURL = "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"

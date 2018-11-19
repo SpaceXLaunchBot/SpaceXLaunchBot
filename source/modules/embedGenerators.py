@@ -5,7 +5,7 @@ Stuff for generating/creating embeds about launches to send to users
 from copy import deepcopy
 from discord import Embed
 
-from modules.struct import launchTimeFromTS
+from modules.structure import launchTimeFromTS
 from modules.statics import falconRed, rocketIDImages
 
 async def getLaunchInfoEmbed(nextLaunchJSON):
@@ -15,6 +15,7 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
     # Don't just copy a pointer, copy the whole thing into another section of memory
     originalLaunchEmbedLite = deepcopy(launchEmbed)
     
+
     # Update with longer description
     numPayloads = len(nextLaunchJSON["rocket"]["second_stage"]["payloads"])
     launchEmbed.description = "A {} rocket carrying {} payload{}, launching from {}".format(

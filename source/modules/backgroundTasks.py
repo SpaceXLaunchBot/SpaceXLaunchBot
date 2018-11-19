@@ -7,14 +7,13 @@ import logging
 from datetime import datetime, timedelta
 
 from modules.redisClient import redisConn
-from modules import embedGenerators, struct, struct, apis
+from modules import embedGenerators, structure, apis
 
 logger = logging.getLogger(__name__)
 
 ONE_MINUTE = 60  # Just makes things a little more readable
-API_CHECK_INTERVAL = struct.config["apiCheckInterval"]
-LAUNCH_NOTIF_DELTA = timedelta(minutes = struct.config["launchNotificationDelta"])
-REAPER_INTERVAL = struct.config["reaperInterval"]
+API_CHECK_INTERVAL = structure.config["apiCheckInterval"]
+LAUNCH_NOTIF_DELTA = timedelta(minutes = structure.config["launchNotificationDelta"])
 
 async def notificationTask(client):
     """
@@ -34,108 +33,67 @@ async def notificationTask(client):
         background, it shouldn't matter much...
         """
 
-        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
         latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
         launchNotifSent = await redisConn.getLaunchNotifSent()
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
-        
-        if subbedChannelsDict["err"]:
-            logger.error("getSubscribedChannelIDs returned err, skipping this cycle")
-            pass
-        elif not latestLaunchInfoEmbedDict:
-            logger.error("latestLaunchInfoEmbedDict is 0, skipping this cycle")
-            pass
-        elif not nextLaunchJSON:
-            logger.error("nextLaunchJSON returned 0, skipping this cycle")
-            pass  # Error, wait for next loop/cycle
 
+        # TODO: Error checking for smembers
+        subbedChannelIDs = await redisConn.smembers("subscribedChannels")
+
+        launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
+        launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
+
+        # Launch information message
+        if latestLaunchInfoEmbedDict == launchInfoEmbedDict:
+            pass
         else:
-            subbedChannelIDs = subbedChannelsDict["list"]
+            logger.info("Launch info changed, sending notifications")
 
-            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-            launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
+            launchNotifSent = "False"
+            latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
-            # Launch information message
-            if latestLaunchInfoEmbedDict == launchInfoEmbedDict:
-                pass
-            else:
-                logger.info("Launch info changed, sending notifications")
+            # New launch found, send all "subscribed" channels the embed
+            for channelID in subbedChannelIDs:
+                channel = client.get_channel(channelID)
+                await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
-                launchNotifSent = "False"
-                latestLaunchInfoEmbedDict = launchInfoEmbedDict
+        # Launch notification message
+        launchTime = nextLaunchJSON["launch_date_unix"]
+        if await structure.isInt(launchTime):
+            
+            launchTime = int(launchTime)
 
-                # New launch found, send all "subscribed" channels the embed
-                for channelID in subbedChannelIDs:
-                    channel = client.get_channel(channelID)
-                    await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
+            # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
+            timePlusDelta = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
-            # Launch notification message
-            launchTime = nextLaunchJSON["launch_date_unix"]
-            if await struct.isInt(launchTime):
-                
-                launchTime = int(launchTime)
+            # If the launch time is within the next LAUNCH_NOTIF_DELTA
+            if timePlusDelta > launchTime:
+                if launchNotifSent == "False":
 
-                # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
-                timePlusDelta = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
+                    logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
+                    launchNotifSent = "True"
 
-                # If the launch time is within the next LAUNCH_NOTIF_DELTA
-                if timePlusDelta > launchTime:
-                    if launchNotifSent == "False":
+                    launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
+                    for channelID in subbedChannelIDs:
+                        channel = client.get_channel(channelID)
 
-                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
-                        launchNotifSent = "True"
-
-                        launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
-                        for channelID in subbedChannelIDs:
-                            channel = client.get_channel(channelID)
-
-                            guildID = channel.guild.id
-                            mentions = await redisConn.safeGet(guildID, deserialize=True)
-                            
-                            await client.safeSend(channel, embed=launchingSoonEmbed)
-                            if mentions:
-                                # Ping the roles/users (mentions) requested
-                                await client.safeSend(channel, text=mentions)
-                            
-                    else:
-                        logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
+                        guildID = channel.guild.id
+                        mentions = await redisConn.safeGet(guildID, deserialize=True)
                         
-            # Save any changed data to redis
-            e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
-            e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
-            if not e1:
-                logger.error(f"safeSet launchNotifSent failed, returned {e1}")
-            if not e2:
-                logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
+                        await client.safeSend(channel, embed=launchingSoonEmbed)
+                        if mentions:
+                            # Ping the roles/users (mentions) requested
+                            await client.safeSend(channel, text=mentions)
+                        
+                else:
+                    logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
+                    
+        # Save any changed data to redis
+        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
+        e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
+        if not e1:
+            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
+        if not e2:
+            logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)
-
-async def reaper(client):
-    """
-    Every reaperInterval check for non-existant (dead) channels in subbedChannelIDs
-    and remove them
-    Essentially garbage collection for the channel list
-    TODO: If parts of the Discord API goes down, this can sometimes trigger the
-    removal of channels that do exist but Discord can't find them
-    TODO: Clean Redis server of unused key/values
-    TODO: This is essentially a race condition:
-            - reaper gets from redis -> starts iterating channels
-            - user adds a channel -> saved to redis
-            - reaper finished -> saves old(er) list of subbed channels to redis
-    """
-    await client.wait_until_ready()
-    logger.info("Started")
-    while not client.is_closed():
-        subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
-        subbedChannelIDs = subbedChannelsDict["list"]
-        for channelID in subbedChannelIDs:
-            # Returns None if the channel ID does not exist OR the bot cannot "see" the channel
-            if client.get_channel(channelID) == None:
-                subbedChannelIDs.remove(channelID)
-                logger.info(f"{channelID} is not a valid ID, removing from db")
-
-        ret = await redisConn.safeSet("subscribedChannels", subbedChannelIDs, True)
-        if not ret:
-            logger.error(f"safeSet subscribedChannels failed, returned {ret}")
-
-        await asyncio.sleep(ONE_MINUTE * REAPER_INTERVAL)
