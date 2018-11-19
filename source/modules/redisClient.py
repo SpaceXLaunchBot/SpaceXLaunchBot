@@ -4,8 +4,7 @@ Key                       | Value
 --------------------------|-----------------------------------------------------
 subscribedChannels        | A Redis SET of channel IDs that are subscribed to the
                           | notification service
-str( Guild snowflake )    | (TODO:) A Redis hash containing server options
-                          | Currently this key is used just for addping, etc.
+str( Guild snowflake )    | A Redis hash containing server options
 notificationTaskStore     | A Redis hash containing variables that need to
                           | persist between runs of the notification background
                           | task. This currently includes:
@@ -36,7 +35,7 @@ class redisClient(StrictRedis):
                 return await self.sadd(key, value.encode("UTF-8"))
             return await self.sadd(key, value)
         except Exception as e:
-            logger.error(f"Failed to safeSadd data in Redis: key: {key} error: {type(e).__name__}: {e}")
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
 
     async def safeGet(self, key, deserialize=False):
@@ -53,7 +52,7 @@ class redisClient(StrictRedis):
             else:
                 return value.decode("UTF-8")
         except Exception as e:
-            logger.error(f"Failed to get data from Redis: key: {key} error: {type(e).__name__}: {e}")
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
 
     async def safeSet(self, key, value, serialize=False):
@@ -66,7 +65,7 @@ class redisClient(StrictRedis):
                 return await self.set(key, pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL))    
             return await self.set(key, value.encode("UTF-8"))
         except Exception as e:
-            logger.error(f"Failed to set data in Redis: key: {key} error: {type(e).__name__}: {e}")
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
 
     async def getNotificationTaskStore(self):
@@ -93,9 +92,51 @@ class redisClient(StrictRedis):
             await self.hset("notificationTaskStore", "launchingSoonNotifSent", launchingSoonNotifSent)
             await self.hset("notificationTaskStore", "latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict)
         except Exception as e:
-            logger.error(f"hset failed: error: {type(e).__name__}: {e}")
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
         return 1
+
+    async def setGuildSettings(self, guildID, rolesToPing):
+        """
+        Saves a servers settings using a Redis hash - if rolesToPing is None,
+        then delete the key/hash pair from the database
+        guildID can be int or str
+        rolesToPing should be an array of roles / tags / etc. OR None
+        returns -1 on error
+        """
+        guildID = str(guildID)  # Make sure we are using a string
+        try:
+            if rolesToPing == None:
+                return await self.hdel(guildID)
+            
+            rolesToPingPickled = pickle.dumps(rolesToPing, protocol=pickle.HIGHEST_PROTOCOL)
+            await self.hset(guildID, "rolesToPing", rolesToPingPickled)
+            return 0
+        
+        except Exception as e:
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
+            return -1
+
+    async def getGuildSettings(self, guildID):
+        """
+        Returns a servers settings from Redis
+        guildID can be int or str
+        returns a dict of varName : var
+        returns -1 on error
+        """
+        guildID = str(guildID)
+
+        # Wrap Redis operations in error catching block
+        try:
+            rolesToPingPickled = await self.hget(guildID, "rolesToPing")
+        except Exception as e:
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
+            return -1
+        
+        rolesToPing = pickle.loads(rolesToPingPickled)
+        return {
+            "rolesToPing": rolesToPing
+        }
 
 """
 When this is imported for the first time, set up our Redis connection and save
