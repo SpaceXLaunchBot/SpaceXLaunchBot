@@ -33,13 +33,13 @@ async def notificationTask(client):
         background, it shouldn't matter much...
         """
 
-        latestLaunchInfoEmbedDict = await redisConn.getLatestLaunchInfoEmbedDict()
-        launchNotifSent = await redisConn.getLaunchNotifSent()
-        nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
-
-        # TODO: Error checking for smembers
+        # TODO: Error checking for both redisConn uses
+        notificationTaskStore = await redisConn.getNotificationTaskStore()
+        launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
+        latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
         subbedChannelIDs = await redisConn.smembers("subscribedChannels")
 
+        nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
         launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
@@ -49,7 +49,7 @@ async def notificationTask(client):
         else:
             logger.info("Launch info changed, sending notifications")
 
-            launchNotifSent = "False"
+            launchingSoonNotifSent = "False"
             latestLaunchInfoEmbedDict = launchInfoEmbedDict
 
             # New launch found, send all "subscribed" channels the embed
@@ -68,10 +68,10 @@ async def notificationTask(client):
 
             # If the launch time is within the next LAUNCH_NOTIF_DELTA
             if timePlusDelta > launchTime:
-                if launchNotifSent == "False":
+                if launchingSoonNotifSent == "False":
 
                     logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
-                    launchNotifSent = "True"
+                    launchingSoonNotifSent = "True"
 
                     launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
                     for channelID in subbedChannelIDs:
@@ -81,19 +81,15 @@ async def notificationTask(client):
                         mentions = await redisConn.safeGet(guildID, deserialize=True)
                         
                         await client.safeSend(channel, embed=launchingSoonEmbed)
-                        if mentions:
+                        if mentions and mentions != -1:
                             # Ping the roles/users (mentions) requested
                             await client.safeSend(channel, text=mentions)
                         
                 else:
-                    logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchNotifSent is {launchNotifSent}")
+                    logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}")
                     
         # Save any changed data to redis
-        e1 = await redisConn.safeSet("launchNotifSent", launchNotifSent)
-        e2 = await redisConn.safeSet("latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict, True)
-        if not e1:
-            logger.error(f"safeSet launchNotifSent failed, returned {e1}")
-        if not e2:
-            logger.error(f"safeSet latestLaunchInfoEmbedDict failed, returned {e2}")
+        # TODO: Error checking
+        await redisConn.setNotificationTaskStore(launchingSoonNotifSent, latestLaunchInfoEmbedDict)
 
         await asyncio.sleep(ONE_MINUTE * API_CHECK_INTERVAL)

@@ -131,7 +131,7 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 replyMsg = f"Added launch notification ping for mentions(s): {rolesToMention}"
                 ret = await redisConn.safeSet(guildID, rolesToMention, True)
-                if not ret:
+                if ret == -1:
                     return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
                             
             await self.safeSend(message.channel, text=replyMsg)
