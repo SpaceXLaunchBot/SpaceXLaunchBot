@@ -35,9 +35,10 @@ class SpaceXLaunchBotClient(discord.Client):
     
     async def on_ready(self):
 
-        # TODO: Update below to new Redis structure
-        # Initialise needed keys with default values if they do not exist
+        # Initialise needed Redis keys with default values if they do not exist
         # Only needed when running for the first time / new db
+        if not await redisConn.exists("notificationTaskStore"):
+            redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
         # Run background tasks after initializing database
         self.loop.create_task(backgroundTasks.notificationTask(self))

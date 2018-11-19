@@ -33,17 +33,20 @@ async def notificationTask(client):
         """
 
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
-
+        
         if nextLaunchJSON == -1:
             # Can't do anything if API isn't working, skip this cycle
             pass
+        
+        elif not await redisConn.exists("subscribedChannels"):
+            # No subscribedChannels SET, no channels to send notifications to
+            pass
 
         else:
-            # TODO: Error checking for both redisConn uses
+            subbedChannelIDs = await redisConn.smembers("subscribedChannels")
             notificationTaskStore = await redisConn.getNotificationTaskStore()
             launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
             latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
-            subbedChannelIDs = await redisConn.smembers("subscribedChannels")
             
             launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
