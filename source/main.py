@@ -91,7 +91,6 @@ class SpaceXLaunchBotClient(discord.Client):
 
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
-            # TODO: Change all err returns to -1 instead of 0 (consistency)
             if nextLaunchJSON == -1:
                 launchInfoEmbed, launchInfoEmbedLite = statics.apiErrorEmbed, statics.apiErrorEmbed
             else:
