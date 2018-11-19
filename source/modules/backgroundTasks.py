@@ -18,7 +18,7 @@ REAPER_INTERVAL = struct.config["reaperInterval"]
 
 async def notificationTask(client):
     """
-    Every $API_CHECK_INTERVAL minutes:
+    Every API_CHECK_INTERVAL minutes:
     If the embed has changed, something new has happened so send
         all channels an embed with updated info
     If the time of the next upcoming launch is within the next hour,
@@ -75,11 +75,11 @@ async def notificationTask(client):
                 
                 launchTime = int(launchTime)
 
-                # Get timestamp for the time $LAUNCH_NOTIF_DELTA from now
-                soon = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
+                # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
+                timePlusDelta = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
 
-                # If the launch time is within the next hour
-                if soon > launchTime:
+                # If the launch time is within the next LAUNCH_NOTIF_DELTA
+                if timePlusDelta > launchTime:
                     if launchNotifSent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
@@ -112,12 +112,16 @@ async def notificationTask(client):
 
 async def reaper(client):
     """
-    Every $reaperInterval check for non-existant (dead) channels in subbedChannelIDs
+    Every reaperInterval check for non-existant (dead) channels in subbedChannelIDs
     and remove them
     Essentially garbage collection for the channel list
     TODO: If parts of the Discord API goes down, this can sometimes trigger the
     removal of channels that do exist but Discord can't find them
     TODO: Clean Redis server of unused key/values
+    TODO: This is essentially a race condition:
+            - reaper gets from redis -> starts iterating channels
+            - user adds a channel -> saved to redis
+            - reaper finished -> saves old(er) list of subbed channels to redis
     """
     await client.wait_until_ready()
     logger.info("Started")
