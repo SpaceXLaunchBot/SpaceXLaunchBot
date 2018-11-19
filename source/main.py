@@ -48,15 +48,14 @@ class SpaceXLaunchBotClient(discord.Client):
 
         await self.change_presence(activity=discord.Game(name="with rockets"))
 
-        # subbedChannelsDict = await redisConn.getSubscribedChannelIDs()
-        # totalSubbed = len(subbedChannelsDict["list"])
+        totalSubbed = redisConn.scard("subscribedChannels")
         totalGuilds = len(self.guilds)
         totalUsers = len(self.users)   
         
         logger.info(f"Username: {self.user.name}")
         logger.info(f"ClientID: {self.user.id}")
         logger.info(f"Connected to {totalGuilds} guilds")
-        # logger.info(f"Connected to {totalSubbed} subscribed channels")
+        logger.info(f"Connected to {totalSubbed} subscribed channels")
         logger.info(f"Serving {totalUsers} users")
         logger.info("Bot ready")
 

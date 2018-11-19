@@ -4,14 +4,14 @@ Key                       | Value
 --------------------------|-----------------------------------------------------
 subscribedChannels        | A Redis SET of channel IDs that are subscribed to the
                           | notification service
-str( Guild snowflake )    | A Redis hash containing server options
+str( Guild snowflake )    | (TODO:) A Redis hash containing server options
+                          | Currently this key is used just for addping, etc.
 notificationTaskStore     | A Redis hash containing variables that need to
                           | persist between runs of the notification background
                           | task. This currently includes:
                           | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
                           | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
 metricsStore              | Used for bot metrics, currently unsure of structure
-                          | Currently this key is used just for addping, etc.
 """
 
 from aredis import StrictRedis
