@@ -12,7 +12,7 @@ class spacexAPI(object):
     async def getNextLaunchJSON():
         """
         Using aiohttp, grab the latest launch info
-        Returns 0 if fail
+        Returns -1 if fail
         """
         upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/next"
         async with aiohttp.ClientSession() as session:
@@ -20,11 +20,11 @@ class spacexAPI(object):
                 async with session.get(upcomingLaunchesURL) as response:
                     if response.status != 200:
                         logger.error("Failed to get data from SpaceX API: response.status != 200")
-                        return 0
+                        return -1
                     return await response.json()
             except Exception as e:
                 logger.error(f"Failed to get data from SpaceX API: {type(e).__name__}: {e}")
-                return 0
+                return -1
 
 class dblApiClient(object):
     """
