@@ -11,7 +11,7 @@ notificationTaskStore     | A Redis hash containing variables that need to
                           | task. This currently includes:
                           | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
                           | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
-metricsStore              | Used for bot metrics, currently unsure of structure
+metricsStore              | Used for bot metrics, currently unused & unsure of structure
 """
 
 from aredis import StrictRedis
