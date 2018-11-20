@@ -38,7 +38,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # Initialise needed Redis keys with default values if they do not exist
         # Only needed when running for the first time / new db
         if not await redisConn.exists("notificationTaskStore"):
-            redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
+            await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
         # Run background tasks after initializing database
         self.loop.create_task(backgroundTasks.notificationTask(self))
@@ -48,7 +48,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         await self.change_presence(activity=discord.Game(name="with rockets"))
 
-        totalSubbed = redisConn.scard("subscribedChannels")
+        totalSubbed = await redisConn.scard("subscribedChannels")
         totalGuilds = len(self.guilds)
         totalUsers = len(self.users)   
         
@@ -103,7 +103,7 @@ class SpaceXLaunchBotClient(discord.Client):
             replyMsg = "This channel has been added to the notification service"
             ret = await redisConn.safeSadd("subscribedChannels", message.channel.id)
             if ret == 0:
-                replyMsg = "This channel was already subscribed to the notification service"
+                replyMsg = "This channel is already subscribed to the notification service"
             elif ret == -1:
                 return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
             await self.safeSend(message.channel, text=replyMsg)
