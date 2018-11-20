@@ -96,46 +96,45 @@ class redisClient(StrictRedis):
             return -1
         return 1
 
-    async def setGuildSettings(self, guildID, rolesToPing):
+    async def setGuildSettings(self, guildID, rolesToMention):
         """
-        Saves a servers settings using a Redis hash - if rolesToPing is None,
-        then delete the key/hash pair from the database
+        Saves a guilds settings using a Redis hash
         guildID can be int or str
-        rolesToPing should be an array of roles / tags / etc. OR None
+        rolesToMention should be an array of roles / tags / etc. OR None
         returns -1 on error
         """
         guildID = str(guildID)  # Make sure we are using a string
-        try:
-            if rolesToPing == None:
-                return await self.hdel(guildID)
-            
-            rolesToPingPickled = pickle.dumps(rolesToPing, protocol=pickle.HIGHEST_PROTOCOL)
-            await self.hset(guildID, "rolesToPing", rolesToPingPickled)
+        try:            
+            rolesToMentionPickled = pickle.dumps(rolesToMention, protocol=pickle.HIGHEST_PROTOCOL)
+            await self.hset(guildID, "rolesToMention", rolesToMentionPickled)
             return 0
-        
         except Exception as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
 
     async def getGuildSettings(self, guildID):
         """
-        Returns a servers settings from Redis
+        Returns a guilds settings from Redis
         guildID can be int or str
         returns a dict of varName : var
         returns -1 on error
+        returns 0 if guildID does not have any settings set
         """
         guildID = str(guildID)
 
+        if not await self.exists(guildID):
+            return 0
+
         # Wrap Redis operations in error catching block
         try:
-            rolesToPingPickled = await self.hget(guildID, "rolesToPing")
+            rolesToMentionPickled = await self.hget(guildID, "rolesToMention")
         except Exception as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
         
-        rolesToPing = pickle.loads(rolesToPingPickled)
+        rolesToMention = pickle.loads(rolesToMentionPickled)
         return {
-            "rolesToPing": rolesToPing
+            "rolesToMention": rolesToMention
         }
 
 """

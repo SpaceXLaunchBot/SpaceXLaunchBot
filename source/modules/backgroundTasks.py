@@ -62,6 +62,7 @@ async def notificationTask(client):
 
                 # New launch found, send all "subscribed" channels the embed
                 for channelID in subbedChannelIDs:
+                    # TODO: If we can't get_channel, remove from set and skip
                     channel = client.get_channel(channelID)
                     await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
@@ -83,15 +84,19 @@ async def notificationTask(client):
 
                         launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
                         for channelID in subbedChannelIDs:
+                            # TODO: (same as above) If we can't get_channel, remove from set and skip
                             channel = client.get_channel(channelID)
 
                             guildID = channel.guild.id
-                            mentions = await redisConn.safeGet(guildID, deserialize=True)
+
+                            guildSettings = await redisConn.getGuildSettings(guildID)
                             
                             await client.safeSend(channel, embed=launchingSoonEmbed)
-                            if mentions and mentions != -1:
+                            
+                            # TODO: Deal with database error (-1) differently?
+                            if guildSettings != 0 and guildSettings != -1:
                                 # Ping the roles/users (mentions) requested
-                                await client.safeSend(channel, text=mentions)
+                                await client.safeSend(channel, text=guildSettings["rolesToMention"])
                             
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}")

@@ -66,6 +66,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logger.info(f"Joined guild, ID: {guild.id}")
 
     async def on_guild_remove(self, guild):
+        # TODO: Check if guild settings exist, if so, delete from db (and log the fact a deletion occured)
         await dbl.updateGuildCount(len(self.guilds))
         logger.info(f"Removed from guild, ID: {guild.id}")
 
@@ -121,24 +122,23 @@ class SpaceXLaunchBotClient(discord.Client):
         # Add/remove ping commands
 
         elif message.content.startswith(PREFIX + "addping"):
-            replyMsg: str
-            guildID = str(message.guild.id)
+            replyMsg = "Invalid input for addping command"
             rolesToMention = " ".join(message.content.split("addping")[1:])
-            
-            if rolesToMention.strip() == "":
-                replyMsg = "Invalid input for addping command"
-            else:
+            if rolesToMention.strip() != "":
                 replyMsg = f"Added launch notification ping for mentions(s): {rolesToMention}"
-                ret = await redisConn.safeSet(guildID, rolesToMention, True)
+                ret = await redisConn.setGuildSettings(message.guild.id, rolesToMention)
                 if ret == -1:
                     return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
-                            
             await self.safeSend(message.channel, text=replyMsg)
 
         elif message.content.startswith(PREFIX + "removeping"):
-            guildID = str(message.guild.id)
-            ret = await redisConn.delete(guildID)
-            if not ret:
+            """
+            Currently just deletes the guild settings Redis key/val as the only setting saved is the mentionsToPing
+            TODO: Once we are storing more per-guild settings, don't delete the whole key here
+            """
+            ret = await redisConn.delete(str(message.guild.id))
+            if ret == 0:
+                # ret is the number of keys deleted
                 return await self.safeSend(message.channel, text="This server has no pings to be removed")
             await self.safeSend(message.channel, text="Removed ping succesfully")
             
