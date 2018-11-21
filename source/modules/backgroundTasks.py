@@ -99,7 +99,7 @@ async def notificationTask(client):
                                 await client.safeSend(channel, launchingSoonEmbed)
                                 guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
 
-                                # TODO: Deal with database error (-1) differently?
+                                # If there are settings and the DB did not err
                                 if guildSettings != 0 and guildSettings != -1:
                                     # Ping the roles/users (mentions) requested
                                     await client.safeSend(channel, guildSettings["rolesToMention"])

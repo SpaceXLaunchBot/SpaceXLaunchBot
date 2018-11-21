@@ -44,8 +44,10 @@ async def launchTimeFromTS(timestamp):
 
 # Load local config file into a dictionary that can be exported
 configFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "config", "config.json")
-# TODO: Update neededKeys
-neededKeys = ["commandPrefix", "apiCheckInterval", "launchNotificationDelta", "logFormat"]
+neededKeys = [
+    "ownerTag", "commandPrefix", "apiCheckInterval", "launchNotificationDelta",
+    "logFilePath", "logFormat", "colours"
+]
 try:
     with open(configFilePath, "r") as inFile:
         config = json.load(inFile)
