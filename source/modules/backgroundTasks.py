@@ -32,6 +32,7 @@ async def notificationTask(client):
         background, it shouldn't matter much...
         """
 
+        channelsToRemove = []
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
         if nextLaunchJSON == -1:
@@ -65,9 +66,11 @@ async def notificationTask(client):
 
                 # New launch found, send all "subscribed" channels the embed
                 for channelID in subbedChannelIDs:
-                    # TODO: If we can't get_channel, remove from set and skip
                     channel = client.get_channel(channelID)
-                    await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
+                    if channel == None:
+                        channelsToRemove.append(channelID)
+                    else:
+                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             # Launch notification message
             launchTime = nextLaunchJSON["launch_date_unix"]
@@ -89,20 +92,26 @@ async def notificationTask(client):
                         launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
                         
                         for channelID in subbedChannelIDs:
-                            # TODO: (same as above) If we can't get_channel, remove from set and skip
                             channel = client.get_channel(channelID)
-                            guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
-                            await client.safeSend(channel, launchingSoonEmbed)
-                            
-                            # TODO: Deal with database error (-1) differently?
-                            if guildSettings != 0 and guildSettings != -1:
-                                # Ping the roles/users (mentions) requested
-                                await client.safeSend(channel, guildSettings["rolesToMention"])
+                            if channel == None:
+                                channelsToRemove.append(channelID)
+                            else:
+                                await client.safeSend(channel, launchingSoonEmbed)
+                                guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
+
+                                # TODO: Deal with database error (-1) differently?
+                                if guildSettings != 0 and guildSettings != -1:
+                                    # Ping the roles/users (mentions) requested
+                                    await client.safeSend(channel, guildSettings["rolesToMention"])
                             
                     else:
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}")
                         
             # Save any changed data to redis
+            # Remove channels that we can't access anymore
+            for channelID in channelsToRemove:
+                logger.info(f"{channelID} is not a valid channel ID, removing")
+                await redisConn.srem("subscribedChannels", str(channelID))
             # Error checking happens inside the function
             await redisConn.setNotificationTaskStore(launchingSoonNotifSent, latestLaunchInfoEmbedDict)
 
