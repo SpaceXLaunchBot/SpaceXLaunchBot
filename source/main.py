@@ -106,8 +106,8 @@ class SpaceXLaunchBotClient(discord.Client):
             if ret == 0:
                 replyMsg = "This channel is already subscribed to the notification service"
             elif ret == -1:
-                return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
-            await self.safeSend(message.channel, text=replyMsg)
+                return await self.safeSend(message.channel, statics.dbErrorEmbed)
+            await self.safeSend(message.channel, replyMsg)
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             replyMsg = "This channel has been removed from the launch notification service"
@@ -115,8 +115,8 @@ class SpaceXLaunchBotClient(discord.Client):
             if ret == 0:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
             elif ret == -1:
-                return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
-            await self.safeSend(message.channel, text=replyMsg)
+                return await self.safeSend(message.channel, statics.dbErrorEmbed)
+            await self.safeSend(message.channel, replyMsg)
 
 
         # Add/remove ping commands
@@ -128,8 +128,8 @@ class SpaceXLaunchBotClient(discord.Client):
                 replyMsg = f"Added launch notification ping for mentions(s): {rolesToMention}"
                 ret = await redisConn.setGuildSettings(message.guild.id, rolesToMention)
                 if ret == -1:
-                    return await self.safeSend(message.channel, embed=statics.dbErrorEmbed)
-            await self.safeSend(message.channel, text=replyMsg)
+                    return await self.safeSend(message.channel, statics.dbErrorEmbed)
+            await self.safeSend(message.channel, replyMsg)
 
         elif message.content.startswith(PREFIX + "removeping"):
             """
@@ -139,34 +139,32 @@ class SpaceXLaunchBotClient(discord.Client):
             ret = await redisConn.delete(str(message.guild.id))
             if ret == 0:
                 # ret is the number of keys deleted
-                return await self.safeSend(message.channel, text="This server has no pings to be removed")
-            await self.safeSend(message.channel, text="Removed ping succesfully")
+                return await self.safeSend(message.channel, "This server has no pings to be removed")
+            await self.safeSend(message.channel, "Removed ping succesfully")
             
 
         # Misc
 
         elif message.content.startswith(PREFIX + "info"):
-            await self.safeSend(message.channel, embed=statics.infoEmbed)
+            await self.safeSend(message.channel, statics.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
-            await self.safeSend(message.channel, embed=statics.helpEmbed)
+            await self.safeSend(message.channel, statics.helpEmbed)
 
-    async def safeSend(self, channel, text=None, embed=None):
+    async def safeSend(self, channel, toSend):
         """
-        Send a text / embed message (one or the other, not both) to a
-        user, and if an error occurs, safely supress it
-        On failure, returns:
-            -1 : Nothing to send (text & embed are `None`)
+        Send a text / embed message to a user, and if an error occurs, safely
+        supress it. On failure, returns:
+            -1 : Nothing to send (toSend is not a string or Embed)
             -2 : Forbidden (API down, Message too big, etc.)
             -3 : HTTPException (No permission to message this channel)
             -4 : InvalidArgument (Invalid channel ID)
         On success returns what the channel.send method returns
         """
-        # TODO: Only have 1 parameter and auto detect if text or embed
         try:
-            if text:
-                return await channel.send(text)
-            elif embed:
-                return await channel.send(embed=embed)
+            if type(toSend) == str:
+                return await channel.send(toSend)
+            elif type(toSend) == discord.Embed:
+                return await channel.send(embed=toSend)
             else:
                 return -1
         except discord.errors.Forbidden:
@@ -192,7 +190,7 @@ class SpaceXLaunchBotClient(discord.Client):
         Returns 0 if neither embeds are sent
         """
         for embed in embeds:
-            returned = await self.safeSend(channel, embed=embed)
+            returned = await self.safeSend(channel, embed)
             if returned == -3:
                 pass  # Embed might be too big, try lite version
             elif returned == -2 or returned == -4:
@@ -200,7 +198,7 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 return returned
         # Both failed to send, try to let user know something went wrong
-        await self.safeSend(channel, embed=statics.generalErrorEmbed)
+        await self.safeSend(channel, statics.generalErrorEmbed)
         return 0
 
 # Run bot
