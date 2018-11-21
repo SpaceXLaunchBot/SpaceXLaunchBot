@@ -100,17 +100,18 @@ class redisClient(StrictRedis):
         """
         Saves a guilds settings using a Redis hash
         guildID can be int or str
-        rolesToMention should be an array of roles / tags / etc. OR None
+        rolesToMention should be an string of roles / tags / etc. OR None
         returns -1 on error
+        returns 0 on success
         """
         guildID = str(guildID)  # Make sure we are using a string
-        try:            
-            rolesToMentionPickled = pickle.dumps(rolesToMention, protocol=pickle.HIGHEST_PROTOCOL)
-            await self.hset(guildID, "rolesToMention", rolesToMentionPickled)
-            return 0
+        try:
+            if rolesToMention:
+                await self.hset(guildID, "rolesToMention", rolesToMention)
         except Exception as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
+        return 0
 
     async def getGuildSettings(self, guildID):
         """
@@ -118,21 +119,19 @@ class redisClient(StrictRedis):
         guildID can be int or str
         returns a dict of varName : var
         returns -1 on error
-        returns 0 if guildID does not have any settings set
+        returns 0 if guildID does not have any settings stored
         """
         guildID = str(guildID)
-
         if not await self.exists(guildID):
             return 0
 
         # Wrap Redis operations in error catching block
         try:
-            rolesToMentionPickled = await self.hget(guildID, "rolesToMention")
+            rolesToMention = await self.hget(guildID, "rolesToMention")
         except Exception as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1
         
-        rolesToMention = pickle.loads(rolesToMentionPickled)
         return {
             "rolesToMention": rolesToMention
         }
