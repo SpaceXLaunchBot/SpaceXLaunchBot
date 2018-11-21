@@ -22,7 +22,7 @@ falconRed = Colour.from_rgb(*config["colours"]["falconRed"])
 
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
-    description="I am a bot for providing news and information about upcoming SpaceX launches\nI also provide a notification service for launch information and reminders for launches happening soon",
+    description="I am a Discord bot for getting news and information about upcoming SpaceX launches ",
     color=falconRed
 )
 infoEmbed.add_field(name="Github", value="https://github.com/r-spacex/SpaceX-Launch-Bot")

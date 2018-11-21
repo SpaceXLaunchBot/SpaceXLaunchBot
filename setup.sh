@@ -36,16 +36,14 @@ sudo pip3 install -r requirements.txt
 
 echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
-if askyn "Edit SLB.service now? This will have to be done before running it";
-then sudo nano /etc/systemd/system/SLB.service; fi
 
 echo "Copying redis config to /etc/redis"
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
 
-if askyn "Edit config.json now?";
-then sudo nano /opt/SpaceX-Launch-Bot/source/config/config.json; fi
+if askyn "Edit SLB.service now? This will have to be done before running it";
+then sudo nano /etc/systemd/system/SLB.service; fi
 
 cat << EndOfMsg
 
