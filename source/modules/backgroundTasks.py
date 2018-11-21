@@ -73,10 +73,12 @@ async def notificationTask(client):
                 launchTime = int(launchTime)
 
                 # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
-                timePlusDelta = (datetime.utcnow() + LAUNCH_NOTIF_DELTA).timestamp()
+                currentTime = datetime.utcnow()
+                timePlusDelta = (currentTime + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next LAUNCH_NOTIF_DELTA
-                if timePlusDelta > launchTime:
+                # and if the launchTime is not in the past
+                if timePlusDelta >= launchTime and launchTime >= currentTime.timestamp():
                     if launchingSoonNotifSent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
