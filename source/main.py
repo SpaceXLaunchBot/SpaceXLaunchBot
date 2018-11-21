@@ -38,6 +38,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # Initialise needed Redis keys with default values if they do not exist
         # Only needed when running for the first time / new db
         if not await redisConn.exists("notificationTaskStore"):
+            logger.info("notificationTaskStore does not exist in Redis, creating")
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
         # Run background tasks after initializing database
