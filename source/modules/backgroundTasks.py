@@ -44,6 +44,9 @@ async def notificationTask(client):
 
         else:
             subbedChannelIDs = await redisConn.smembers("subscribedChannels")
+            # Redis returns strings from a set, we want integers
+            subbedChannelIDs = [int(cid) for cid in subbedChannelIDs]
+
             notificationTaskStore = await redisConn.getNotificationTaskStore()
             launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
             latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
