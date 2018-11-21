@@ -83,16 +83,12 @@ async def notificationTask(client):
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchingSoonNotifSent = "True"
-
                         launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
+                        
                         for channelID in subbedChannelIDs:
                             # TODO: (same as above) If we can't get_channel, remove from set and skip
                             channel = client.get_channel(channelID)
-
-                            guildID = channel.guild.id
-
-                            guildSettings = await redisConn.getGuildSettings(guildID)
-                            
+                            guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
                             await client.safeSend(channel, launchingSoonEmbed)
                             
                             # TODO: Deal with database error (-1) differently?
