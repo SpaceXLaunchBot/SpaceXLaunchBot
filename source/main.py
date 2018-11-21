@@ -103,7 +103,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
             replyMsg = "This channel has been added to the notification service"
-            ret = await redisConn.safeSadd("subscribedChannels", message.channel.id)
+            ret = await redisConn.safeSadd("subscribedChannels", str(message.channel.id))
             if ret == 0:
                 replyMsg = "This channel is already subscribed to the notification service"
             elif ret == -1:
@@ -112,7 +112,7 @@ class SpaceXLaunchBotClient(discord.Client):
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             replyMsg = "This channel has been removed from the launch notification service"
-            ret = redisConn.srem("subscribedChannels", message.channel.id)
+            ret = redisConn.srem("subscribedChannels", str(message.channel.id))
             if ret == 0:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
             elif ret == -1:
