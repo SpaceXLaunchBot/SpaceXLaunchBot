@@ -23,13 +23,13 @@ def loadEnvVar(varName):
     except KeyError:
         fatalError(f"Environment Variable \"{varName}\" cannot be found")
 
-async def isInt(possiblyInteger):
+async def convertToInt(possiblyInteger):
     """
-    An async function that returns True if the parameter is an integer
+    An async function that converts possiblyInteger to an integer and returns it
+    If this fails then it returns False
     """
     try:
-        int(possiblyInteger)
-        return True
+        return int(possiblyInteger)
     except ValueError:
         return False
 
@@ -37,10 +37,12 @@ async def launchTimeFromTS(timestamp):
     """
     Get a launch time string from a unix timestamp
     """
-    if await isInt(timestamp):
+    try:
         formattedDate = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
         return f"{formattedDate} UTC"
-    return "To Be Announced"
+    except TypeError:
+        # timestamp is not int
+        return "To Be Announced"
 
 # Load local config file into a dictionary that can be exported
 configFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "config", "config.json")

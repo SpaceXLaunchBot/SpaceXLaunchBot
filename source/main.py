@@ -112,7 +112,7 @@ class SpaceXLaunchBotClient(discord.Client):
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             replyMsg = "This channel has been removed from the launch notification service"
-            ret = await redisConn.srem("subscribedChannels", str(message.channel.id))
+            ret = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
             if ret == 0:
                 replyMsg = "This channel was not previously subscribed to the launch notification service"
             elif ret == -1:

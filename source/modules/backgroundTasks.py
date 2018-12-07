@@ -45,8 +45,9 @@ async def notificationTask(client):
 
         else:
             subbedChannelIDs = await redisConn.smembers("subscribedChannels")
-            # Redis returns strings from a set, we want integers
-            subbedChannelIDs = [int(cid) for cid in subbedChannelIDs]
+            # Redis returns a set of strings, we want integers (a tuple is used
+            # for memory-saving reasons)
+            subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
 
             notificationTaskStore = await redisConn.getNotificationTaskStore()
             launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
@@ -73,18 +74,17 @@ async def notificationTask(client):
                         await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
 
             # Launch notification message
-            launchTime = nextLaunchJSON["launch_date_unix"]
-            if await structure.isInt(launchTime):
-                
-                launchTime = int(launchTime)
+            launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])
+            # If launchTimestamp is an int carry on, else it is TBA
+            if launchTimestamp:
 
                 # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
                 currentTime = datetime.utcnow()
                 timePlusDelta = (currentTime + LAUNCH_NOTIF_DELTA).timestamp()
 
                 # If the launch time is within the next LAUNCH_NOTIF_DELTA
-                # and if the launchTime is not in the past
-                if timePlusDelta >= launchTime and launchTime >= currentTime.timestamp():
+                # and if the launchTimestamp is not in the past
+                if timePlusDelta >= launchTimestamp and launchTimestamp >= currentTime.timestamp():
                     if launchingSoonNotifSent == "False":
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
@@ -100,7 +100,7 @@ async def notificationTask(client):
                                 guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
 
                                 # If there are settings and the DB did not err
-                                if guildSettings != 0 and guildSettings != -1:
+                                if guildSettings not in [0, -1]:
                                     # Ping the roles/users (mentions) requested
                                     await client.safeSend(channel, guildSettings["rolesToMention"])
                             
@@ -111,7 +111,7 @@ async def notificationTask(client):
             # Remove channels that we can't access anymore
             for channelID in channelsToRemove:
                 logger.info(f"{channelID} is not a valid channel ID, removing")
-                await redisConn.srem("subscribedChannels", str(channelID))
+                await redisConn.srem("subscribedChannels", str(channelID).encode("UTF-8"))
             # Error checking happens inside the function
             await redisConn.setNotificationTaskStore(launchingSoonNotifSent, latestLaunchInfoEmbedDict)
 
