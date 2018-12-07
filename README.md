@@ -58,9 +58,9 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 - [ ] Improve `info` command (more info, better formatting)
 - [ ] Add a voting command or some way of insetivising / integrating DBL voting
 - [x] Restructure Redis
-- [ ] Generally clean up code
+- [x] Generally clean up code
   - [x] Clean up `/modules`, seperate into more meaningful dirs
-  - [ ] Store settings, data, etc. in objects instead of dicts (where appropriate0)
+  - [x] Store settings, data, etc. in objects instead of dicts (where appropriate0)
   - [ ] Clean up embed generation
     - [ ] Make "launching soon" messages look a bit better
   - [ ] Only refer to messages as "launch information" or "launching soon" messages
