@@ -111,9 +111,8 @@ class SpaceXLaunchBotClient(discord.Client):
         elif message.content.startswith(PREFIX + "removeping"):
             """
             Currently just deletes the guild settings Redis key/val as the only setting saved is the mentionsToPing
-            TODO: Once we are storing more per-guild settings, don't delete the whole key here
             """
-            keyDeleted = await redisConn.delete(str(message.guild.id))
+            keyDeleted = await redisConn.hdel(message.guild.id, "rolesToMention")
             if keyDeleted == 0:
                 return await self.safeSend(message.channel, "This server has no pings to be removed")
             await self.safeSend(message.channel, "Removed ping succesfully")
