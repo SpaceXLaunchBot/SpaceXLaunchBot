@@ -8,24 +8,27 @@ from discord import Embed
 from modules.structure import launchTimeFromTS
 from modules.statics import falconRed, rocketIDImages
 
+payloadInfo = \
+"""Type: {}
+Orbit: {}
+Mass: {}
+Manufacturer(s): {}
+Customer(s): {}
+"""
+
+coreInfo = \
+"""Serial: {}
+Flight: {}
+Landing: {}
+Landing Type: {}
+"""
+
 async def genLaunchInfoEmbeds(nextLaunchJSON):
-    embedTitle = "r/SpaceX Discussion"
-    numPayloads = len(nextLaunchJSON["rocket"]["second_stage"]["payloads"])
-    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
-
-    if nextLaunchJSON["links"]["reddit_campaign"] == None:
-        embedTitle = "No discussion URL"
-
+   
     launchEmbed = Embed(
-        title=embedTitle,
-        url=nextLaunchJSON["links"]["reddit_campaign"],
+        title="Details",
         color=falconRed,
-        description="A {} carrying {} payload{}, launching from {}".format(
-            nextLaunchJSON["rocket"]["rocket_name"],
-            numPayloads,
-            "" if numPayloads < 2 else "s",
-            nextLaunchJSON["launch_site"]["site_name_long"]
-        )
+        description=nextLaunchJSON["details"]
     )
 
     # Set thumbnail depending on rocket ID
@@ -36,19 +39,37 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
     ))
 
     # Add a field for the launch date  
+    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
     launchEmbed.add_field(name="Launch date", value=UTCLaunchDate)
 
     # Basic embed structure built, copy into small version
     launchEmbedSmall = deepcopy(launchEmbed)
-   
+
+    discussionURL = nextLaunchJSON["links"]["reddit_campaign"]    
+    if discussionURL != None:
+        launchEmbed.add_field(name="r/SpaceX Discussion", value=discussionURL)
+    
+    launchEmbed.add_field(name="Launch site", value=nextLaunchJSON["launch_site"]["site_name_long"])
+
+    if nextLaunchJSON["rocket"]["rocket_id"] == "falcon9":
+        # Falcon 9 always has 1 core, FH (or others) will be different
+        launchEmbed.add_field(name="Core info", value=coreInfo.format(
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["core_serial"],
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["flight"],
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_intent"],
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"]
+            )
+        )
+
     # Add a field for each payload, with basic information
     for payload in nextLaunchJSON["rocket"]["second_stage"]["payloads"]:
         launchEmbed.add_field(
             name="Payload: {}".format(payload["payload_id"]),
-            value="Type: {}\nOrbit: {}\nMass: {}kg\nCustomer(s): {}".format(
+            value=payloadInfo.format(
                 payload["payload_type"],
                 payload["orbit"],
                 payload["payload_mass_kg"],
+                payload["manufacturer"],
                 ", ".join(payload["customers"])
             )
         )
