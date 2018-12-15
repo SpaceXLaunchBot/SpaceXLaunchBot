@@ -53,7 +53,7 @@ async def notificationTask(client):
             launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
             latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
             
-            launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
+            launchInfoEmbed, launchEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
             # Launch information message
@@ -71,9 +71,9 @@ async def notificationTask(client):
                     if channel == None:
                         channelsToRemove.append(channelID)
                     else:
-                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedLite])
+                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchEmbedSmall])
 
-            # Launch notification message
+            # Launching soon message
             launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])
             # If launchTimestamp is an int carry on, else it is TBA
             if launchTimestamp:
@@ -89,7 +89,7 @@ async def notificationTask(client):
 
                         logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
                         launchingSoonNotifSent = "True"
-                        launchingSoonEmbed = await embedGenerators.getLaunchingSoonEmbed(nextLaunchJSON)
+                        launchingSoonEmbed = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
                         
                         for channelID in subbedChannelIDs:
                             channel = client.get_channel(channelID)

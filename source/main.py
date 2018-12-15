@@ -52,7 +52,6 @@ class SpaceXLaunchBotClient(discord.Client):
         if message.author.bot or not message.guild:
             # Don't reply to bots (includes self)
             # Don't reply to PM's
-            # TODO: Only reply in textChannel instances
             return
 
         try:
@@ -69,10 +68,10 @@ class SpaceXLaunchBotClient(discord.Client):
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == -1:
-                launchInfoEmbed, launchInfoEmbedLite = statics.apiErrorEmbed, statics.apiErrorEmbed
+                launchInfoEmbed, launchEmbedSmall = statics.apiErrorEmbed, statics.apiErrorEmbed
             else:
-                launchInfoEmbed, launchInfoEmbedLite = await embedGenerators.getLaunchInfoEmbed(nextLaunchJSON)
-            await self.safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedLite])
+                launchInfoEmbed, launchEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
+            await self.safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchEmbedSmall])
 
 
         # Add/remove channel commands

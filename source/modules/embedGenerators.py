@@ -8,32 +8,39 @@ from discord import Embed
 from modules.structure import launchTimeFromTS
 from modules.statics import falconRed, rocketIDImages
 
-async def getLaunchInfoEmbed(nextLaunchJSON):
-    # No need to do the same thing twice
-    launchEmbed = await getLaunchInfoEmbedLite(nextLaunchJSON, small=False)
-
-    # Don't just copy a pointer, copy the whole thing into another section of memory
-    originalLaunchEmbedLite = deepcopy(launchEmbed)
-    
-
-    # Update with longer description
+async def genLaunchInfoEmbeds(nextLaunchJSON):
+    embedTitle = "r/SpaceX Discussion"
     numPayloads = len(nextLaunchJSON["rocket"]["second_stage"]["payloads"])
-    launchEmbed.description = "A {} rocket carrying {} payload{}, launching from {}".format(
-        nextLaunchJSON["rocket"]["rocket_name"],
-        numPayloads,
-        "" if numPayloads < 2 else "s",
-        nextLaunchJSON["launch_site"]["site_name_long"]
+    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
+
+    if nextLaunchJSON["links"]["reddit_campaign"] == None:
+        embedTitle = "No discussion URL"
+
+    launchEmbed = Embed(
+        title=embedTitle,
+        url=nextLaunchJSON["links"]["reddit_campaign"],
+        color=falconRed,
+        description="A {} carrying {} payload{}, launching from {}".format(
+            nextLaunchJSON["rocket"]["rocket_name"],
+            numPayloads,
+            "" if numPayloads < 2 else "s",
+            nextLaunchJSON["launch_site"]["site_name_long"]
+        )
     )
 
-    # Add a field showing each reused component
-    reusing = []
-    for component in nextLaunchJSON["reuse"]:
-        if nextLaunchJSON["reuse"][component]:
-            reusing.append(component)
-    if reusing != []:
-        # Only add this field if there are reused components
-        launchEmbed.add_field(name="Reused components:", value=", ".join(reusing))
-    
+    # Set thumbnail depending on rocket ID
+    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
+    launchEmbed.set_author(name="Launch #{} - {}".format(
+        nextLaunchJSON["flight_number"],
+        nextLaunchJSON["mission_name"]
+    ))
+
+    # Add a field for the launch date  
+    launchEmbed.add_field(name="Launch date", value=UTCLaunchDate)
+
+    # Basic embed structure built, copy into small version
+    launchEmbedSmall = deepcopy(launchEmbed)
+   
     # Add a field for each payload, with basic information
     for payload in nextLaunchJSON["rocket"]["second_stage"]["payloads"]:
         launchEmbed.add_field(
@@ -46,51 +53,12 @@ async def getLaunchInfoEmbed(nextLaunchJSON):
             )
         )
 
-    return launchEmbed, originalLaunchEmbedLite
+    return launchEmbed, launchEmbedSmall
 
-async def getLaunchInfoEmbedLite(nextLaunchJSON, small=True):
-    """
-    A "lite" version of the embed that should never reach the embed size limit
-    small is used to determine whether this is going to be used to make the
-    bigger embed, or actually needs to contain less content
-    """
-
-    embedTitle = "r/SpaceX Discussion"
-    if nextLaunchJSON["links"]["reddit_campaign"] == None:
-        embedTitle = "No discussion URL"
-
-    launchEmbed = Embed(
-        title=embedTitle,
-        url=nextLaunchJSON["links"]["reddit_campaign"],  # URL can be None
-        description="This information has been reduced as the data is too large to contain in this embed",
-        color=falconRed
-    )
-
-    # Set thumbnail depending on rocket ID
-    launchEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
-    launchEmbed.set_author(name="Launch #{} - {}".format(
-        nextLaunchJSON["flight_number"],
-        nextLaunchJSON["mission_name"]
-    ))
-
-    # Actually making a lite embed, so add reduced info here
-    if small:
-        # Info in new field
-        launchEmbed.add_field(name="Information", value="A {} rocket carrying {} payload(s), launching from {}".format(
-            nextLaunchJSON["rocket"]["rocket_name"],
-            len(nextLaunchJSON["rocket"]["second_stage"]["payloads"]),
-            nextLaunchJSON["launch_site"]["site_name_long"]
-        ))
-
-    # Add a field for the launch date  
-    UTCDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
-    launchEmbed.add_field(name="Launch date", value=UTCDate)
-
-    return launchEmbed
-
-async def getLaunchingSoonEmbed(nextLaunchJSON):
+async def genLaunchingSoonEmbed(nextLaunchJSON):
+    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
     notifEmbed = Embed(color=falconRed)
-
+    
     notifEmbed.set_author(name="{} is launching soon!".format(nextLaunchJSON["mission_name"]))
     
     if nextLaunchJSON["links"]["video_link"] != None:
@@ -105,8 +73,7 @@ async def getLaunchingSoonEmbed(nextLaunchJSON):
     else:
         notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
 
-    UTCDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
-    notifEmbed.add_field(name="Launch date", value=UTCDate)
+    notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
 
     if nextLaunchJSON["links"]["reddit_launch"] != None:
         notifEmbed.add_field(name="r/SpaceX Launch Thread", value=nextLaunchJSON["links"]["reddit_launch"])
