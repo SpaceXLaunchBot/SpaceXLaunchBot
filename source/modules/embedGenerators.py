@@ -20,6 +20,7 @@ coreInfo = \
 Flight: {}
 Landing: {}
 Landing Type: {}
+Landing Vehicle: {}
 """
 launchDateInfo = \
 """{}
@@ -67,7 +68,8 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["core_serial"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["flight"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_intent"],
-                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"]
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"],
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_vehicle"]
         ))
 
     # Add a field for each payload, with basic information
