@@ -30,7 +30,6 @@ Precision: {}
 async def genLaunchInfoEmbeds(nextLaunchJSON):
    
     launchEmbed = Embed(
-        title="Details",
         color=falconRed,
         description=nextLaunchJSON["details"]
     )
