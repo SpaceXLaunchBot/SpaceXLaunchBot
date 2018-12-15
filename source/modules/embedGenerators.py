@@ -41,6 +41,13 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
         nextLaunchJSON["mission_name"]
     ))
 
+    launchEmbed.add_field(
+        name="Launch vehicle",
+        value="{} {}".format(
+            nextLaunchJSON["rocket"]["rocket_name"],
+            nextLaunchJSON["rocket"]["rocket_type"]
+    ))
+
     # Add a field for the launch date  
     UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
     launchEmbed.add_field(
