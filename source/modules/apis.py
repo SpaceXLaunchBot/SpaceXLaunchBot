@@ -14,7 +14,7 @@ class spacexAPI(object):
         Using aiohttp, grab the latest launch info
         Returns -1 if fail
         """
-        upcomingLaunchesURL = "https://api.spacexdata.com/v2/launches/next"
+        upcomingLaunchesURL = "https://api.spacexdata.com/v3/launches/next"
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(upcomingLaunchesURL) as response:
