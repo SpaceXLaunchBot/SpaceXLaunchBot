@@ -15,12 +15,15 @@ Mass: {}
 Manufacturer(s): {}
 Customer(s): {}
 """
-
 coreInfo = \
 """Serial: {}
 Flight: {}
 Landing: {}
 Landing Type: {}
+"""
+launchDateInfo = \
+"""{}
+Precision: {}
 """
 
 async def genLaunchInfoEmbeds(nextLaunchJSON):
@@ -40,7 +43,12 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
 
     # Add a field for the launch date  
     UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
-    launchEmbed.add_field(name="Launch date", value=UTCLaunchDate)
+    launchEmbed.add_field(
+        name="Launch date",
+        value=launchDateInfo.format(
+            UTCLaunchDate,
+            nextLaunchJSON["tentative_max_precision"]
+    ))
 
     # Basic embed structure built, copy into small version
     launchEmbedSmall = deepcopy(launchEmbed)
@@ -53,13 +61,14 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
 
     if nextLaunchJSON["rocket"]["rocket_id"] == "falcon9":
         # Falcon 9 always has 1 core, FH (or others) will be different
-        launchEmbed.add_field(name="Core info", value=coreInfo.format(
+        launchEmbed.add_field(
+            name="Core info",
+            value=coreInfo.format(
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["core_serial"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["flight"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_intent"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"]
-            )
-        )
+        ))
 
     # Add a field for each payload, with basic information
     for payload in nextLaunchJSON["rocket"]["second_stage"]["payloads"]:
@@ -71,8 +80,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 payload["payload_mass_kg"],
                 payload["manufacturer"],
                 ", ".join(payload["customers"])
-            )
-        )
+        ))
 
     return launchEmbed, launchEmbedSmall
 
