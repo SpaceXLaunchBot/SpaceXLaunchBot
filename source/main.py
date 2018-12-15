@@ -38,13 +38,15 @@ class SpaceXLaunchBotClient(discord.Client):
         await dbl.updateGuildCount(totalGuilds)
 
     async def on_guild_join(self, guild):
-        await dbl.updateGuildCount(len(self.guilds))
         logger.info(f"Joined guild, ID: {guild.id}")
+        await dbl.updateGuildCount(len(self.guilds))
 
     async def on_guild_remove(self, guild):
-        # TODO: Check if guild settings exist, if so, delete from db (and log the fact a deletion occured)
-        await dbl.updateGuildCount(len(self.guilds))
         logger.info(f"Removed from guild, ID: {guild.id}")
+        await dbl.updateGuildCount(len(self.guilds))
+        ret = await redisConn.delete(str(guild.id))
+        if ret != 0:
+            logger.info(f"Removed server settings for {guild.id}")
 
     async def on_message(self, message):
         if message.author.bot or not message.guild:
@@ -111,9 +113,8 @@ class SpaceXLaunchBotClient(discord.Client):
             Currently just deletes the guild settings Redis key/val as the only setting saved is the mentionsToPing
             TODO: Once we are storing more per-guild settings, don't delete the whole key here
             """
-            ret = await redisConn.delete(str(message.guild.id))
-            if ret == 0:
-                # ret is the number of keys deleted
+            keyDeleted = await redisConn.delete(str(message.guild.id))
+            if keyDeleted == 0:
                 return await self.safeSend(message.channel, "This server has no pings to be removed")
             await self.safeSend(message.channel, "Removed ping succesfully")
             
