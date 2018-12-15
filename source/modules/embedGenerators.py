@@ -62,7 +62,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
 
     discussionURL = nextLaunchJSON["links"]["reddit_campaign"]    
     if discussionURL != None:
-        launchEmbed.add_field(name="r/SpaceX Discussion", value=discussionURL)
+        launchEmbed.add_field(name="r/SpaceX discussion", value=discussionURL)
     
     launchEmbed.add_field(name="Launch site", value=nextLaunchJSON["launch_site"]["site_name_long"])
 
