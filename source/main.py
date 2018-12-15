@@ -54,6 +54,8 @@ class SpaceXLaunchBotClient(discord.Client):
             # Don't reply to PM's
             return
 
+        userIsOwner = message.author.id == int(structure.config["ownerID"])
+
         try:
             userIsAdmin = message.author.permissions_in(message.channel).administrator
         except AttributeError:
@@ -123,6 +125,17 @@ class SpaceXLaunchBotClient(discord.Client):
             await self.safeSend(message.channel, statics.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
             await self.safeSend(message.channel, statics.helpEmbed)
+        
+
+        # Debugging
+
+        if message.content.startswith(PREFIX + "DebugLS") and userIsOwner:
+            # Send launching soon embed
+            nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
+            if nextLaunchJSON == -1:
+                return await self.safeSend(message.channel, statics.apiErrorEmbed)
+            lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
+            await self.safeSend(message.channel, lse)
 
     async def safeSend(self, channel, toSend):
         """

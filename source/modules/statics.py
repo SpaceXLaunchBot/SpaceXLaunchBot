@@ -20,13 +20,15 @@ rocketIDImages = {
 errorRed = Colour.from_rgb(*config["colours"]["errorRed"])
 falconRed = Colour.from_rgb(*config["colours"]["falconRed"])
 
+ownerTag = f"<@{config['ownerID']}>"
+
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
     description="I am a Discord bot for getting news and information about upcoming SpaceX launches ",
     color=falconRed
 )
 infoEmbed.add_field(name="Github", value="https://github.com/r-spacex/SpaceX-Launch-Bot")
-infoEmbed.add_field(name="Contact", value=f"If you have any questions or suggestions, you can message my owner, {config['ownerTag']}, or raise an issue in the Github repo")
+infoEmbed.add_field(name="Contact", value=f"If you have any questions or suggestions, you can message my owner, {ownerTag}, or raise an issue in the Github repo")
 
 helpEmbed = Embed(
     title="SpaceX-Launch-Bot Commands",
@@ -41,7 +43,7 @@ helpEmbed.add_field(name="removeping", value="Stop any roles/users on the server
 helpEmbed.add_field(name="info", value="Information about this bot\n*Any user can use this command*")
 helpEmbed.add_field(name="help", value="List these commands\n*Any user can use this command*")
 
-nextLaunchErrorEmbed = Embed(title="Error", description=f"An launchInfoEmbed error occurred, contact {config['ownerTag']}", color=errorRed)
-apiErrorEmbed = Embed(title="Error", description=f"An API error occurred, contact {config['ownerTag']}", color=errorRed)
-generalErrorEmbed = Embed(title="Error", description=f"An error occurred, contact {config['ownerTag']}", color=errorRed)
-dbErrorEmbed  = Embed(title="Error", description=f"A database error occurred, contact {config['ownerTag']}", color=errorRed)
+nextLaunchErrorEmbed = Embed(title="Error", description=f"An launchInfoEmbed error occurred, contact {ownerTag}", color=errorRed)
+apiErrorEmbed = Embed(title="Error", description=f"An API error occurred, contact {ownerTag}", color=errorRed)
+generalErrorEmbed = Embed(title="Error", description=f"An error occurred, contact {ownerTag}", color=errorRed)
+dbErrorEmbed  = Embed(title="Error", description=f"A database error occurred, contact {ownerTag}", color=errorRed)
