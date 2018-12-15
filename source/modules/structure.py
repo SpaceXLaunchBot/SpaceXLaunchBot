@@ -53,7 +53,7 @@ Initialise globally used variables
 # Load local config file into a dictionary that can be exported
 configFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "config", "config.json")
 neededKeys = [
-    "ownerTag", "commandPrefix", "apiCheckInterval", "launchNotificationDelta",
+    "ownerID", "commandPrefix", "apiCheckInterval", "launchNotificationDelta",
     "logFilePath", "logFormat", "colours"
 ]
 try:
