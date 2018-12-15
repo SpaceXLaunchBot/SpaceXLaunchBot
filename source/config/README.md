@@ -11,3 +11,4 @@ launchNotificationDelta|Int|How far into the future to look for launches that ar
 logFilePath|String|The path to save the log file to
 logFormat|String|The format for the log
 colours|Object containing Arrays|The colours used for different cases:<br>errorRed: used in error related embeds<br>falconRed: used in rocket info / launch embeds
+game|String|The "game" the bot will play

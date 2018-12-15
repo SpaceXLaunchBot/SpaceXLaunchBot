@@ -8,5 +8,6 @@
     "colours": {
         "errorRed": [255, 0, 0],
         "falconRed": [238, 15, 70]
-    }
+    },
+    "game": "with rockets"
 }

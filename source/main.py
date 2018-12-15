@@ -1,41 +1,23 @@
-"""
-Run the bot and start everything
-"""
-
-# Things that need importing for logging to be setup
 import logging
-from modules import structure
-
-# Setup logging (direct logging to file, only log INFO level and above)
-# Do this before other imports as some local modules use logging when imported
-logFilePath = structure.config["logFilePath"]
-handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
-handler.setFormatter(logging.Formatter(structure.config["logFormat"]))
-logging.basicConfig(level=logging.INFO, handlers=[handler])
-# Change discord to only log ERROR level and above
-logging.getLogger("discord").setLevel(logging.ERROR)
-# Start logging
 logger = logging.getLogger(__name__)
 logger.info("Starting bot")
 
-# Import everything else now logging is set up
 import discord
-from modules import embedGenerators, statics, apis, backgroundTasks
-# Automaticallu sets up and starts redis connection when imported
+from modules import structure, embedGenerators, statics, apis, backgroundTasks
 from modules.redisClient import redisConn
 
-# Important vars
 PREFIX = structure.config["commandPrefix"]
-discordToken = structure.loadEnvVar("SpaceXLaunchBotToken")
-dblToken = structure.loadEnvVar("dblToken")
+DISCORD_TOKEN = structure.loadEnvVar("SpaceXLaunchBotToken")
+DBL_TOKEN = structure.loadEnvVar("dblToken")
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
     async def on_ready(self):
-
-        # Initialise needed Redis keys with default values if they do not exist
+        global dbl
+        dbl = apis.dblApiClient(self, DBL_TOKEN)
+ 
         # Only needed when running for the first time / new db
         if not await redisConn.exists("notificationTaskStore"):
             logger.info("notificationTaskStore does not exist in Redis, creating")
@@ -44,20 +26,13 @@ class SpaceXLaunchBotClient(discord.Client):
         # Run background tasks after initializing database
         self.loop.create_task(backgroundTasks.notificationTask(self))
 
-        global dbl  # Can't define this until client (self) is ready
-        dbl = apis.dblApiClient(self, dblToken)
-
-        await self.change_presence(activity=discord.Game(name="with rockets"))
+        await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 
         totalSubbed = await redisConn.scard("subscribedChannels")
         totalGuilds = len(self.guilds)
-        totalUsers = len(self.users)   
         
-        logger.info(f"Username: {self.user.name}")
-        logger.info(f"ClientID: {self.user.id}")
-        logger.info(f"Connected to {totalGuilds} guilds")
-        logger.info(f"Connected to {totalSubbed} subscribed channels")
-        logger.info(f"Serving {totalUsers} users")
+        logger.info(f"{self.user.id} / {self.user.name}")
+        logger.info(f"{totalGuilds} guilds / {totalSubbed} subscribed channels / {len(self.users)} users")
         logger.info("Bot ready")
 
         await dbl.updateGuildCount(totalGuilds)
@@ -81,8 +56,7 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             userIsAdmin = message.author.permissions_in(message.channel).administrator
         except AttributeError:
-            # Happens if user has no roles
-            userIsAdmin = False
+            userIsAdmin = False  # If user has no roles
 
         # Commands can be in any case
         message.content = message.content.lower()
@@ -204,4 +178,4 @@ class SpaceXLaunchBotClient(discord.Client):
 
 # Run bot
 client = SpaceXLaunchBotClient()
-client.run(discordToken)
+client.run(DISCORD_TOKEN)

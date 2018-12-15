@@ -44,6 +44,12 @@ async def launchTimeFromTS(timestamp):
         # timestamp is not int
         return "To Be Announced"
 
+
+
+"""
+Initialise globally used variables
+"""
+
 # Load local config file into a dictionary that can be exported
 configFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "config", "config.json")
 neededKeys = [
@@ -58,3 +64,12 @@ try:
             fatalError(f"Cannot find required key: {key} in configuration file")
 except FileNotFoundError:
     fatalError("Configuration file / directory not found")
+
+# Setup logging (direct logging to file, only log INFO level and above)
+# Do this before other imports as some local modules use logging when imported
+logFilePath = config["logFilePath"]
+handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
+handler.setFormatter(logging.Formatter(config["logFormat"]))
+logging.basicConfig(level=logging.INFO, handlers=[handler])
+# Change discord to only log ERROR level and above
+logging.getLogger("discord").setLevel(logging.ERROR)
