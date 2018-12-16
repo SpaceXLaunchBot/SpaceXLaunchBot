@@ -129,13 +129,20 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Debugging
 
-        if message.content.startswith(PREFIX + "dbgls") and userIsOwner:
+        elif message.content.startswith(PREFIX + "dbgls") and userIsOwner:
             # Send launching soon embed
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == -1:
                 return await self.safeSend(message.channel, statics.apiErrorEmbed)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
+        
+        elif message.content.startswith(PREFIX + "dbghl") and userIsOwner:
+            myEmbed = statics.infoEmbed
+            myEmbed.add_field(name="test", value="[a]({0}) (b)[{0}]".format(
+                "https://youtu.be/6n3pFFPSlW4"
+            ))
+            await self.safeSend(message.channel, myEmbed)
 
     async def safeSend(self, channel, toSend):
         """
