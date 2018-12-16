@@ -96,7 +96,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Add/remove ping commands
 
-        elif message.content.startswith(PREFIX + "addping"):
+        elif userIsAdmin and message.content.startswith(PREFIX + "addping"):
             replyMsg = "Invalid input for addping command"
             rolesToMention = " ".join(message.content.split("addping")[1:])
             if rolesToMention.strip() != "":
@@ -106,7 +106,7 @@ class SpaceXLaunchBotClient(discord.Client):
                     return await self.safeSend(message.channel, statics.dbErrorEmbed)
             await self.safeSend(message.channel, replyMsg)
 
-        elif message.content.startswith(PREFIX + "removeping"):
+        elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
             """
             Currently just deletes the guild settings Redis key/val as the only setting saved is the mentionsToPing
             """
