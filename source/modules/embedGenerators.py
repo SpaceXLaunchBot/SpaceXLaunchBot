@@ -105,8 +105,6 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
     else:
         notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
     
-    notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
-    
     # Embed a link [using](markdown)
     if nextLaunchJSON["links"]["video_link"] != None:
         embedDesc += f"[Livestream]({nextLaunchJSON['links']['video_link']})\n"
@@ -115,5 +113,7 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
     if nextLaunchJSON["links"]["presskit"] != None:
         embedDesc += f"[Press kit]({nextLaunchJSON['links']['presskit']})\n"
     notifEmbed.description = embedDesc
+    
+    notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
 
     return notifEmbed
