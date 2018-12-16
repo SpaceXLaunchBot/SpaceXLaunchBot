@@ -142,6 +142,7 @@ class SpaceXLaunchBotClient(discord.Client):
             myEmbed.add_field(name="test", value="[a]({0}) (b)[{0}]".format(
                 "https://youtu.be/6n3pFFPSlW4"
             ))
+            myEmbed.add_field(name="[test2](https://youtu.be/6n3pFFPSlW4)")
             await self.safeSend(message.channel, myEmbed)
 
     async def safeSend(self, channel, toSend):
