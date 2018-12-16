@@ -19,9 +19,9 @@ class SpaceXLaunchBotClient(discord.Client):
         dbl = apis.dblApiClient(self, DBL_TOKEN)
 
         # Only needed when running for the first time / new db
-        if not await self.exists("notificationTaskStore"):
+        if not await redisConn.exists("notificationTaskStore"):
             logger.info("notificationTaskStore does not exist, creating")
-            await self.setNotificationTaskStore("False", generalErrorEmbed)
+            await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
         
         self.loop.create_task(backgroundTasks.notificationTask(self))
 
