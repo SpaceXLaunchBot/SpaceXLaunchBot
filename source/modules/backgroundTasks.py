@@ -53,7 +53,7 @@ async def notificationTask(client):
             launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
             latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
             
-            launchInfoEmbed, launchEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
+            launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
             launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
             # Launch information message
@@ -71,7 +71,7 @@ async def notificationTask(client):
                     if channel == None:
                         channelsToRemove.append(channelID)
                     else:
-                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchEmbedSmall])
+                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedSmall])
 
             # Launching soon message
             launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])

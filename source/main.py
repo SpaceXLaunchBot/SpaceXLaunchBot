@@ -70,10 +70,10 @@ class SpaceXLaunchBotClient(discord.Client):
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == -1:
-                launchInfoEmbed, launchEmbedSmall = statics.apiErrorEmbed, statics.apiErrorEmbed
+                launchInfoEmbed, launchInfoEmbedSmall = statics.apiErrorEmbed, statics.apiErrorEmbed
             else:
-                launchInfoEmbed, launchEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
-            await self.safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchEmbedSmall])
+                launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
+            await self.safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedSmall])
 
 
         # Add/remove channel commands
