@@ -43,11 +43,11 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 
 - A **launch information** message shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every 15 minutes.
 
-![LaunchInfo](images/screenshots/launchInfo.png)
+![launchInfo](images/screenshots/launchInfo.png)
 
 - A **launching soon** message provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
 
-![LaunchSoon](images/screenshots/LaunchSoon.png)
+![launchSoon](images/screenshots/launchSoon.png)
 
 ---
 
