@@ -12,6 +12,7 @@ askyn() {
 cat << EndOfMsg
 This script will erase your current redis config if you have one
 For this script to work, these things need to be true:
+You are running Python 3.6+ under the "python3" command
 SLB should exist in /opt/SpaceX-Launch-Bot
 pip3 should be installed
 You have a Discord bot token and a Discord-bot-list token for that bot
