@@ -25,13 +25,7 @@ class redisClient(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
         # Uses redis default host, port, and dbnum by default
         super().__init__(host=host, port=port, db=dbNum)
-
         logger.info(f"Connected to {host}:{port} on db num {dbNum}")
-        
-        # Only needed when running for the first time / new db
-        if not await self.exists("notificationTaskStore"):
-            logger.info("notificationTaskStore does not exist, creating")
-            await self.setNotificationTaskStore("False", generalErrorEmbed)
 
     async def safeSadd(self, key, value):
         """

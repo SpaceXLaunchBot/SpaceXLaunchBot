@@ -18,6 +18,11 @@ class SpaceXLaunchBotClient(discord.Client):
         global dbl
         dbl = apis.dblApiClient(self, DBL_TOKEN)
 
+        # Only needed when running for the first time / new db
+        if not await self.exists("notificationTaskStore"):
+            logger.info("notificationTaskStore does not exist, creating")
+            await self.setNotificationTaskStore("False", generalErrorEmbed)
+        
         self.loop.create_task(backgroundTasks.notificationTask(self))
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
