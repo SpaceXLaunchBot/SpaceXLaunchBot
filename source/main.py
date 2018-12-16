@@ -121,7 +121,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Debugging
 
-        elif message.content.startswith(PREFIX + "dbgls") and userIsOwner:
+        elif userIsOwner and message.content.startswith(PREFIX + "dbgls"):
             # Send launching soon embed
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
             if nextLaunchJSON == -1:
