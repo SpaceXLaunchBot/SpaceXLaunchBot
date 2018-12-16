@@ -47,7 +47,7 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 
 - A **launching soon** message provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
 
-![LaunchNotif](images/screenshots/launchNotif.png)
+![LaunchSoon](images/screenshots/LaunchSoon.png)
 
 ---
 
