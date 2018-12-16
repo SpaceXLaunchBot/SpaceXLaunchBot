@@ -17,20 +17,13 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         global dbl
         dbl = apis.dblApiClient(self, DBL_TOKEN)
- 
-        # Only needed when running for the first time / new db
-        if not await redisConn.exists("notificationTaskStore"):
-            logger.info("notificationTaskStore does not exist in Redis, creating")
-            await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
-        # Run background tasks after initializing database
         self.loop.create_task(backgroundTasks.notificationTask(self))
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 
         totalSubbed = await redisConn.scard("subscribedChannels")
-        totalGuilds = len(self.guilds)
-        
+        totalGuilds = len(self.guilds)        
         logger.info(f"{self.user.id} / {self.user.name}")
         logger.info(f"{totalGuilds} guilds / {totalSubbed} subscribed channels / {len(self.users)} users")
         logger.info("Bot ready")
@@ -51,11 +44,10 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_message(self, message):
         if message.author.bot or not message.guild:
             # Don't reply to bots (includes self)
-            # Don't reply to PM's
+            # Only reply to messages from guilds
             return
 
         userIsOwner = message.author.id == int(structure.config["ownerID"])
-
         try:
             userIsAdmin = message.author.permissions_in(message.channel).administrator
         except AttributeError:
@@ -136,15 +128,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 return await self.safeSend(message.channel, statics.apiErrorEmbed)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
-        
-        elif message.content.startswith(PREFIX + "dbghl") and userIsOwner:
-            from copy import deepcopy
-            myEmbed = deepcopy(statics.infoEmbed)
-            myEmbed.add_field(name="test", value="[a]({0}) (b)[{0}]".format(
-                "https://youtu.be/6n3pFFPSlW4"
-            ))
-            myEmbed.add_field(name="[test2](https://youtu.be/6n3pFFPSlW4)", value="")
-            await self.safeSend(message.channel, myEmbed)
+
 
     async def safeSend(self, channel, toSend):
         """
