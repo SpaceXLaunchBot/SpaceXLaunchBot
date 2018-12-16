@@ -107,12 +107,13 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
     
     notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
     
+    # Embed a link [using](markdown)
     if nextLaunchJSON["links"]["video_link"] != None:
-        embedDesc += f"[Livestream]({nextLaunchJSON['links']['video_link']})"
+        embedDesc += f"[Livestream]({nextLaunchJSON['links']['video_link']})\n"
     if nextLaunchJSON["links"]["reddit_launch"] != None:
-        embedDesc += f"[r/SpaceX Launch Thread]({nextLaunchJSON['links']['reddit_launch']})"
+        embedDesc += f"[r/SpaceX Launch Thread]({nextLaunchJSON['links']['reddit_launch']})\n"
     if nextLaunchJSON["links"]["presskit"] != None:
-        embedDesc += f"[Press kit]({nextLaunchJSON['links']['presskit']})"
+        embedDesc += f"[Press kit]({nextLaunchJSON['links']['presskit']})\n"
     notifEmbed.description = embedDesc
 
     return notifEmbed
