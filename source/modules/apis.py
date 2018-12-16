@@ -9,12 +9,18 @@ class spacexAPI(object):
     """
     
     @staticmethod
-    async def getNextLaunchJSON():
+    async def getNextLaunchJSON(debug=False):
         """
         Using aiohttp, grab the latest launch info
         Returns -1 if fail
         """
-        upcomingLaunchesURL = "https://api.spacexdata.com/v3/launches/next"
+        
+        route = "next"
+        if debug:
+            route = "latest"
+
+        upcomingLaunchesURL = f"https://api.spacexdata.com/v3/launches/{route}"
+        
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(upcomingLaunchesURL) as response:

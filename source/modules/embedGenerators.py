@@ -31,15 +31,14 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
    
     launchInfoEmbed = Embed(
         color=falconRed,
-        description=nextLaunchJSON["details"]
-    )
+        description=nextLaunchJSON["details"],
+        title = "Launch #{} - {}".format(
+            nextLaunchJSON["flight_number"],
+            nextLaunchJSON["mission_name"]
+    ))
 
     # Set thumbnail depending on rocket ID
     launchInfoEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
-    launchInfoEmbed.set_author(name="Launch #{} - {}".format(
-        nextLaunchJSON["flight_number"],
-        nextLaunchJSON["mission_name"]
-    ))
 
     launchInfoEmbed.add_field(
         name="Launch vehicle",
@@ -94,28 +93,26 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
 
 async def genLaunchingSoonEmbed(nextLaunchJSON):
     UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
-    notifEmbed = Embed(color=falconRed)
-    
-    notifEmbed.set_author(name="{} is launching soon!".format(nextLaunchJSON["mission_name"]))
-    
-    if nextLaunchJSON["links"]["video_link"] != None:
-        notifEmbed.title= "Livestream"
-        notifEmbed.url = nextLaunchJSON["links"]["video_link"]
-    else:
-        notifEmbed.title="r/SpaceX Discussion"
-        notifEmbed.url = nextLaunchJSON["links"]["reddit_campaign"]
+    embedDesc = ""
 
+    notifEmbed = Embed(
+        color=falconRed,
+        title="{} is launching soon!".format(nextLaunchJSON["mission_name"])
+    )
+    
     if nextLaunchJSON["links"]["mission_patch_small"] != None:
         notifEmbed.set_thumbnail(url=nextLaunchJSON["links"]["mission_patch_small"])
     else:
         notifEmbed.set_thumbnail(url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]])
-
-    notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
-
-    if nextLaunchJSON["links"]["reddit_launch"] != None:
-        notifEmbed.add_field(name="r/SpaceX Launch Thread", value=nextLaunchJSON["links"]["reddit_launch"])
-
-    if nextLaunchJSON["links"]["presskit"] != None:
-        notifEmbed.add_field(name="Press kit", value=nextLaunchJSON["links"]["presskit"])
     
+    notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
+    
+    if nextLaunchJSON["links"]["video_link"] != None:
+        embedDesc += f"[Livestream]({nextLaunchJSON['links']['video_link']})"
+    if nextLaunchJSON["links"]["reddit_launch"] != None:
+        embedDesc += f"[r/SpaceX Launch Thread]({nextLaunchJSON['links']['reddit_launch']})"
+    if nextLaunchJSON["links"]["presskit"] != None:
+        embedDesc += f"[Press kit]({nextLaunchJSON['links']['presskit']})"
+    notifEmbed.description = embedDesc
+
     return notifEmbed

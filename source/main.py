@@ -128,7 +128,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         elif userIsOwner and message.content.startswith(PREFIX + "dbgls"):
             # Send launching soon embed
-            nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
+            nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON(debug=True)
             if nextLaunchJSON == -1:
                 return await self.safeSend(message.channel, statics.apiErrorEmbed)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
