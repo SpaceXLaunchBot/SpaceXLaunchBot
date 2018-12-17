@@ -45,7 +45,6 @@ async def launchTimeFromTS(timestamp):
         return "To Be Announced"
 
 
-
 """
 Initialise globally used variables
 """
