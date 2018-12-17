@@ -67,4 +67,4 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 - [ ] "Allowing a mention as the prefix ("@MyBot help") or adding a way to find the bot's prefix with only a mention ("@MyBot" or "@MyBot, what's your prefix?") will help users who are new to your bot in getting started. (Make sure that whatever the message is, it's easily found. A great way to do this is by including it in your bot's presence.)"
 - [x] Complete in-code TODOs
 - [x] Add field in launch information embeds to show whether any stages are landing (and if so, where / on what)
-- [ ] Test if executing a redisConn command on a dead server causes an error, or just returns an err value (and change err handling appropriatley)
+- [ ] Test if executing a Redis command on a dead server causes an error, or just returns an err value (and change err handling appropriatley)
