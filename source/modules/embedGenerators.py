@@ -6,7 +6,7 @@ from copy import deepcopy
 from discord import Embed
 
 from modules.structure import launchTimeFromTS
-from modules.statics import falconRed, rocketIDImages
+from modules.statics import falconRed, rocketIDImages, apiErrorEmbed
 
 payloadInfo = \
 """Type: {}
@@ -28,7 +28,9 @@ Precision: {}
 """
 
 async def genLaunchInfoEmbeds(nextLaunchJSON):
-   
+    if nextLaunchJSON == -1:
+        return apiErrorEmbed, apiErrorEmbed
+    
     launchInfoEmbed = Embed(
         color=falconRed,
         description=nextLaunchJSON["details"],

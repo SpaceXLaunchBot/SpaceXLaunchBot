@@ -26,12 +26,6 @@ async def notificationTask(client):
     await client.wait_until_ready()
     logger.info("Started")
     while not client.is_closed():
-        """
-        Getting everything and then checking for errors probably isn't very
-        efficient but since this is run on a set time loop and runs in the
-        background, it shouldn't matter much...
-        """
-
         channelsToRemove = []
         nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
         
@@ -71,7 +65,7 @@ async def notificationTask(client):
                     if channel == None:
                         channelsToRemove.append(channelID)
                     else:
-                        await client.safeSendLaunchInfo(channel, [launchInfoEmbed, launchInfoEmbedSmall])
+                        await client.safeSendLaunchInfo(channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=False)
 
             # Launching soon message
             launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])

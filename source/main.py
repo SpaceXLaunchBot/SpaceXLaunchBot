@@ -66,11 +66,8 @@ class SpaceXLaunchBotClient(discord.Client):
 
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
-            if nextLaunchJSON == -1:
-                launchInfoEmbed, launchInfoEmbedSmall = statics.apiErrorEmbed, statics.apiErrorEmbed
-            else:
-                launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
-            await self.safeSendLaunchInfo(message.channel, [launchInfoEmbed, launchInfoEmbedSmall])
+            launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
+            await self.safeSendLaunchInfo(message.channel, launchInfoEmbed, launchInfoEmbedSmall)
 
 
         # Add/remove channel commands
@@ -156,32 +153,21 @@ class SpaceXLaunchBotClient(discord.Client):
         except discord.errors.InvalidArgument:
             return -4
 
-    async def safeSendLaunchInfo(self, channel, embeds):
+    async def safeSendLaunchInfo(self, channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=True):
         """
-        Specifically for sending 2 launch embeds, a full-detail one,
-        and failing that, a "lite" version of the embed
-        
-        parameter $embeds:
-            Should be as list of 2 embeds, one to attempt to send,
-            and one that is garunteed to be under the character
-            limit, to send if the first one is too big.
-            It could also be a list with just 1 embed, but if this
-            is over the char limit, nothing will happen.
-            Other errors are automatically handled
-        
-        Returns 0 if neither embeds are sent
+        Safely send the launch information embed. If this fails, send the
+        smaller version that should always be under the character limit for an
+        embed, failing this, send an error message (if sendErr=True)
         """
-        for embed in embeds:
-            returned = await self.safeSend(channel, embed)
-            if returned == -3:
-                pass  # Embed might be too big, try lite version
-            elif returned == -2 or returned == -4:
-                return 0
-            else:
-                return returned
-        # Both failed to send, try to let user know something went wrong
-        await self.safeSend(channel, statics.generalErrorEmbed)
-        return 0
+        sent = await self.safeSend(channel, launchInfoEmbed)
+
+        if sent in [-2, -3]:
+            # Launch embed might be too big, try smaller version
+            sent = await self.safeSend(channel, launchInfoEmbedSmall)
+
+            if sent in [-2, -3] and sendErr:
+                # Still something wrong, send error embed
+                await self.safeSend(channel, statics.generalErrorEmbed)
 
 # Run bot
 client = SpaceXLaunchBotClient()
