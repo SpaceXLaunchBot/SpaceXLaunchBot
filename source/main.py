@@ -42,8 +42,8 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_guild_remove(self, guild):
         logger.info(f"Removed from guild, ID: {guild.id}")
         await dbl.updateGuildCount(len(self.guilds))
-        ret = await redisConn.delete(str(guild.id))
-        if ret != 0:
+        deleted = await redisConn.delete(str(guild.id))
+        if deleted != 0:
             logger.info(f"Removed server settings for {guild.id}")
 
     async def on_message(self, message):
@@ -76,42 +76,39 @@ class SpaceXLaunchBotClient(discord.Client):
         # Add/remove channel commands
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
-            replyMsg = "This channel has been added to the notification service"
-            ret = await redisConn.safeSadd("subscribedChannels", str(message.channel.id))
-            if ret == 0:
-                replyMsg = "This channel is already subscribed to the notification service"
-            elif ret == -1:
-                return await self.safeSend(message.channel, statics.dbErrorEmbed)
-            await self.safeSend(message.channel, replyMsg)
+            reply = "This channel has been added to the notification service"
+            added = await redisConn.safeSadd("subscribedChannels", str(message.channel.id))
+            if added == 0:
+                reply = "This channel is already subscribed to the notification service"
+            elif added == -1:
+                reply = statics.dbErrorEmbed
+            await self.safeSend(message.channel, reply)
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
-            replyMsg = "This channel has been removed from the launch notification service"
-            ret = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
-            if ret == 0:
-                replyMsg = "This channel was not previously subscribed to the launch notification service"
-            elif ret == -1:
-                return await self.safeSend(message.channel, statics.dbErrorEmbed)
-            await self.safeSend(message.channel, replyMsg)
+            reply = "This channel has been removed from the launch notification service"
+            removed = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
+            if removed == 0:
+                reply = "This channel was not previously subscribed to the launch notification service"
+            elif removed == -1:
+                reply = statics.dbErrorEmbed
+            await self.safeSend(message.channel, reply)
 
 
         # Add/remove ping commands
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addping"):
-            replyMsg = "Invalid input for addping command"
+            reply = "Invalid input for addping command"
             rolesToMention = " ".join(message.content.split("addping")[1:])
             if rolesToMention.strip() != "":
-                replyMsg = f"Added launch notification ping for mentions(s): {rolesToMention}"
+                reply = f"Added launch notification ping for mentions(s): {rolesToMention}"
                 ret = await redisConn.setGuildSettings(message.guild.id, rolesToMention)
                 if ret == -1:
                     return await self.safeSend(message.channel, statics.dbErrorEmbed)
-            await self.safeSend(message.channel, replyMsg)
+            await self.safeSend(message.channel, reply)
 
         elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
-            """
-            Currently just deletes the guild settings Redis key/val as the only setting saved is the mentionsToPing
-            """
-            keyDeleted = await redisConn.hdel(message.guild.id, "rolesToMention")
-            if keyDeleted == 0:
+            deleted = await redisConn.hdel(message.guild.id, "rolesToMention")
+            if deleted == 0:
                 return await self.safeSend(message.channel, "This server has no pings to be removed")
             await self.safeSend(message.channel, "Removed ping succesfully")
             
