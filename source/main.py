@@ -166,7 +166,7 @@ class SpaceXLaunchBotClient(discord.Client):
             sent = await self.safeSend(channel, launchInfoEmbedSmall)
 
             if sent in [-2, -3] and sendErr:
-                # Still something wrong, send error embed
+                # Still something wrong, try to send error embed
                 await self.safeSend(channel, statics.generalErrorEmbed)
 
 # Run bot
