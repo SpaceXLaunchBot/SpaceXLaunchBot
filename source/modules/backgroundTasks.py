@@ -94,7 +94,9 @@ async def notificationTask(client):
                                     try:
                                         guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
                                     except RedisError:
-                                        pass  # TODO: Maybe log an error here?
+                                        # If a redis error occurs here, it is better to send out
+                                        # the remaining notifications than to exit this block
+                                        pass
                                     else:
                                         # If there are settings saved for the guild
                                         if guildSettings != 0:
