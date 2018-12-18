@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 ONE_MINUTE = 60  # Just makes things a little more readable
 API_CHECK_INTERVAL = structure.config["apiCheckInterval"]
-LAUNCH_NOTIF_DELTA = timedelta(minutes = structure.config["launchNotificationDelta"])
+LAUNCH_NOTIF_DELTA = timedelta(minutes=structure.config["launchNotificationDelta"])
 
 async def notificationTask(client):
     """
-    TODO: Break this up into functions (tidy it up a bit)
+    TODO: Break this up into functions (atleast tidy it up a bit)
     Every API_CHECK_INTERVAL minutes:
     If the embed has changed, something new has happened so send
         all channels an embed with updated info
@@ -52,9 +52,7 @@ async def notificationTask(client):
                 launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
                 # Launch information message
-                if latestLaunchInfoEmbedDict == launchInfoEmbedDict:
-                    pass
-                else:
+                if latestLaunchInfoEmbedDict != launchInfoEmbedDict:
                     logger.info("Launch info changed, sending notifications")
 
                     launchingSoonNotifSent = "False"
@@ -96,7 +94,7 @@ async def notificationTask(client):
                                     try:
                                         guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
                                     except RedisError:
-                                        pass
+                                        pass  # TODO: Maybe log an error here?
                                     else:
                                         # If there are settings saved for the guild
                                         if guildSettings != 0:

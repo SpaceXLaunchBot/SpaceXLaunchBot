@@ -32,11 +32,11 @@ class redisClient(StrictRedis):
         Gets variables from notificationTaskStore
         Automatically decodes variables
         """
-        launchingSoonNotifSent = (await self.hget("notificationTaskStore", "launchingSoonNotifSent")).decode("UTF-8")
-        latestLaunchInfoEmbedDict = pickle.loads(await self.hget("notificationTaskStore", "latestLaunchInfoEmbedDict"))
+        launchingSoonNotifSent = await self.hget("notificationTaskStore", "launchingSoonNotifSent")
+        latestLaunchInfoEmbedDict = await self.hget("notificationTaskStore", "latestLaunchInfoEmbedDict")
         return {
-            "launchingSoonNotifSent": launchingSoonNotifSent,
-            "latestLaunchInfoEmbedDict": latestLaunchInfoEmbedDict
+            "launchingSoonNotifSent": launchingSoonNotifSent.decode("UTF-8"),
+            "latestLaunchInfoEmbedDict": pickle.loads(latestLaunchInfoEmbedDict)
         }
 
     async def setNotificationTaskStore(self, launchingSoonNotifSent, latestLaunchInfoEmbedDict):
@@ -57,7 +57,7 @@ class redisClient(StrictRedis):
         """
         guildID = str(guildID)  # Make sure we are using a string
         if rolesToMention:
-            await self.hset(guildID, "rolesToMention", rolesToMention)
+            await self.hset(guildID, "rolesToMention", rolesToMention.encode("UTF-8"))
 
     async def getGuildSettings(self, guildID):
         """
@@ -71,7 +71,7 @@ class redisClient(StrictRedis):
             return 0
         rolesToMention = await self.hget(guildID, "rolesToMention")
         return {
-            "rolesToMention": rolesToMention
+            "rolesToMention": rolesToMention.decode("UTF-8")
         }
 
 """
