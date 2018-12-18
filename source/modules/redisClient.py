@@ -21,6 +21,11 @@ from modules.statics import generalErrorEmbed
 
 logger = logging.getLogger(__name__)
 
+"""
+TODO: Is creating my own "safe" methods the best way to handle this?
+TODO: The 3 "except Exception as e" lines in every method is not very DRY
+"""
+
 class redisClient(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
         # Uses redis default host, port, and dbnum by default
@@ -36,6 +41,29 @@ class redisClient(StrictRedis):
             if type(value) == str:
                 return await self.sadd(key, value.encode("UTF-8"))
             return await self.sadd(key, value)
+        except Exception as e:
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
+            return -1
+    
+    async def safeSrem(self, key, value):
+        """
+        Returns -1 if srem fails
+        value is encoded using UTF-8 if it is a string
+        """
+        try:
+            if type(value) == str:
+                return await self.srem(key, value.encode("UTF-8"))
+            return await self.srem(key, value)
+        except Exception as e:
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
+            return -1
+    
+    async def safeHdel(self, key, field):
+        """
+        Returns -1 if hdel fails
+        """
+        try:
+            return await self.hdel(key, field)
         except Exception as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             return -1

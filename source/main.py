@@ -83,7 +83,7 @@ class SpaceXLaunchBotClient(discord.Client):
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             reply = "This channel has been removed from the launch notification service"
-            removed = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
+            removed = await redisConn.safeSrem("subscribedChannels", str(message.channel.id))
             if removed == 0:
                 reply = "This channel was not previously subscribed to the launch notification service"
             elif removed == -1:
@@ -104,11 +104,14 @@ class SpaceXLaunchBotClient(discord.Client):
             await self.safeSend(message.channel, reply)
 
         elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
-            deleted = await redisConn.hdel(message.guild.id, "rolesToMention")
+            reply = "Removed ping succesfully"
+            deleted = await redisConn.safeHdel(message.guild.id, "rolesToMention")
             if deleted == 0:
-                return await self.safeSend(message.channel, "This server has no pings to be removed")
-            await self.safeSend(message.channel, "Removed ping succesfully")
-            
+                reply = "This server has no pings to be removed"
+            elif deleted == -1:
+                reply = statics.dbErrorEmbed
+            await self.safeSend(message.channel, reply)
+
 
         # Misc
 
