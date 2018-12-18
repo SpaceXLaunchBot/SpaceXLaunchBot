@@ -3,6 +3,8 @@ logger = logging.getLogger(__name__)
 logger.info("Starting bot")
 
 import discord
+from aredis import RedisError
+
 from modules import structure, embedGenerators, statics, apis, backgroundTasks
 from modules.redisClient import redisConn
 
@@ -60,7 +62,18 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Commands can be in any case
         message.content = message.content.lower()
-        
+
+        # If the command fails, the bot should keep running, but log the error
+        try:
+            await self.handleCommand(message, userIsOwner, userIsAdmin)
+        except RedisError as e:
+            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
+            await self.safeSend(message.channel, statics.dbErrorEmbed)
+        except Exception as e:
+            logger.error(f"handleCommand failed:  {type(e).__name__}: {e}")
+            await self.safeSend(message.channel, statics.generalErrorEmbed)
+    
+    async def handleCommand(self, message, userIsOwner, userIsAdmin):
 
         # Info command
 
@@ -74,20 +87,16 @@ class SpaceXLaunchBotClient(discord.Client):
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
             reply = "This channel has been added to the notification service"
-            added = await redisConn.safeSadd("subscribedChannels", str(message.channel.id))
+            added = await redisConn.sadd("subscribedChannels", str(message.channel.id).encode("UTF-8"))
             if added == 0:
                 reply = "This channel is already subscribed to the notification service"
-            elif added == -1:
-                reply = statics.dbErrorEmbed
             await self.safeSend(message.channel, reply)
         
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             reply = "This channel has been removed from the launch notification service"
-            removed = await redisConn.safeSrem("subscribedChannels", str(message.channel.id))
+            removed = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
             if removed == 0:
                 reply = "This channel was not previously subscribed to the launch notification service"
-            elif removed == -1:
-                reply = statics.dbErrorEmbed
             await self.safeSend(message.channel, reply)
 
 
@@ -98,18 +107,14 @@ class SpaceXLaunchBotClient(discord.Client):
             rolesToMention = " ".join(message.content.split("addping")[1:])
             if rolesToMention.strip() != "":
                 reply = f"Added launch notification ping for mentions(s): {rolesToMention}"
-                ret = await redisConn.setGuildSettings(message.guild.id, rolesToMention)
-                if ret == -1:
-                    return await self.safeSend(message.channel, statics.dbErrorEmbed)
+                await redisConn.setGuildSettings(message.guild.id, rolesToMention)
             await self.safeSend(message.channel, reply)
 
         elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
             reply = "Removed ping succesfully"
-            deleted = await redisConn.safeHdel(message.guild.id, "rolesToMention")
+            deleted = await redisConn.hdel(message.guild.id, "rolesToMention")
             if deleted == 0:
                 reply = "This server has no pings to be removed"
-            elif deleted == -1:
-                reply = statics.dbErrorEmbed
             await self.safeSend(message.channel, reply)
 
 
@@ -126,8 +131,6 @@ class SpaceXLaunchBotClient(discord.Client):
         elif userIsOwner and message.content.startswith(PREFIX + "dbgls"):
             # Send launching soon embed
             nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON(debug=True)
-            if nextLaunchJSON == -1:
-                return await self.safeSend(message.channel, statics.apiErrorEmbed)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
 

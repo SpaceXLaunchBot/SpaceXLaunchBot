@@ -22,15 +22,11 @@ class spacexAPI(object):
         upcomingLaunchesURL = f"https://api.spacexdata.com/v3/launches/{route}"
         
         async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(upcomingLaunchesURL) as response:
-                    if response.status != 200:
-                        logger.error("Failed to get data from SpaceX API: response.status != 200")
-                        return -1
-                    return await response.json()
-            except Exception as e:
-                logger.error(f"Failed to get data from SpaceX API: {type(e).__name__}: {e}")
-                return -1
+            async with session.get(upcomingLaunchesURL) as response:
+                if response.status != 200:
+                    logger.error("Failed to get data from SpaceX API: response.status != 200")
+                    return -1
+                return await response.json()
 
 class dblApiClient(object):
     """
