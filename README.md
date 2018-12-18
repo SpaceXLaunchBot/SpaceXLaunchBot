@@ -37,7 +37,7 @@ Command|Description|Permissions needed
 `!info`|Show information about the bot|None
 `!help`|List these commands|None
 
-## Notification service
+## Notifications
 
 The `!addchannel` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
 
