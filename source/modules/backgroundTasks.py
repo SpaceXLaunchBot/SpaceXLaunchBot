@@ -18,6 +18,7 @@ LAUNCH_NOTIF_DELTA = timedelta(minutes = structure.config["launchNotificationDel
 
 async def notificationTask(client):
     """
+    TODO: Break this up into functions (tidy it up a bit)
     Every API_CHECK_INTERVAL minutes:
     If the embed has changed, something new has happened so send
         all channels an embed with updated info
