@@ -138,7 +138,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def safeSend(self, channel, toSend):
         """
         Send a text / embed message to a user, and if an error occurs, safely
-        supress it. On failure, returns:
+        supress it so the bot doesen't crash completely. On failure, returns:
             -1 : Nothing to send (toSend is not a string or Embed)
             -2 : Forbidden (API down, Message too big, etc.)
             -3 : HTTPException (No permission to message this channel)
