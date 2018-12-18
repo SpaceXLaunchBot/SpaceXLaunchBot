@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class spacexAPI(object):
+class spacexApi(object):
     """
     Handles interactions with the SpaceX API
     """
@@ -28,7 +28,7 @@ class spacexAPI(object):
                     return -1
                 return await response.json()
 
-class dblApiClient(object):
+class dblApi(object):
     """
     Handles interactions with the discordbots.org API
     """

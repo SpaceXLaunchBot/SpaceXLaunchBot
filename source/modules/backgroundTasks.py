@@ -36,7 +36,7 @@ async def notificationTask(client):
             else:
                 channelsToRemove = []
                 
-                nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
+                nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
 
                 subbedChannelIDs = await redisConn.smembers("subscribedChannels")
                 notificationTaskStore = await redisConn.getNotificationTaskStore()

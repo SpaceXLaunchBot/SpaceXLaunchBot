@@ -18,7 +18,7 @@ class SpaceXLaunchBotClient(discord.Client):
     
     async def on_ready(self):
         global dbl
-        dbl = apis.dblApiClient(self, DBL_TOKEN)
+        dbl = apis.dblApi(self, DBL_TOKEN)
 
         # Only needed when running for the first time / new db
         if not await redisConn.exists("notificationTaskStore"):
@@ -78,7 +78,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # Info command
 
         if message.content.startswith(PREFIX + "nextlaunch"):
-            nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON()
+            nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
             launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
             await self.safeSendLaunchInfo(message.channel, launchInfoEmbed, launchInfoEmbedSmall)
 
@@ -130,7 +130,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         elif userIsOwner and message.content.startswith(PREFIX + "dbgls"):
             # Send launching soon embed
-            nextLaunchJSON = await apis.spacexAPI.getNextLaunchJSON(debug=True)
+            nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON(debug=True)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
 
