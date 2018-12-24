@@ -18,7 +18,7 @@ LAUNCH_NOTIF_DELTA = timedelta(minutes=structure.config["launchNotificationDelta
 
 async def notificationTask(client):
     """
-    TODO: Break this up into functions (atleast tidy it up a bit)
+    TODO: Tidy this up
     Every API_CHECK_INTERVAL minutes:
     If the embed has changed, something new has happened so send
         all channels an embed with updated info
@@ -66,6 +66,7 @@ async def notificationTask(client):
                         else:
                             await client.safeSendLaunchInfo(channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=False)
 
+                # TODO: Move into new task that runs more frequently so the message can say in how many mins the launch will be happening
                 # Launching soon message
                 launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])
                 # If launchTimestamp is an int carry on, else it is TBA
