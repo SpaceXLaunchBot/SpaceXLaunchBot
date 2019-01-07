@@ -3,30 +3,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class spacexApi(object):
     """
     Handles interactions with the SpaceX API
     """
-    
+
     @staticmethod
     async def getNextLaunchJSON(debug=False):
         """
         Using aiohttp, grab the latest launch info
         Returns -1 if fail
         """
-        
+
         route = "next"
         if debug:
             route = "latest"
 
         upcomingLaunchesURL = f"https://api.spacexdata.com/v3/launches/{route}"
-        
+
         async with aiohttp.ClientSession() as session:
             async with session.get(upcomingLaunchesURL) as response:
                 if response.status != 200:
-                    logger.error("Failed to get data from SpaceX API: response.status != 200")
+                    logger.error(
+                        "Failed to get data from SpaceX API: response.status != 200"
+                    )
                     return -1
                 return await response.json()
+
 
 class dblApi(object):
     """
@@ -39,7 +43,9 @@ class dblApi(object):
 
     async def updateGuildCount(self, guildCount):
         async with aiohttp.ClientSession() as session:
-                try:
-                    await session.post(self.dblURL, json={"server_count": guildCount}, headers=self.headers)
-                except Exception as e:
-                    logger.error(f"Failed to post guild count: {type(e).__name__}: {e}")
+            try:
+                await session.post(
+                    self.dblURL, json={"server_count": guildCount}, headers=self.headers
+                )
+            except Exception as e:
+                logger.error(f"Failed to post guild count: {type(e).__name__}: {e}")

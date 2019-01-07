@@ -1,4 +1,5 @@
 import logging
+
 logger = logging.getLogger(__name__)
 logger.info("Starting bot")
 
@@ -12,10 +13,11 @@ PREFIX = structure.config["commandPrefix"]
 DISCORD_TOKEN = structure.loadEnvVar("SpaceXLaunchBotToken")
 DBL_TOKEN = structure.loadEnvVar("dblToken")
 
+
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     async def on_ready(self):
         global dbl
         dbl = apis.dblApi(self, DBL_TOKEN)
@@ -24,15 +26,17 @@ class SpaceXLaunchBotClient(discord.Client):
         if not await redisConn.exists("notificationTaskStore"):
             logger.info("notificationTaskStore does not exist, creating")
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
-        
+
         self.loop.create_task(backgroundTasks.notificationTask(self))
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 
         totalSubbed = await redisConn.scard("subscribedChannels")
-        totalGuilds = len(self.guilds)        
+        totalGuilds = len(self.guilds)
         logger.info(f"{self.user.id} / {self.user.name}")
-        logger.info(f"{totalGuilds} guilds / {totalSubbed} subscribed channels / {len(self.users)} users")
+        logger.info(
+            f"{totalGuilds} guilds / {totalSubbed} subscribed channels / {len(self.users)} users"
+        )
         logger.info("Bot ready")
 
         await dbl.updateGuildCount(totalGuilds)
@@ -72,33 +76,39 @@ class SpaceXLaunchBotClient(discord.Client):
         except Exception as e:
             logger.error(f"handleCommand failed:  {type(e).__name__}: {e}")
             await self.safeSend(message.channel, statics.generalErrorEmbed)
-    
+
     async def handleCommand(self, message, userIsOwner, userIsAdmin):
 
         # Info command
 
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
-            launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
-            await self.safeSendLaunchInfo(message.channel, launchInfoEmbed, launchInfoEmbedSmall)
-
+            launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(
+                nextLaunchJSON
+            )
+            await self.safeSendLaunchInfo(
+                message.channel, launchInfoEmbed, launchInfoEmbedSmall
+            )
 
         # Add/remove channel commands
 
         elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
             reply = "This channel has been added to the notification service"
-            added = await redisConn.sadd("subscribedChannels", str(message.channel.id).encode("UTF-8"))
+            added = await redisConn.sadd(
+                "subscribedChannels", str(message.channel.id).encode("UTF-8")
+            )
             if added == 0:
                 reply = "This channel is already subscribed to the notification service"
             await self.safeSend(message.channel, reply)
-        
+
         elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
             reply = "This channel has been removed from the launch notification service"
-            removed = await redisConn.srem("subscribedChannels", str(message.channel.id).encode("UTF-8"))
+            removed = await redisConn.srem(
+                "subscribedChannels", str(message.channel.id).encode("UTF-8")
+            )
             if removed == 0:
                 reply = "This channel was not previously subscribed to the launch notification service"
             await self.safeSend(message.channel, reply)
-
 
         # Add/remove ping commands
 
@@ -106,7 +116,9 @@ class SpaceXLaunchBotClient(discord.Client):
             reply = "Invalid input for addping command"
             rolesToMention = " ".join(message.content.split("addping")[1:])
             if rolesToMention.strip() != "":
-                reply = f"Added launch notification ping for mentions(s): {rolesToMention}"
+                reply = (
+                    f"Added launch notification ping for mentions(s): {rolesToMention}"
+                )
                 await redisConn.setGuildSettings(message.guild.id, rolesToMention)
             await self.safeSend(message.channel, reply)
 
@@ -117,14 +129,12 @@ class SpaceXLaunchBotClient(discord.Client):
                 reply = "This server has no pings to be removed"
             await self.safeSend(message.channel, reply)
 
-
         # Misc
 
         elif message.content.startswith(PREFIX + "info"):
             await self.safeSend(message.channel, statics.infoEmbed)
         elif message.content.startswith(PREFIX + "help"):
             await self.safeSend(message.channel, statics.helpEmbed)
-        
 
         # Debugging
 
@@ -133,7 +143,6 @@ class SpaceXLaunchBotClient(discord.Client):
             nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON(debug=True)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
-
 
     async def safeSend(self, channel, toSend):
         """
@@ -159,7 +168,9 @@ class SpaceXLaunchBotClient(discord.Client):
         except discord.errors.InvalidArgument:
             return -4
 
-    async def safeSendLaunchInfo(self, channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=True):
+    async def safeSendLaunchInfo(
+        self, channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=True
+    ):
         """
         Safely send the launch information embed. If this fails, send the
         smaller version that should always be under the character limit for an
@@ -174,6 +185,7 @@ class SpaceXLaunchBotClient(discord.Client):
             if sent in [-2, -3] and sendErr:
                 # Still something wrong, try to send error embed
                 await self.safeSend(channel, statics.generalErrorEmbed)
+
 
 # Run bot
 client = SpaceXLaunchBotClient()

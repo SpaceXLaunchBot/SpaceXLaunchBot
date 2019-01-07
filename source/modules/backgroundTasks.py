@@ -16,6 +16,7 @@ ONE_MINUTE = 60  # Just makes things a little more readable
 API_CHECK_INTERVAL = structure.config["apiCheckInterval"]
 LAUNCH_NOTIF_DELTA = timedelta(minutes=structure.config["launchNotificationDelta"])
 
+
 async def notificationTask(client):
     """
     TODO: Tidy this up
@@ -35,21 +36,27 @@ async def notificationTask(client):
 
             else:
                 channelsToRemove = []
-                
+
                 nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
 
                 subbedChannelIDs = await redisConn.smembers("subscribedChannels")
                 notificationTaskStore = await redisConn.getNotificationTaskStore()
-                
+
                 # Redis returns a set of strings, we want integers (a tuple is used
                 # for memory-saving reasons)
                 subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
 
                 launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
-                latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
-                
-                launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
-                launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
+                latestLaunchInfoEmbedDict = notificationTaskStore[
+                    "latestLaunchInfoEmbedDict"
+                ]
+
+                launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(
+                    nextLaunchJSON
+                )
+                launchInfoEmbedDict = (
+                    launchInfoEmbed.to_dict()
+                )  # Only calculate this once
 
                 # Launch information message
                 if latestLaunchInfoEmbedDict != launchInfoEmbedDict:
@@ -64,11 +71,18 @@ async def notificationTask(client):
                         if channel == None:
                             channelsToRemove.append(channelID)
                         else:
-                            await client.safeSendLaunchInfo(channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=False)
+                            await client.safeSendLaunchInfo(
+                                channel,
+                                launchInfoEmbed,
+                                launchInfoEmbedSmall,
+                                sendErr=False,
+                            )
 
                 # TODO: Move into new task that runs more frequently so the message can say in how many mins the launch will be happening
                 # Launching soon message
-                launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])
+                launchTimestamp = await structure.convertToInt(
+                    nextLaunchJSON["launch_date_unix"]
+                )
                 # If launchTimestamp is an int carry on, else it is TBA
                 if launchTimestamp:
 
@@ -78,13 +92,20 @@ async def notificationTask(client):
 
                     # If the launch time is within the next LAUNCH_NOTIF_DELTA
                     # and if the launchTimestamp is not in the past
-                    if timePlusDelta >= launchTimestamp and launchTimestamp >= currentTime.timestamp():
+                    if (
+                        timePlusDelta >= launchTimestamp
+                        and launchTimestamp >= currentTime.timestamp()
+                    ):
                         if launchingSoonNotifSent == "False":
 
-                            logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification")
+                            logger.info(
+                                f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification"
+                            )
                             launchingSoonNotifSent = "True"
-                            launchingSoonEmbed = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
-                            
+                            launchingSoonEmbed = await embedGenerators.genLaunchingSoonEmbed(
+                                nextLaunchJSON
+                            )
+
                             for channelID in subbedChannelIDs:
                                 channel = client.get_channel(channelID)
                                 if channel == None:
@@ -93,7 +114,9 @@ async def notificationTask(client):
                                     await client.safeSend(channel, launchingSoonEmbed)
 
                                     try:
-                                        guildSettings = await redisConn.getGuildSettings(channel.guild.id)         
+                                        guildSettings = await redisConn.getGuildSettings(
+                                            channel.guild.id
+                                        )
                                     except RedisError:
                                         # If a redis error occurs here, it is better to send out
                                         # the remaining notifications than to exit this block
@@ -102,19 +125,27 @@ async def notificationTask(client):
                                         # If there are settings saved for the guild
                                         if guildSettings != 0:
                                             # Ping the roles/users (mentions) requested
-                                            await client.safeSend(channel, guildSettings["rolesToMention"])
-                                
+                                            await client.safeSend(
+                                                channel, guildSettings["rolesToMention"]
+                                            )
+
                         else:
-                            logger.info(f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}")
-                            
+                            logger.info(
+                                f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}"
+                            )
+
                 # Save any changed data to redis
                 # Remove channels that we can't access anymore
                 for channelID in channelsToRemove:
                     logger.info(f"{channelID} is not a valid channel ID, removing")
-                    await redisConn.srem("subscribedChannels", str(channelID).encode("UTF-8"))
+                    await redisConn.srem(
+                        "subscribedChannels", str(channelID).encode("UTF-8")
+                    )
 
-                await redisConn.setNotificationTaskStore(launchingSoonNotifSent, latestLaunchInfoEmbedDict)
-            
+                await redisConn.setNotificationTaskStore(
+                    launchingSoonNotifSent, latestLaunchInfoEmbedDict
+                )
+
         except RedisError as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
         except Exception as e:

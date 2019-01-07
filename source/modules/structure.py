@@ -10,9 +10,11 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def fatalError(message):
     logger.critical(message)
     sys.exit(-1)
+
 
 def loadEnvVar(varName):
     """
@@ -21,7 +23,8 @@ def loadEnvVar(varName):
     try:
         return environ[varName]
     except KeyError:
-        fatalError(f"Environment Variable \"{varName}\" cannot be found")
+        fatalError(f'Environment Variable "{varName}" cannot be found')
+
 
 async def convertToInt(possiblyInteger):
     """
@@ -33,12 +36,15 @@ async def convertToInt(possiblyInteger):
     except ValueError:
         return False
 
+
 async def launchTimeFromTS(timestamp):
     """
     Get a launch time string from a unix timestamp
     """
     try:
-        formattedDate = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+        formattedDate = datetime.utcfromtimestamp(timestamp).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
         return f"{formattedDate} UTC"
     except TypeError:
         # timestamp is not int
@@ -50,10 +56,17 @@ Initialise globally used variables
 """
 
 # Load local config file into a dictionary that can be exported
-configFilePath = path.join(path.dirname(path.abspath(__file__)), "..", "config", "config.json")
+configFilePath = path.join(
+    path.dirname(path.abspath(__file__)), "..", "config", "config.json"
+)
 neededKeys = [
-    "ownerID", "commandPrefix", "apiCheckInterval", "launchNotificationDelta",
-    "logFilePath", "logFormat", "colours"
+    "ownerID",
+    "commandPrefix",
+    "apiCheckInterval",
+    "launchNotificationDelta",
+    "logFilePath",
+    "logFormat",
+    "colours",
 ]
 try:
     with open(configFilePath, "r") as inFile:

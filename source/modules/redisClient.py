@@ -21,6 +21,7 @@ from modules.statics import generalErrorEmbed
 
 logger = logging.getLogger(__name__)
 
+
 class redisClient(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
         # Uses redis default host, port, and dbnum by default
@@ -32,22 +33,36 @@ class redisClient(StrictRedis):
         Gets variables from notificationTaskStore
         Automatically decodes variables
         """
-        launchingSoonNotifSent = await self.hget("notificationTaskStore", "launchingSoonNotifSent")
-        latestLaunchInfoEmbedDict = await self.hget("notificationTaskStore", "latestLaunchInfoEmbedDict")
+        launchingSoonNotifSent = await self.hget(
+            "notificationTaskStore", "launchingSoonNotifSent"
+        )
+        latestLaunchInfoEmbedDict = await self.hget(
+            "notificationTaskStore", "latestLaunchInfoEmbedDict"
+        )
         return {
             "launchingSoonNotifSent": launchingSoonNotifSent.decode("UTF-8"),
-            "latestLaunchInfoEmbedDict": pickle.loads(latestLaunchInfoEmbedDict)
+            "latestLaunchInfoEmbedDict": pickle.loads(latestLaunchInfoEmbedDict),
         }
 
-    async def setNotificationTaskStore(self, launchingSoonNotifSent, latestLaunchInfoEmbedDict):
+    async def setNotificationTaskStore(
+        self, launchingSoonNotifSent, latestLaunchInfoEmbedDict
+    ):
         """
         Update / create the hash for notificationTaskStore
         Automatically encodes both arguments
         """
         launchingSoonNotifSent = launchingSoonNotifSent.encode("UTF-8")
-        latestLaunchInfoEmbedDict = pickle.dumps(latestLaunchInfoEmbedDict, protocol=pickle.HIGHEST_PROTOCOL)
-        await self.hset("notificationTaskStore", "launchingSoonNotifSent", launchingSoonNotifSent)
-        await self.hset("notificationTaskStore", "latestLaunchInfoEmbedDict", latestLaunchInfoEmbedDict)
+        latestLaunchInfoEmbedDict = pickle.dumps(
+            latestLaunchInfoEmbedDict, protocol=pickle.HIGHEST_PROTOCOL
+        )
+        await self.hset(
+            "notificationTaskStore", "launchingSoonNotifSent", launchingSoonNotifSent
+        )
+        await self.hset(
+            "notificationTaskStore",
+            "latestLaunchInfoEmbedDict",
+            latestLaunchInfoEmbedDict,
+        )
 
     async def setGuildSettings(self, guildID, rolesToMention):
         """
@@ -70,9 +85,8 @@ class redisClient(StrictRedis):
         if not await self.exists(guildID):
             return 0
         rolesToMention = await self.hget(guildID, "rolesToMention")
-        return {
-            "rolesToMention": rolesToMention.decode("UTF-8")
-        }
+        return {"rolesToMention": rolesToMention.decode("UTF-8")}
+
 
 """
 When this is imported for the first time, set up our Redis connection and save
