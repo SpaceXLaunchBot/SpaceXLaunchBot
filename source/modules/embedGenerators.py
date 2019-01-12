@@ -108,13 +108,12 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
 
     if nextLaunchJSON["links"]["mission_patch_small"] != None:
         notifEmbed.set_thumbnail(url=nextLaunchJSON["links"]["mission_patch_small"])
-    else:
-        if nextLaunchJSON["rocket"]["rocket_id"] in rocketIDImages:
-            notifEmbed.set_thumbnail(
-                url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
-            )
+    elif nextLaunchJSON["rocket"]["rocket_id"] in rocketIDImages:
+        notifEmbed.set_thumbnail(
+            url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
+        )
 
-    # Embed a link [using](markdown)
+    # Embed links [using](markdown)
     if nextLaunchJSON["links"]["video_link"] != None:
         embedDesc += f"[Livestream]({nextLaunchJSON['links']['video_link']})\n"
     if nextLaunchJSON["links"]["reddit_launch"] != None:
