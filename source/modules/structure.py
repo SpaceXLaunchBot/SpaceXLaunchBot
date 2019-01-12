@@ -12,13 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 def fatalError(message):
+    """
+    Log message and exit with status code -1
+    """
     logger.critical(message)
     sys.exit(-1)
 
 
 def loadEnvVar(varName):
     """
-    Returns the environment variable $varName, or exits program with error msg
+    Returns the environment variable varName, or exits program with error msg
     """
     try:
         return environ[varName]
