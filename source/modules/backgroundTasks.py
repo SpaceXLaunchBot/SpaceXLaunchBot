@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 ONE_MINUTE = 60  # Just makes things a little more readable
 API_CHECK_INTERVAL = structure.config["apiCheckInterval"]
-LAUNCH_NOTIF_DELTA = timedelta(minutes=structure.config["launchNotificationDelta"])
+LAUNCH_SOON_DELTA = timedelta(minutes=structure.config["launchSoonDelta"])
 
 
 async def notificationTask(client):
@@ -86,11 +86,11 @@ async def notificationTask(client):
                 # If launchTimestamp is an int carry on, else it is TBA
                 if launchTimestamp:
 
-                    # Get timestamp for the time LAUNCH_NOTIF_DELTA from now
+                    # Get timestamp for the time LAUNCH_SOON_DELTA from now
                     currentTime = datetime.utcnow()
-                    timePlusDelta = (currentTime + LAUNCH_NOTIF_DELTA).timestamp()
+                    timePlusDelta = (currentTime + LAUNCH_SOON_DELTA).timestamp()
 
-                    # If the launch time is within the next LAUNCH_NOTIF_DELTA
+                    # If the launch time is within the next LAUNCH_SOON_DELTA
                     # and if the launchTimestamp is not in the past
                     if (
                         timePlusDelta >= launchTimestamp
@@ -99,7 +99,7 @@ async def notificationTask(client):
                         if launchingSoonNotifSent == "False":
 
                             logger.info(
-                                f"Launch happening within {LAUNCH_NOTIF_DELTA}, sending notification"
+                                f"Launch happening within {LAUNCH_SOON_DELTA}, sending notification"
                             )
                             launchingSoonNotifSent = "True"
                             launchingSoonEmbed = await embedGenerators.genLaunchingSoonEmbed(
@@ -131,7 +131,7 @@ async def notificationTask(client):
 
                         else:
                             logger.info(
-                                f"Launch happening within {LAUNCH_NOTIF_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}"
+                                f"Launch happening within {LAUNCH_SOON_DELTA}, launchingSoonNotifSent is {launchingSoonNotifSent}"
                             )
 
                 # Save any changed data to redis

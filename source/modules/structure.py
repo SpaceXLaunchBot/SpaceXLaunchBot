@@ -66,7 +66,7 @@ neededKeys = [
     "ownerID",
     "commandPrefix",
     "apiCheckInterval",
-    "launchNotificationDelta",
+    "launchSoonDelta",
     "logFilePath",
     "logFormat",
     "colours",
