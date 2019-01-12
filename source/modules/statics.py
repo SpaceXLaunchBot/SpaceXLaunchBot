@@ -22,7 +22,7 @@ rocketIDImages = {
 errorRed = Colour.from_rgb(*config["colours"]["errorRed"])
 falconRed = Colour.from_rgb(*config["colours"]["falconRed"])
 
-ownerTag = f"<@{config['ownerID']}>"
+ownerMention = f"<@{config['ownerID']}>"
 
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
@@ -34,7 +34,7 @@ infoEmbed.add_field(
 )
 infoEmbed.add_field(
     name="Contact",
-    value=f"If you have any questions or suggestions, you can message my owner, {ownerTag}, or raise an issue in the Github repo",
+    value=f"If you have any questions or suggestions, you can message my owner, {ownerMention}, or raise an issue in the Github repo",
 )
 
 helpEmbed = Embed(
@@ -55,7 +55,7 @@ helpEmbed.add_field(
     value="Remove the current channel to the bots launch notification service\n*Only admins can use this command*",
 )
 helpEmbed.add_field(
-    name="addping @role",
+    name="addping @mention",
     value="Add roles/users to be pinged when the 'launching soon' (launch notification) message is sent. Can be formatted with multiple mentions in any order, like this: `!addping @role1 @user1 @role2`. Calling `!addping` multiple times will not stack the roles, it will just overwrite your previous settings\n*Only admins can use this command*",
 )
 helpEmbed.add_field(
@@ -71,19 +71,21 @@ helpEmbed.add_field(
 
 nextLaunchErrorEmbed = Embed(
     title="Error",
-    description=f"An launchInfoEmbed error occurred, contact {ownerTag}",
+    description=f"An launchInfoEmbed error occurred, contact {ownerMention}",
     color=errorRed,
 )
 apiErrorEmbed = Embed(
     title="Error",
-    description=f"An API error occurred, contact {ownerTag}",
+    description=f"An API error occurred, contact {ownerMention}",
     color=errorRed,
 )
 generalErrorEmbed = Embed(
-    title="Error", description=f"An error occurred, contact {ownerTag}", color=errorRed
+    title="Error",
+    description=f"An error occurred, contact {ownerMention}",
+    color=errorRed,
 )
 dbErrorEmbed = Embed(
     title="Error",
-    description=f"A database error occurred, contact {ownerTag}",
+    description=f"A database error occurred, contact {ownerMention}",
     color=errorRed,
 )
