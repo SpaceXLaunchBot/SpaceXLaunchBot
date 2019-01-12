@@ -109,9 +109,10 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
     if nextLaunchJSON["links"]["mission_patch_small"] != None:
         notifEmbed.set_thumbnail(url=nextLaunchJSON["links"]["mission_patch_small"])
     else:
-        notifEmbed.set_thumbnail(
-            url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
-        )
+        if nextLaunchJSON["rocket"]["rocket_id"] in rocketIDImages:
+            notifEmbed.set_thumbnail(
+                url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
+            )
 
     # Embed a link [using](markdown)
     if nextLaunchJSON["links"]["video_link"] != None:
