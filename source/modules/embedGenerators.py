@@ -35,9 +35,10 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
     )
 
     # Set thumbnail depending on rocket ID
-    launchInfoEmbed.set_thumbnail(
-        url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
-    )
+    if nextLaunchJSON["rocket"]["rocket_id"] in rocketIDImages:
+        launchInfoEmbed.set_thumbnail(
+            url=rocketIDImages[nextLaunchJSON["rocket"]["rocket_id"]]
+        )
 
     launchInfoEmbed.add_field(
         name="Launch vehicle",
