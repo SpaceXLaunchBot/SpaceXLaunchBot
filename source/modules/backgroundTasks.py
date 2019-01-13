@@ -22,6 +22,8 @@ async def getNotifTaskVars():
     """
     Returns subbedChannelIDs, notificationTaskStore, and nextLaunchJSON, which
     are used by the notification tasks
+    Not inside the notificationTask wrapper as there is not way of passing them to the
+    wrapped funcion
     """
     subbedChannelIDs = await redisConn.smembers("subscribedChannels")
     subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
@@ -33,13 +35,12 @@ async def getNotifTaskVars():
     return subbedChannelIDs, notificationTaskStore, nextLaunchJSON
 
 
-# TODO: Does using this wrapper work? Especially saving new values
 def notificationTask(loopInterval):
     """
     Runs the original function every loopInterval Minutes
     The wrapped function will be passed the Discord client object
     The wrapped function must return a list of channels to remove, as well as
-        launchingSoonNotifSent and latestLaunchInfoEmbedDict to be saved to Redis
+    launchingSoonNotifSent and latestLaunchInfoEmbedDict to be saved to Redis
     """
 
     def wrapper(func):
