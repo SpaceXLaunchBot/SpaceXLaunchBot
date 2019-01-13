@@ -23,7 +23,8 @@ async def getNotifTaskVars():
     Returns subbedChannelIDs, notificationTaskStore, and nextLaunchJSON, which
     are used by the notification tasks
     Not inside the notificationTask wrapper as there is no way of passing them to the
-    wrapped function (the initial function call (loop.create_task) can only pass client)
+    wrapped task (the initial function call (settings up with loop.create_task) can only
+    pass the client object, so there can't be any other arguments to the tasks)
     """
     subbedChannelIDs = await redisConn.smembers("subscribedChannels")
     subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
