@@ -68,3 +68,4 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 - [x] Complete in-code TODOs
 - [x] Add field in launch information embeds to show whether any stages are landing (and if so, where / on what)
 - [x] Test if executing a Redis command on a dead server causes an error, or just returns an err value (and change err handling appropriatley)
+- [ ] Set up log file rotation
