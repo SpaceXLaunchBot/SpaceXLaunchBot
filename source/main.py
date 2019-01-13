@@ -27,7 +27,8 @@ class SpaceXLaunchBotClient(discord.Client):
             logger.info("notificationTaskStore does not exist, creating")
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
-        self.loop.create_task(backgroundTasks.notificationTask(self))
+        self.loop.create_task(backgroundTasks.launchingSoonNotifTask(self))
+        self.loop.create_task(backgroundTasks.launchChangedNotifTask(self))
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 

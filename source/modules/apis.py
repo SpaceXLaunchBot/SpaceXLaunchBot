@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 class spacexApi(object):
     """
     Handles interactions with the SpaceX API
+    Ratelimit is (as of 13/01/19) 50 req/sec per IP address, which should be fine
     """
 
     @staticmethod
