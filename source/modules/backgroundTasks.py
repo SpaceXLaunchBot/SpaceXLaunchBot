@@ -30,7 +30,7 @@ def notificationTask(loopInterval):
         @wraps(func)
         async def task(client, *args):
             await client.wait_until_ready()
-            logger.info("Started")
+            logger.info(f"{func.__name__} started")
             while not client.is_closed():
                 try:
                     subbedChannelIDs = await redisConn.smembers("subscribedChannels")
