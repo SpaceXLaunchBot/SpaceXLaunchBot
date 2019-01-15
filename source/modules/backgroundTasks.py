@@ -18,24 +18,6 @@ API_CHECK_INTERVAL = structure.config["apiCheckInterval"]
 LAUNCH_SOON_DELTA = timedelta(minutes=structure.config["launchSoonDelta"])
 
 
-async def getNotifTaskVars():
-    """
-    Returns subbedChannelIDs, notificationTaskStore, and nextLaunchJSON, which
-    are used by the notification tasks
-    Not inside the notificationTask wrapper as there is no way of passing them to the
-    wrapped task (the initial function call (settings up with loop.create_task) can only
-    pass the client object, so there can't be any other arguments to the tasks)
-    """
-    subbedChannelIDs = await redisConn.smembers("subscribedChannels")
-    subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
-
-    notificationTaskStore = await redisConn.getNotificationTaskStore()
-
-    nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
-
-    return subbedChannelIDs, notificationTaskStore, nextLaunchJSON
-
-
 def notificationTask(loopInterval):
     """
     Runs the original function every loopInterval Minutes
@@ -46,14 +28,21 @@ def notificationTask(loopInterval):
 
     def wrapper(func):
         @wraps(func)
-        async def task(client):
+        async def task(client, *args):
             await client.wait_until_ready()
             logger.info("Started")
             while not client.is_closed():
                 try:
+                    subbedChannelIDs = await redisConn.smembers("subscribedChannels")
+                    subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
+
+                    notificationTaskStore = await redisConn.getNotificationTaskStore()
+
+                    nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
+
                     # Call function with variables we know are needed
                     channelsToRemove, launchingSoonNotifSent, latestLaunchInfoEmbedDict = await func(
-                        client
+                        client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
                     )
 
                     # Save any changed data to redis
@@ -81,13 +70,12 @@ def notificationTask(loopInterval):
 
 
 @notificationTask(1)
-async def launchingSoonNotifTask(client):
-    subbedChannelIDs, notificationTaskStore, nextLaunchJSON = await getNotifTaskVars()
-
+async def launchingSoonNotifTask(
+    client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
+):
     channelsToRemove = []
     launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
 
-    # Launching soon message
     launchTimestamp = await structure.convertToInt(nextLaunchJSON["launch_date_unix"])
     # If launchTimestamp is an int carry on, else it is TBA
     if launchTimestamp:
@@ -148,9 +136,9 @@ async def launchingSoonNotifTask(client):
 
 
 @notificationTask(API_CHECK_INTERVAL)
-async def launchChangedNotifTask(client):
-    subbedChannelIDs, notificationTaskStore, nextLaunchJSON = await getNotifTaskVars()
-
+async def launchChangedNotifTask(
+    client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
+):
     channelsToRemove = []
     launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
     latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
