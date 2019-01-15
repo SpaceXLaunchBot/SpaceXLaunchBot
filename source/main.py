@@ -27,7 +27,8 @@ class SpaceXLaunchBotClient(discord.Client):
             logger.info("notificationTaskStore does not exist, creating")
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
-        # Because of the way the notification tasks work, the None arguments will be ignored
+        # These will actually work without passing the 3 Nones, as the wrapper for the functions
+        # deals with those 3 arguments. None is used just so editors / linters won't show errors
         self.loop.create_task(
             backgroundTasks.launchingSoonNotifTask(self, None, None, None)
         )
