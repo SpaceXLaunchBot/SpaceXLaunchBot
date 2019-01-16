@@ -5,6 +5,7 @@ General functions and variables used throughout the bot
 import sys
 import json
 import logging
+from logging.handlers import TimedRotatingFileHandler
 from os import path, environ
 from datetime import datetime
 
@@ -82,9 +83,18 @@ except FileNotFoundError:
 
 # Setup logging (direct logging to file, only log INFO level and above)
 # Do this before other imports as some local modules use logging when imported
+
 logFilePath = config["logFilePath"]
-handler = logging.FileHandler(filename=logFilePath, encoding="UTF-8", mode="a")
-handler.setFormatter(logging.Formatter(config["logFormat"]))
-logging.basicConfig(level=logging.INFO, handlers=[handler])
+
+logFileHandler = TimedRotatingFileHandler(
+    filename=logFilePath, when="W0", backupCount=10, encoding="UTF-8"
+)
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[logFileHandler],
+    format=logging.Formatter(config["logFormat"]),
+)
+
 # Change discord to only log ERROR level and above
 logging.getLogger("discord").setLevel(logging.ERROR)

@@ -1,4 +1,5 @@
 import logging
+from modules import structure  # Import this before to set up logging
 
 logger = logging.getLogger(__name__)
 logger.info("Starting bot")
@@ -6,7 +7,7 @@ logger.info("Starting bot")
 import discord
 from aredis import RedisError
 
-from modules import structure, embedGenerators, statics, apis, backgroundTasks
+from modules import embedGenerators, statics, apis, backgroundTasks
 from modules.redisClient import redisConn
 
 PREFIX = structure.config["commandPrefix"]
