@@ -89,12 +89,9 @@ logFilePath = config["logFilePath"]
 logFileHandler = TimedRotatingFileHandler(
     filename=logFilePath, when="W0", backupCount=10, encoding="UTF-8"
 )
+logFileHandler.setFormatter(logging.Formatter(config["logFormat"]))
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[logFileHandler],
-    format=logging.Formatter(config["logFormat"]),
-)
+logging.basicConfig(level=logging.INFO, handlers=[logFileHandler])
 
 # Change discord to only log ERROR level and above
 logging.getLogger("discord").setLevel(logging.ERROR)
