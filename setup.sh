@@ -10,8 +10,8 @@ askyn() {
 }
 
 cat << EndOfMsg
-This script will erase your current redis config if you have one
 For this script to work, these things need to be true:
+You do not have Redis installed
 You are running Python 3.6+ under the "python3" command
 SLB should exist in /opt/SpaceX-Launch-Bot
 pip3 should be installed
@@ -20,8 +20,21 @@ EndOfMsg
 
 askyn "Is this correct?" || exit
 
-echo "Installing apt dependencies"
-sudo apt install redis-server -y
+echo "Installing apt dependecies"
+sudo apt install build-essential tcl make -y
+
+# TODO: Test this, Does systemd need setting up? Do users need setting up?
+# TODO: https://askubuntu.com/questions/868848/how-to-install-redis-on-ubuntu-16-04
+echo "Installing latest stable version of Redis"
+cd /tmp
+curl -O http://download.redis.io/redis-stable.tar.gz
+tar xzvf redis-stable.tar.gz
+cd redis-stable
+make
+if askyn "Run make test?";
+then make test; fi
+sudo make install
+sudo mkdir /etc/redis
 
 echo "Setting correct owner and permissions for /opt/SpaceX-Launch-Bot"
 sudo adduser --system --group --no-create-home SLB
