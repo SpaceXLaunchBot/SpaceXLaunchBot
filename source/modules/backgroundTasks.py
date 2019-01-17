@@ -24,6 +24,7 @@ def notificationTask(loopInterval):
     The wrapped function will be passed the Discord client object
     The wrapped function must return a list of channels to remove, as well as
     launchingSoonNotifSent and latestLaunchInfoEmbedDict to be saved to Redis
+    TODO: If nextLaunchJSON returns -1, don't execute func, skip this loop
     """
 
     def wrapper(func):
