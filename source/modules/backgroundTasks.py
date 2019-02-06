@@ -1,5 +1,7 @@
 """
 Async tasks to run in the background
+
+TODO: Make this less spaghetti
 """
 
 import asyncio
