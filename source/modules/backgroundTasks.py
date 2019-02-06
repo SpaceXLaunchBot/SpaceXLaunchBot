@@ -65,8 +65,6 @@ def notificationTask(loopInterval):
 
                 except RedisError as e:
                     logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
-                except Exception as e:
-                    logger.error(f"Task failed:  {type(e).__name__}: {e}")
                 finally:
                     await asyncio.sleep(ONE_MINUTE * loopInterval)
 
