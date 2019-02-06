@@ -21,10 +21,10 @@ LAUNCH_SOON_DELTA = timedelta(minutes=structure.config["launchSoonDelta"])
 def notificationTask(loopInterval):
     """
     Runs the original function every loopInterval Minutes
-    The wrapped function will be passed the Discord client object
+    The wrapped function will be passed the Discord client object, subbedChannelIDs,
+    notificationTaskStore, and nextLaunchJSON
     The wrapped function must return a list of channels to remove, as well as
-    launchingSoonNotifSent and latestLaunchInfoEmbedDict to be saved to Redis
-    TODO: If nextLaunchJSON returns -1, don't execute func, skip this loop
+    launchingSoonNotifSent and latestLaunchInfoEmbedDict vars to be saved to Redis
     """
 
     def wrapper(func):
@@ -41,22 +41,27 @@ def notificationTask(loopInterval):
 
                     nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
 
-                    # Call function with variables we know are needed
-                    channelsToRemove, launchingSoonNotifSent, latestLaunchInfoEmbedDict = await func(
-                        client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
-                    )
+                    if nextLaunchJSON != -1:
 
-                    # Save any changed data to redis
-                    # Remove channels that we can't access anymore
-                    for channelID in channelsToRemove:
-                        logger.info(f"{channelID} is not a valid channel ID, removing")
-                        await redisConn.srem(
-                            "subscribedChannels", str(channelID).encode("UTF-8")
+                        # Call function with variables we know are needed
+                        channelsToRemove, launchingSoonNotifSent, latestLaunchInfoEmbedDict = await func(
+                            client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
                         )
 
-                    await redisConn.setNotificationTaskStore(
-                        launchingSoonNotifSent, latestLaunchInfoEmbedDict
-                    )
+                        # Save any changed data to redis
+                        # Remove channels that we can't access anymore
+                        for channelID in channelsToRemove:
+                            logger.info(f"{channelID} is not a valid channel ID, removing")
+                            await redisConn.srem(
+                                "subscribedChannels", str(channelID).encode("UTF-8")
+                            )
+
+                        await redisConn.setNotificationTaskStore(
+                            launchingSoonNotifSent, latestLaunchInfoEmbedDict
+                        )
+                    
+                    else:
+                        logger.info("nextLaunchJSON returned -1, skipping this cycle")
 
                 except RedisError as e:
                     logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
