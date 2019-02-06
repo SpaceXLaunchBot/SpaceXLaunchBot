@@ -21,8 +21,8 @@ LAUNCH_SOON_DELTA = timedelta(minutes=structure.config["launchSoonDelta"])
 def notificationTask(loopInterval):
     """
     Runs the original function every loopInterval Minutes
-    The wrapped function will be passed the Discord client object, subbedChannelIDs,
-    notificationTaskStore, and nextLaunchJSON
+    The wrapped function will be passed the Discord client, subbedChannelIDs,
+    notificationTaskStore, and nextLaunchJSON objects
     The wrapped function must return a list of channels to remove, as well as
     launchingSoonNotifSent and latestLaunchInfoEmbedDict vars to be saved to Redis
     """
