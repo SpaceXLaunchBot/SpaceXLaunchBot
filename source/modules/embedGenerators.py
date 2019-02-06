@@ -11,8 +11,8 @@ from modules.statics import falconRed, rocketIDImages
 payloadInfo = """Type: {}
 Orbit: {}
 Mass: {}
-Manufacturer(s): {}
-Customer(s): {}
+Manufacturer: {}
+Customer{}: {}
 """
 coreInfo = """Serial: {}
 Flight: {}
@@ -77,7 +77,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["flight"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_intent"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"],
-                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_vehicle"],
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_vehicle"]
             ),
         )
 
@@ -90,7 +90,8 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 payload["orbit"],
                 payload["payload_mass_kg"],
                 payload["manufacturer"],
-                ", ".join(payload["customers"]),
+                "(s)" if len(payload["customers"]) > 1 else "",
+                ", ".join(payload["customers"])
             ),
         )
 
