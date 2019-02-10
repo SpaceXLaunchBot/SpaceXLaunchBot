@@ -61,7 +61,7 @@ cat << EndOfMsg
 
 Setup finished
 If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again"
-To start SLB enable and start it using systemd"
+To start SLB enable and start it using systemd
 
 EndOfMsg
 
