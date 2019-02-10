@@ -64,3 +64,8 @@ If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it 
 To start SLB enable and start it using systemd"
 
 EndOfMsg
+
+# To get a copy of dump.rdb:
+# sudo cp /var/lib/redis/dump.rdb ~/
+# sudo chwon USER dump.rdb
+# --> Download from server
