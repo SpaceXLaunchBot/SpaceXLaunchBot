@@ -23,8 +23,7 @@ EndOfMsg
 askyn "Is this correct?" || exit
 
 echo "Installing apt dependencies"
-# TODO: Which dependencies are needed for get-pip?
-sudo apt install python3-distutils python3-dev redis-server -y
+sudo apt install python3-distutils redis-server -y
 
 cd /tmp
 
