@@ -30,7 +30,13 @@ class spacexApi(object):
                         "Failed to get data from SpaceX API: response.status != 200"
                     )
                     return -1
-                return await response.json()
+                try:
+                    return await response.json()
+                except aiohttp.client_exceptions.ContentTypeError:
+                    logger.error(
+                        "Failed to get data from SpaceX API: JSON decode failed"
+                    )
+                    return -1
 
 
 class dblApi(object):
