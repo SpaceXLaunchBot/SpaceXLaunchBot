@@ -153,8 +153,8 @@ class SpaceXLaunchBotClient(discord.Client):
             await self.safeSend(message.channel, lse)
 
         elif userIsOwner and message.content.startswith(PREFIX + "resetNTS"):
-            logger.info("Owner resetting notificationTaskStore")
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
+            await self.safeSend(message.channel, "Reset notificationTaskStore")
 
     async def safeSend(self, channel, toSend):
         """
