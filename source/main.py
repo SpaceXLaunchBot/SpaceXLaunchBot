@@ -152,6 +152,10 @@ class SpaceXLaunchBotClient(discord.Client):
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
 
+        elif userIsOwner and message.content.startswith(PREFIX + "resetNTS"):
+            logger.info("Owner resetting notificationTaskStore")
+            await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
+
     async def safeSend(self, channel, toSend):
         """
         Send a text / embed message to a user, and if an error occurs, safely
