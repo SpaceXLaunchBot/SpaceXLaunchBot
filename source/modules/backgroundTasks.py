@@ -47,13 +47,18 @@ def notificationTask(loopInterval):
 
                         # Call function with variables we know are needed
                         channelsToRemove, launchingSoonNotifSent, latestLaunchInfoEmbedDict = await func(
-                            client, subbedChannelIDs, notificationTaskStore, nextLaunchJSON
+                            client,
+                            subbedChannelIDs,
+                            notificationTaskStore,
+                            nextLaunchJSON,
                         )
 
                         # Save any changed data to redis
                         # Remove channels that we can't access anymore
                         for channelID in channelsToRemove:
-                            logger.info(f"{channelID} is not a valid channel ID, removing")
+                            logger.info(
+                                f"{channelID} is not a valid channel ID, removing"
+                            )
                             await redisConn.srem(
                                 "subscribedChannels", str(channelID).encode("UTF-8")
                             )
@@ -61,7 +66,7 @@ def notificationTask(loopInterval):
                         await redisConn.setNotificationTaskStore(
                             launchingSoonNotifSent, latestLaunchInfoEmbedDict
                         )
-                    
+
                     else:
                         logger.info("nextLaunchJSON returned -1, skipping this cycle")
 
@@ -149,9 +154,7 @@ async def launchChangedNotifTask(
     launchingSoonNotifSent = notificationTaskStore["launchingSoonNotifSent"]
     latestLaunchInfoEmbedDict = notificationTaskStore["latestLaunchInfoEmbedDict"]
 
-    launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(
-        nextLaunchJSON
-    )
+    launchInfoEmbed = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
     launchInfoEmbedDict = launchInfoEmbed.to_dict()  # Only calculate this once
 
     if latestLaunchInfoEmbedDict != launchInfoEmbedDict:
@@ -166,8 +169,6 @@ async def launchChangedNotifTask(
             if channel == None:
                 channelsToRemove.append(channelID)
             else:
-                await client.safeSendLaunchInfo(
-                    channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=False
-                )
+                await client.safeSend(channel, launchInfoEmbed)
 
     return channelsToRemove, launchingSoonNotifSent, latestLaunchInfoEmbedDict

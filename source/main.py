@@ -91,12 +91,13 @@ class SpaceXLaunchBotClient(discord.Client):
 
         if message.content.startswith(PREFIX + "nextlaunch"):
             nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
-            launchInfoEmbed, launchInfoEmbedSmall = await embedGenerators.genLaunchInfoEmbeds(
-                nextLaunchJSON
-            )
-            await self.safeSendLaunchInfo(
-                message.channel, launchInfoEmbed, launchInfoEmbedSmall
-            )
+            if nextLaunchJSON == -1:
+                launchInfoEmbed = statics.apiErrorEmbed
+            else:
+                launchInfoEmbed = await embedGenerators.genLaunchInfoEmbeds(
+                    nextLaunchJSON
+                )
+            await self.safeSend(message.channel, launchInfoEmbed)
 
         # Add/remove channel commands
 
@@ -147,12 +148,13 @@ class SpaceXLaunchBotClient(discord.Client):
         # Debugging
 
         elif userIsOwner and message.content.startswith(PREFIX + "dbgls"):
-            # Send launching soon embed
+            # DeBugLaunchingSoon - Send launching soon embed for prev launch
             nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON(debug=True)
             lse = await embedGenerators.genLaunchingSoonEmbed(nextLaunchJSON)
             await self.safeSend(message.channel, lse)
 
-        elif userIsOwner and message.content.startswith(PREFIX + "resetNTS"):
+        elif userIsOwner and message.content.startswith(PREFIX + "resetnts"):
+            # Reset notificationTaskStore to default values (triggers notifications)
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
             await self.safeSend(message.channel, "Reset notificationTaskStore")
 
@@ -161,9 +163,9 @@ class SpaceXLaunchBotClient(discord.Client):
         Send a text / embed message to a user, and if an error occurs, safely
         supress it so the bot doesen't crash completely. On failure, returns:
             -1 : Nothing to send (toSend is not a string or Embed)
-            -2 : Forbidden (API down, Message too big, etc.)
-            -3 : HTTPException (No permission to message this channel)
-            -4 : InvalidArgument (Invalid channel ID)
+            -2 : Forbidden (No permission to message this channel)
+            -3 : HTTPException (API down, Message too big, etc.)
+            -4 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
         On success returns what the channel.send method returns
         """
         try:
@@ -179,24 +181,6 @@ class SpaceXLaunchBotClient(discord.Client):
             return -3
         except discord.errors.InvalidArgument:
             return -4
-
-    async def safeSendLaunchInfo(
-        self, channel, launchInfoEmbed, launchInfoEmbedSmall, sendErr=True
-    ):
-        """
-        Safely send the launch information embed. If this fails, send the
-        smaller version that should always be under the character limit for an
-        embed, failing this, send an error message (if sendErr=True)
-        """
-        sent = await self.safeSend(channel, launchInfoEmbed)
-
-        if sent in [-2, -3]:
-            # Launch embed might be too big, try smaller version
-            sent = await self.safeSend(channel, launchInfoEmbedSmall)
-
-            if sent in [-2, -3] and sendErr:
-                # Still something wrong, try to send error embed
-                await self.safeSend(channel, statics.generalErrorEmbed)
 
 
 # Run bot

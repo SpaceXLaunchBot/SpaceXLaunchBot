@@ -6,7 +6,7 @@ from copy import deepcopy
 from discord import Embed
 
 from modules.structure import launchTimeFromTS
-from modules.statics import falconRed, rocketIDImages
+from modules.statics import falconRed, rocketIDImages, generalErrorEmbed
 
 payloadInfo = """Type: {}
 Orbit: {}
@@ -77,7 +77,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["flight"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_intent"],
                 nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_type"],
-                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_vehicle"]
+                nextLaunchJSON["rocket"]["first_stage"]["cores"][0]["landing_vehicle"],
             ),
         )
 
@@ -91,11 +91,17 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
                 payload["payload_mass_kg"],
                 payload["manufacturer"],
                 "(s)" if len(payload["customers"]) > 1 else "",
-                ", ".join(payload["customers"])
+                ", ".join(payload["customers"]),
             ),
         )
 
-    return launchInfoEmbed, launchInfoEmbedSmall
+    if len(launchInfoEmbed.title) > 256:
+        # Title too big to send, no way around this other than send an err
+        return generalErrorEmbed
+    elif len(launchInfoEmbed) > 2048:
+        # If body too big, send small embed
+        return launchInfoEmbedSmall
+    return launchInfoEmbed
 
 
 async def genLaunchingSoonEmbed(nextLaunchJSON):
