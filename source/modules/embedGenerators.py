@@ -1,11 +1,7 @@
-"""
-Stuff for generating/creating embeds about launches to send to users
-"""
-
 from copy import deepcopy
 from discord import Embed
 
-from modules.structure import launchTimeFromTS
+from modules.structure import UTCFromTS
 from modules.statics import falconRed, rocketIDImages, generalErrorEmbed
 
 payloadInfo = """Type: {}
@@ -49,7 +45,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
     )
 
     # Add a field for the launch date
-    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
+    UTCLaunchDate = await UTCFromTS(nextLaunchJSON["launch_date_unix"])
     launchInfoEmbed.add_field(
         name="Launch date",
         value=launchDateInfo.format(
@@ -69,6 +65,7 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
     )
 
     if nextLaunchJSON["rocket"]["rocket_id"] == "falcon9":
+        # TODO: ALlow "Core Info" section for FH
         # Falcon 9 always has 1 core, FH (or others) will be different
         launchInfoEmbed.add_field(
             name="Core info",
@@ -99,13 +96,13 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
         # Title too big to send, no way around this other than send an err
         return generalErrorEmbed
     elif len(launchInfoEmbed) > 2048:
-        # If body too big, send small embed
+        # If body is too big, send small embed
         return launchInfoEmbedSmall
     return launchInfoEmbed
 
 
 async def genLaunchingSoonEmbed(nextLaunchJSON):
-    UTCLaunchDate = await launchTimeFromTS(nextLaunchJSON["launch_date_unix"])
+    UTCLaunchDate = await UTCFromTS(nextLaunchJSON["launch_date_unix"])
     embedDesc = ""
 
     notifEmbed = Embed(

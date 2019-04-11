@@ -1,9 +1,3 @@
-"""
-Messages / embeds / variables that won't be dynamically changing, such as the
-colour objects, help message, and the various error messages. These are then
-imported into other files
-"""
-
 from discord import Embed, Colour
 
 from modules.structure import config

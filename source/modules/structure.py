@@ -13,9 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def fatalError(message):
-    """
-    Log message and exit with status code -1
-    """
     logger.critical(message)
     sys.exit(-1)
 
@@ -30,20 +27,9 @@ def loadEnvVar(varName):
         fatalError(f'Environment Variable "{varName}" cannot be found')
 
 
-async def convertToInt(possiblyInteger):
+async def UTCFromTS(timestamp):
     """
-    An async function that converts possiblyInteger to an integer and returns it
-    If this fails then it returns False
-    """
-    try:
-        return int(possiblyInteger)
-    except ValueError:
-        return False
-
-
-async def launchTimeFromTS(timestamp):
-    """
-    Get a launch time string from a unix timestamp
+    Get a UTC string from a unix timestamp
     """
     try:
         formattedDate = datetime.utcfromtimestamp(timestamp).strftime(
@@ -71,6 +57,7 @@ neededKeys = [
     "logFilePath",
     "logFormat",
     "colours",
+    "game",
 ]
 try:
     with open(configFilePath, "r") as inFile:

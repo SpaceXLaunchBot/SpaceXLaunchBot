@@ -4,55 +4,52 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class spacexApi(object):
+class spacexApi:
     """
     Handles interactions with the SpaceX API
-    Ratelimit is (as of 13/01/19) 50 req/sec per IP address, which should be fine
+    As of 13/01/19, API ratelimit is 50 req/sec per IP
     """
 
     @staticmethod
-    async def getNextLaunchJSON(debug=False):
+    async def getNextLaunchJSON(previous=False):
         """
-        Using aiohttp, grab the latest launch info
-        Returns -1 if fail
+        Using aiohttp, get the latest launch info in JSON format
+        If previous=True, use data from previous launch (for debugging)
+        Returns -1 on failure
         """
 
-        route = "next"
-        if debug:
+        if previous:
             route = "latest"
+        else:
+            route = "next"
 
         upcomingLaunchesURL = f"https://api.spacexdata.com/v3/launches/{route}"
 
         async with aiohttp.ClientSession() as session:
             async with session.get(upcomingLaunchesURL) as response:
-                if response.status != 200:
-                    logger.error(
-                        "Failed to get data from SpaceX API: response.status != 200"
-                    )
+                if response.status == 200:
+                    try:
+                        nextLaunchJSON = await response.json()
+                    except aiohttp.client_exceptions.ContentTypeError:
+                        logger.error("SpaceX API: JSON decode failed")
+                        return -1
+                else:
+                    logger.error(f"SpaceX API: Response status: {response.status}")
                     return -1
-                try:
-                    return await response.json()
-                except aiohttp.client_exceptions.ContentTypeError:
-                    logger.error(
-                        "Failed to get data from SpaceX API: JSON decode failed"
-                    )
-                    return -1
+                return nextLaunchJSON
 
 
-class dblApi(object):
+class dblApi:
     """
     Handles interactions with the discordbots.org API
     """
 
-    def __init__(self, discordClient, dblToken):
-        self.dblURL = f"https://discordbots.org/api/bots/{discordClient.user.id}/stats"
+    def __init__(self, clientID, dblToken):
+        self.dblURL = f"https://discordbots.org/api/bots/{clientID}/stats"
         self.headers = {"Authorization": dblToken, "Content-Type": "application/json"}
 
     async def updateGuildCount(self, guildCount):
         async with aiohttp.ClientSession() as session:
-            try:
-                await session.post(
-                    self.dblURL, json={"server_count": guildCount}, headers=self.headers
-                )
-            except Exception as e:
-                logger.error(f"Failed to post guild count: {type(e).__name__}: {e}")
+            await session.post(
+                self.dblURL, json={"server_count": guildCount}, headers=self.headers
+            )

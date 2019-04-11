@@ -1,16 +1,16 @@
 """
-Redis structure:
-Key                       | Value
---------------------------|-----------------------------------------------------
-subscribedChannels        | A Redis SET of channel IDs that are subscribed to the
-                          | notification service
-str( Guild snowflake )    | A Redis hash containing server options
-notificationTaskStore     | A Redis hash containing variables that need to
-                          | persist between runs of the notification background
-                          | task. This currently includes:
-                          | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
-                          | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
-metricsStore              | Used for bot metrics, currently unused & unsure of structure
+Redis structure
+---------------
+All keys are prepended with "slb."
+
+Key                   | Value
+----------------------|-----------------------------------------------------------------
+subscribedChannels    | A Redis SET of channel IDs that are to be sent notifications
+str(Guild ID)         | A string containing Discord mentions (channels, users, etc.)
+notificationTaskStore | A Redis hash containing variables that need to persist between
+                      | runs of the notification background task(s). This includes:
+                      | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
+                      | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
 """
 
 from aredis import StrictRedis
@@ -24,20 +24,18 @@ logger = logging.getLogger(__name__)
 
 class redisClient(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
-        # Uses redis default host, port, and dbnum by default
         super().__init__(host=host, port=port, db=dbNum)
-        logger.info(f"Connected to {host}:{port} on db num {dbNum}")
+        logger.info(f"Connected to {host}:{port} on DB {dbNum}")
 
     async def getNotificationTaskStore(self):
         """
-        Gets variables from notificationTaskStore
-        Automatically decodes variables
+        Gets and decodes variables from notificationTaskStore
         """
         launchingSoonNotifSent = await self.hget(
-            "notificationTaskStore", "launchingSoonNotifSent"
+            "slb.notificationTaskStore", "launchingSoonNotifSent"
         )
         latestLaunchInfoEmbedDict = await self.hget(
-            "notificationTaskStore", "latestLaunchInfoEmbedDict"
+            "slb.notificationTaskStore", "latestLaunchInfoEmbedDict"
         )
         return {
             "launchingSoonNotifSent": launchingSoonNotifSent.decode("UTF-8"),
@@ -56,36 +54,37 @@ class redisClient(StrictRedis):
             latestLaunchInfoEmbedDict, protocol=pickle.HIGHEST_PROTOCOL
         )
         await self.hset(
-            "notificationTaskStore", "launchingSoonNotifSent", launchingSoonNotifSent
+            "slb.notificationTaskStore",
+            "launchingSoonNotifSent",
+            launchingSoonNotifSent,
         )
         await self.hset(
-            "notificationTaskStore",
+            "slb.notificationTaskStore",
             "latestLaunchInfoEmbedDict",
             latestLaunchInfoEmbedDict,
         )
 
-    async def setGuildSettings(self, guildID, rolesToMention):
+    async def setGuildMentions(self, guildID, rolesToMention):
         """
-        Saves a guilds settings using a Redis hash
+        Set mentions for a guild
         guildID can be int or str
-        rolesToMention should be an string of roles / tags / etc. OR None
+        rolesToMention should be an string of roles / tags / etc.
         """
-        guildID = str(guildID)  # Make sure we are using a string
-        if rolesToMention:
-            await self.hset(guildID, "rolesToMention", rolesToMention.encode("UTF-8"))
+        guildMentionsDBKey = f"slb.{str(guildID)}"
+        rolesToMention = rolesToMention.encode("UTF-8")
+        await self.set(guildMentionsDBKey, rolesToMention)
 
-    async def getGuildSettings(self, guildID):
+    async def getGuildMentions(self, guildID):
         """
-        Returns a guilds settings from Redis
+        Returns a string of mentions for that guild
         guildID can be int or str
-        returns a dict of varName : var
-        returns 0 if guildID does not have any settings stored
+        returns False if guildID does not have any settings stored
         """
-        guildID = str(guildID)
-        if not await self.exists(guildID):
-            return 0
-        rolesToMention = await self.hget(guildID, "rolesToMention")
-        return {"rolesToMention": rolesToMention.decode("UTF-8")}
+        guildMentionsDBKey = f"slb.{str(guildID)}"
+        if not await self.exists(guildMentionsDBKey):
+            return False
+        rolesToMention = await self.get(guildMentionsDBKey)
+        return rolesToMention.decode("UTF-8")
 
 
 """
