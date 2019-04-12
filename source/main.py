@@ -4,7 +4,7 @@ from modules import structure  # Import this before to set up logging
 logger = logging.getLogger(__name__)
 logger.info("Starting bot")
 
-import discord
+import discord, asyncio
 from aredis import RedisError
 
 from modules import embedGenerators, statics, apis, backgroundTasks
@@ -29,16 +29,23 @@ class SpaceXLaunchBotClient(discord.Client):
             await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
 
         """
-        BG / NOTIF TASKS DISABLED AS OF 11/04/19 DUE TO SPAM (unknown reason)
+        11/04/19
+          - BG / NOTIF TASKS DISABLED DUE TO SPAM (unknown reason)
+        13/04/19
+          - Quick fix for spam (will be properly fixed in bg-tasks-rewrite branch)
+          - I am fairly certain the issue was that the on_ready method was called if the
+            client recconnected, which meant that these tasks kept getting duplicated
         """
-        # These will actually work without passing the 3 Nones, as the wrapper for the functions
-        # deals with those 3 arguments. None is used just so editors / linters won't show errors
-        # self.loop.create_task(
-        #     backgroundTasks.launchingSoonNotifTask(self, None, None, None)
-        # )
-        # self.loop.create_task(
-        #     backgroundTasks.launchChangedNotifTask(self, None, None, None)
-        # )
+        if len(asyncio.Task.all_tasks()) == 0:
+            logger.info("all_tasks is 0, startings bg tasks")
+            # These will actually work without passing the 3 Nones, as the wrapper for the functions
+            # deals with those 3 arguments. None is used just so editors / linters won't show errors
+            self.loop.create_task(
+                backgroundTasks.launchingSoonNotifTask(self, None, None, None)
+            )
+            self.loop.create_task(
+                backgroundTasks.launchChangedNotifTask(self, None, None, None)
+            )
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 
