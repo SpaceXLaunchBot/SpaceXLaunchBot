@@ -13,6 +13,7 @@ from modules.redisClient import redisConn
 PREFIX = structure.config["commandPrefix"]
 DISCORD_TOKEN = structure.loadEnvVar("SpaceXLaunchBotToken")
 DBL_TOKEN = structure.loadEnvVar("dblToken")
+BG_TASKS_STARTED = False
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -36,8 +37,8 @@ class SpaceXLaunchBotClient(discord.Client):
           - I am fairly certain the issue was that the on_ready method was called if the
             client recconnected, which meant that these tasks kept getting duplicated
         """
-        if len(asyncio.Task.all_tasks()) == 0:
-            logger.info("all_tasks is 0, startings bg tasks")
+        if BG_TASKS_STARTED == False:
+            logger.info("BG_TASKS_STARTED is False, startings tasks")
             # These will actually work without passing the 3 Nones, as the wrapper for the functions
             # deals with those 3 arguments. None is used just so editors / linters won't show errors
             self.loop.create_task(
@@ -46,6 +47,7 @@ class SpaceXLaunchBotClient(discord.Client):
             self.loop.create_task(
                 backgroundTasks.launchChangedNotifTask(self, None, None, None)
             )
+            BG_TASKS_STARTED = True
 
         await self.change_presence(activity=discord.Game(name=structure.config["game"]))
 
