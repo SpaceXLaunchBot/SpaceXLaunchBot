@@ -114,42 +114,42 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Add/remove channel commands
 
-        # elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
-        #     reply = "This channel has been added to the notification service"
-        #     added = await redisConn.sadd(
-        #         "subscribedChannels", str(message.channel.id).encode("UTF-8")
-        #     )
-        #     if added == 0:
-        #         reply = "This channel is already subscribed to the notification service"
-        #     await self.safeSend(message.channel, reply)
+        elif userIsAdmin and message.content.startswith(PREFIX + "addchannel"):
+            reply = "This channel has been added to the notification service"
+            added = await redisConn.sadd(
+                "subscribedChannels", str(message.channel.id).encode("UTF-8")
+            )
+            if added == 0:
+                reply = "This channel is already subscribed to the notification service"
+            await self.safeSend(message.channel, reply)
 
-        # elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
-        #     reply = "This channel has been removed from the launch notification service"
-        #     removed = await redisConn.srem(
-        #         "subscribedChannels", str(message.channel.id).encode("UTF-8")
-        #     )
-        #     if removed == 0:
-        #         reply = "This channel was not previously subscribed to the launch notification service"
-        #     await self.safeSend(message.channel, reply)
+        elif userIsAdmin and message.content.startswith(PREFIX + "removechannel"):
+            reply = "This channel has been removed from the launch notification service"
+            removed = await redisConn.srem(
+                "subscribedChannels", str(message.channel.id).encode("UTF-8")
+            )
+            if removed == 0:
+                reply = "This channel was not previously subscribed to the launch notification service"
+            await self.safeSend(message.channel, reply)
 
         # Add/remove ping commands
 
-        # elif userIsAdmin and message.content.startswith(PREFIX + "addping"):
-        #     reply = "Invalid input for addping command"
-        #     rolesToMention = " ".join(message.content.split("addping")[1:])
-        #     if rolesToMention.strip() != "":
-        #         reply = (
-        #             f"Added launch notification ping for mentions(s): {rolesToMention}"
-        #         )
-        #         await redisConn.setGuildSettings(message.guild.id, rolesToMention)
-        #     await self.safeSend(message.channel, reply)
+        elif userIsAdmin and message.content.startswith(PREFIX + "addping"):
+            reply = "Invalid input for addping command"
+            rolesToMention = " ".join(message.content.split("addping")[1:])
+            if rolesToMention.strip() != "":
+                reply = (
+                    f"Added launch notification ping for mentions(s): {rolesToMention}"
+                )
+                await redisConn.setGuildSettings(message.guild.id, rolesToMention)
+            await self.safeSend(message.channel, reply)
 
-        # elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
-        #     reply = "Removed ping succesfully"
-        #     deleted = await redisConn.hdel(message.guild.id, "rolesToMention")
-        #     if deleted == 0:
-        #         reply = "This server has no pings to be removed"
-        #     await self.safeSend(message.channel, reply)
+        elif userIsAdmin and message.content.startswith(PREFIX + "removeping"):
+            reply = "Removed ping succesfully"
+            deleted = await redisConn.hdel(message.guild.id, "rolesToMention")
+            if deleted == 0:
+                reply = "This server has no pings to be removed"
+            await self.safeSend(message.channel, reply)
 
         # Misc
 
