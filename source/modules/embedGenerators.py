@@ -98,9 +98,14 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
     if len(launchInfoEmbed.title) > 256:
         # Title too big to send, no way around this other than send an err
         return generalErrorEmbed
-    elif len(launchInfoEmbed) > 2048:
-        # If body too big, send small embed
-        return launchInfoEmbedSmall
+
+    """
+    13/04/19 len(embed) seems to be broken
+    """
+    # elif len(launchInfoEmbed) > 2048:
+    #     # If body too big, send small embed
+    #     return launchInfoEmbedSmall
+
     return launchInfoEmbed
 
 
