@@ -19,15 +19,14 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.dbl = apis.dblApi(self.user.id, config.DBL_TOKEN)
-
         # Create asyncio tasks now
         # self.loop.create_task(func())
 
     async def on_ready(self):
-        # Happens whenever the bot connects to the Discord API, includes when
-        # the connection drops and the bot reconnects
         logger.info("Succesfully connected to Discord API")
+
+        self.dbl = apis.dblApi(self.user.id, config.DBL_TOKEN)
+
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
         await self.dbl.updateGuildCount(len(self.guilds))
 
