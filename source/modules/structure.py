@@ -6,7 +6,7 @@ import sys
 import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from os import path, environ
+from os import path
 from datetime import datetime
 import config
 
@@ -16,16 +16,6 @@ logger = logging.getLogger(__name__)
 def fatalError(message):
     logger.critical(message)
     sys.exit(-1)
-
-
-def loadEnvVar(varName):
-    """
-    Returns the environment variable varName, or exits program with error msg
-    """
-    try:
-        return environ[varName]
-    except KeyError:
-        fatalError(f'Environment Variable "{varName}" cannot be found')
 
 
 async def UTCFromTS(timestamp):

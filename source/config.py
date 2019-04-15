@@ -1,10 +1,11 @@
-# The Discord ID of the person running the bot
-from modules.structure import loadEnvVar
+from os import environ
 
+# Load from environment variables
+DISCORD_TOKEN = environ["SpaceXLaunchBotToken"]
+DBL_TOKEN = environ["dblToken"]
+
+# Discord ID of the person running the bot
 OWNER_ID = "263412940869206027"
-
-DISCORD_TOKEN = loadEnvVar("SpaceXLaunchBotToken")
-DBL_TOKEN = loadEnvVar("dblToken")
 
 # The prefix needed to activate a command
 COMMAND_PREFIX = "!"
