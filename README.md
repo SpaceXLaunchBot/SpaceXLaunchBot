@@ -56,4 +56,3 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 
 - [ ] Finish new background tasks
 - [ ] Improve `info` command (more info, better formatting)
-- [ ] If an Embed obj is too big to send, send either an error embed or a smaller version of the embed

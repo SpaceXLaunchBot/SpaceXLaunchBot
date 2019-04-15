@@ -89,10 +89,10 @@ async def handleCommand(client, message, userIsOwner, userIsAdmin):
 
     elif userIsOwner and message.content.startswith("logdump"):
         # Reply with latest lines from bot.log
-        logMessage = "```bash\n{}```"
+        logMessage = "```\n{}```"
 
         with open(config.LOG_PATH, "r") as f:
-            # Code formatting in message takes up 11 of the 2k allowed chars
-            logContent = f.read()[-(2000 - 11) :]
+            # Code formatting in message takes up 7 of the 2k allowed chars
+            logContent = f.read()[-(2000 - 7) :]
 
         await client.safeSend(message.channel, logMessage.format(logContent))

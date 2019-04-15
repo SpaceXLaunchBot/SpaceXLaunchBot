@@ -80,24 +80,29 @@ class SpaceXLaunchBotClient(discord.Client):
         supress it so the bot doesen't crash completely
         On success returns what the channel.send method returns
         On failure, returns:
-            -1 : Nothing to send (toSend is not a string or Embed)
-            -2 : Forbidden (No permission to message this channel)
-            -3 : HTTPException (API down, Message too big, etc.)
-            -4 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
+            -1 : Message too big (string is >2k chars or len(embed) > 2048)
+            -2 : Nothing to send (toSend is not a string or Embed)
+            -3 : Forbidden (No permission to message this channel)
+            -4 : HTTPException (API down, Message too big, etc.)
+            -5 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
         """
         try:
             if type(toSend) == str:
+                if len(toSend) > 2000:
+                    return -1
                 return await channel.send(toSend)
             elif type(toSend) == discord.Embed:
+                if len(toSend) > 2048:
+                    return -1
                 return await channel.send(embed=toSend)
             else:
-                return -1
+                return -2
         except discord.errors.Forbidden:
-            return -2
-        except discord.errors.HTTPException:
             return -3
-        except discord.errors.InvalidArgument:
+        except discord.errors.HTTPException:
             return -4
+        except discord.errors.InvalidArgument:
+            return -5
 
 
 async def startup():
