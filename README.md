@@ -32,8 +32,9 @@ Command|Description|Permissions needed
 `!nextlaunch`|Send the latest launch information message to the current channel|None
 `!addchannel`|Add the current channel to the notification service|Admin
 `!removechannel`|Remove the current channel from the notification service|Admin
-`!addping @mention`|Add roles/users to be pinged when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `!addping @role1 @user1 @role2`. Calling `!addping` multiple times will not stack the roles, it will just overwrite your previous settings|Admin
-`!removeping`|Stop any roles/users on the server being pinged when a "launching soon" message is sent|Admin
+`!setmentions @mention`|Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `!setmentions @role1 @user1 @role2`. Calling `!setmentions` multiple times will not stack the roles, it will just overwrite your previous mentions|Admin
+`!removementions`|Remove all mentions set for the current guild|Admin
+`!getmentions`|Get mentions set for the current guild|Admin
 `!info`|Show information about the bot|None
 `!help`|List these commands|None
 
@@ -41,11 +42,11 @@ Command|Description|Permissions needed
 
 The `!addchannel` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
 
-- A **launch information** message shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every 15 minutes.
+- A **launch information message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every 15 minutes.
 
 ![launchInfo](images/screenshots/launchInfo.png)
 
-- A **launching soon** message provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
+- A **launching soon message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
 
 ![launchSoon](images/screenshots/launchSoon.png)
 
@@ -54,13 +55,10 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 ## Planned Updates / Improvments
 
 - [x] Make this readme better (easier to read, understand, etc.)
-- [ ] Allow more per-server settings (such as types of notifs, etc.)
 - [ ] Improve `info` command (more info, better formatting)
-- [ ] Add a voting command or some way of insetivising / integrating DBL voting
 - [x] Restructure Redis
 - [x] Generally clean up code
   - [x] Clean up `/modules`, seperate into more meaningful dirs
-  - [x] Store settings, data, etc. in objects instead of dicts (where appropriate0)
   - [x] Clean up embed generation
     - [x] Make "launching soon" messages look a bit better
   - [x] Only refer to messages as "launch information" or "launching soon" messages

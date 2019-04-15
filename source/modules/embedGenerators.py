@@ -2,7 +2,7 @@ from copy import deepcopy
 from discord import Embed
 
 from modules.structure import UTCFromTS
-from modules.statics import falconRed, rocketIDImages, generalErrorEmbed
+from modules.statics import falconRed, rocketIDImages, generalErrorEmbed, ownerMention
 
 payloadInfo = """Type: {}
 Orbit: {}
@@ -131,3 +131,30 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
     notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
 
     return notifEmbed
+
+
+async def getInfoEmbed():
+    """
+    Info ideas:
+    - Developer / Owner tag
+    - Guild, Channel, and User count
+    - Uptime
+    - Github link
+    - Invite link
+    - Bot metrics (command count, avg commands per ?, etc.)
+    - API latency?
+    - Let user know about !help
+    """
+    infoEmbed = Embed(
+        title="SpaceX-Launch-Bot Information",
+        color=falconRed,
+        description="A Discord bot for getting news, information, and notifications about upcoming SpaceX launches",
+    )
+    infoEmbed.add_field(
+        name="Links", value="[GitHub](https://github.com/r-spacex/SpaceX-Launch-Bot)"
+    )
+    infoEmbed.add_field(name="Contact", value=f"{ownerMention}")
+    infoEmbed.add_field(
+        name="Help", value="Use the command !help to get a list of commands"
+    )
+    return infoEmbed

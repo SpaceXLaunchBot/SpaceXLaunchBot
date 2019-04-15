@@ -54,7 +54,7 @@ class SpaceXLaunchBotClient(discord.Client):
         deleted = await redisConn.delete(guildMentionsDBKey)
 
         if deleted != 0:
-            logger.info(f"Removed server settings for {guild.id}")
+            logger.info(f"Removed guild settings for {guild.id}")
 
     async def on_message(self, message):
         if not message.content.startswith(config.COMMAND_PREFIX):
@@ -72,7 +72,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # Commands can be in any case
         message.content = message.content.lower()
 
-        # Gather permission related vars        
+        # Gather permission related vars
         userIsOwner = message.author.id == int(config.OWNER_ID)
         try:
             userIsAdmin = message.author.permissions_in(message.channel).administrator
@@ -92,26 +92,32 @@ class SpaceXLaunchBotClient(discord.Client):
     async def safeSend(self, channel, toSend):
         """
         Send a text / embed message to a user, and if an error occurs, safely
-        supress it so the bot doesen't crash completely. On failure, returns:
-            -1 : Nothing to send (toSend is not a string or Embed)
-            -2 : Forbidden (No permission to message this channel)
-            -3 : HTTPException (API down, Message too big, etc.)
-            -4 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
+        supress it so the bot doesen't crash completely
         On success returns what the channel.send method returns
+        On failure, returns:
+            -1 : Message too big (string is >2k chars or len(embed) > 2048)
+            -2 : Nothing to send (toSend is not a string or Embed)
+            -3 : Forbidden (No permission to message this channel)
+            -4 : HTTPException (API down, Message too big, etc.)
+            -5 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
         """
         try:
             if type(toSend) == str:
+                if len(toSend) > 2000:
+                    return -1
                 return await channel.send(toSend)
             elif type(toSend) == discord.Embed:
+                if len(toSend) > 2048:
+                    return -1
                 return await channel.send(embed=toSend)
             else:
-                return -1
+                return -2
         except discord.errors.Forbidden:
-            return -2
-        except discord.errors.HTTPException:
             return -3
-        except discord.errors.InvalidArgument:
+        except discord.errors.HTTPException:
             return -4
+        except discord.errors.InvalidArgument:
+            return -5
 
 
 client = SpaceXLaunchBotClient()
