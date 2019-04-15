@@ -118,7 +118,7 @@ async def startup():
 
 
 if __name__ == "__main__":
-    asyncio.get_running_loop().run_until_complete(startup())
+    asyncio.get_event_loop().run_until_complete(startup())
 
     client = SpaceXLaunchBotClient()
     client.run(config.DISCORD_TOKEN)
