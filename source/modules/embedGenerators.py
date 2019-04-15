@@ -107,7 +107,6 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
 
 
 async def genLaunchingSoonEmbed(nextLaunchJSON):
-    UTCLaunchDate = await UTCFromTS(nextLaunchJSON["launch_date_unix"])
     embedDesc = ""
 
     notifEmbed = Embed(
@@ -133,6 +132,7 @@ async def genLaunchingSoonEmbed(nextLaunchJSON):
         embedDesc += f"[Press kit]({nextLaunchJSON['links']['presskit']})\n"
     notifEmbed.description = embedDesc
 
+    UTCLaunchDate = await UTCFromTS(nextLaunchJSON["launch_date_unix"])
     notifEmbed.add_field(name="Launch date", value=UTCLaunchDate)
 
     return notifEmbed

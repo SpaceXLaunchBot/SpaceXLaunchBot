@@ -11,7 +11,7 @@ OWNER_ID = "263412940869206027"
 COMMAND_PREFIX = "!"
 
 # The interval time, in minutes, between checking the SpaceX API for updates
-API_CHECK_INTERVAL = 15
+API_CHECK_INTERVAL = 1
 
 # How far into the future to look for launches that are happening soon (in minutes)
 # Should be more >1 as the launching soon notification task is run every minute
