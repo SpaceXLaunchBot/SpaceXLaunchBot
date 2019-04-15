@@ -8,6 +8,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from os import path, environ
 from datetime import datetime
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -41,44 +42,14 @@ async def UTCFromTS(timestamp):
         return "To Be Announced"
 
 
-"""
-Initialise globally used variables
-"""
+def setupLogging():
+    # Setup logging (direct logging to file, only log INFO level and above)
+    logFileHandler = TimedRotatingFileHandler(
+        filename=config.LOG_PATH, when="W0", backupCount=10, encoding="UTF-8"
+    )
+    logFileHandler.setFormatter(logging.Formatter(config.LOG_FORMAT))
 
-# Load local config file into a dictionary that can be exported
-configFilePath = path.join(
-    path.dirname(path.abspath(__file__)), "..", "config", "config.json"
-)
-neededKeys = [
-    "ownerID",
-    "commandPrefix",
-    "apiCheckInterval",
-    "launchSoonDelta",
-    "logFilePath",
-    "logFormat",
-    "colours",
-    "game",
-]
-try:
-    with open(configFilePath, "r") as inFile:
-        config = json.load(inFile)
-    for key in neededKeys:
-        if key not in config:
-            fatalError(f"Cannot find required key: {key} in configuration file")
-except FileNotFoundError:
-    fatalError("Configuration file / directory not found")
+    logging.basicConfig(level=logging.INFO, handlers=[logFileHandler])
 
-# Setup logging (direct logging to file, only log INFO level and above)
-# Do this before other imports as some local modules use logging when imported
-
-logFilePath = config["logFilePath"]
-
-logFileHandler = TimedRotatingFileHandler(
-    filename=logFilePath, when="W0", backupCount=10, encoding="UTF-8"
-)
-logFileHandler.setFormatter(logging.Formatter(config["logFormat"]))
-
-logging.basicConfig(level=logging.INFO, handlers=[logFileHandler])
-
-# Change discord to only log ERROR level and above
-logging.getLogger("discord").setLevel(logging.ERROR)
+    # Change discord to only log ERROR level and above
+    logging.getLogger("discord").setLevel(logging.ERROR)

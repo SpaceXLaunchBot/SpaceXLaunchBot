@@ -1,6 +1,6 @@
 from discord import Embed, Colour
 
-from modules.structure import config
+import config
 
 # Use Github as image hosting
 logoBaseURL = (
@@ -13,10 +13,10 @@ rocketIDImages = {
 }
 
 # Convert chosen RGB values into usable Colour objects
-errorRed = Colour.from_rgb(*config["colours"]["errorRed"])
-falconRed = Colour.from_rgb(*config["colours"]["falconRed"])
+errorRed = Colour.from_rgb(*config.EMBED_COLOURS["errorRed"])
+falconRed = Colour.from_rgb(*config.EMBED_COLOURS["falconRed"])
 
-ownerMention = f"<@{config['ownerID']}>"
+ownerMention = f"<@{config.OWNER_ID}>"
 
 infoEmbed = Embed(
     title="SpaceX-Launch-Bot Information",
@@ -33,7 +33,7 @@ infoEmbed.add_field(
 
 helpEmbed = Embed(
     title="SpaceX-Launch-Bot Commands",
-    description=f"Command prefix: {config['commandPrefix']}",
+    description=f"Command prefix: {config.COMMAND_PREFIX}",
     color=falconRed,
 )
 helpEmbed.add_field(
