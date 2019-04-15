@@ -63,7 +63,7 @@ async def handleCommand(client, message, userIsOwner, userIsAdmin):
         if mentions:
             reply = f"Mentions for this guild: {mentions}"
 
-        await client.safeSend(mentions)
+        await client.safeSend(message.channel, mentions)
 
     # Misc
 
