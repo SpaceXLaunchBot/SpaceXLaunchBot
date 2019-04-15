@@ -73,9 +73,6 @@ class SpaceXLaunchBotClient(discord.Client):
         except RedisError as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
             await self.safeSend(message.channel, statics.dbErrorEmbed)
-        except Exception as e:
-            logger.error(f"handleCommand failed:  {type(e).__name__}: {e}")
-            await self.safeSend(message.channel, statics.generalErrorEmbed)
 
     async def safeSend(self, channel, toSend):
         """
