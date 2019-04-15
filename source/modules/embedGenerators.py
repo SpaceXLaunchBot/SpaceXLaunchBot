@@ -1,4 +1,3 @@
-from copy import deepcopy
 from discord import Embed
 
 from modules.structure import UTCFromTS
@@ -53,9 +52,6 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
         ),
     )
 
-    # Basic embed structure built, copy into small version
-    launchInfoEmbedSmall = deepcopy(launchInfoEmbed)
-
     discussionURL = nextLaunchJSON["links"]["reddit_campaign"]
     if discussionURL != None:
         launchInfoEmbed.add_field(name="r/SpaceX discussion", value=discussionURL)
@@ -92,12 +88,6 @@ async def genLaunchInfoEmbeds(nextLaunchJSON):
             ),
         )
 
-    if len(launchInfoEmbed.title) > 256:
-        # Title too big to send, no way around this other than send an err
-        return generalErrorEmbed
-    elif len(launchInfoEmbed) > 2048:
-        # If body is too big, send small embed
-        return launchInfoEmbedSmall
     return launchInfoEmbed
 
 
