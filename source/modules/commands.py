@@ -39,7 +39,7 @@ async def handleCommand(client, message, userIsOwner, userIsAdmin):
 
     elif userIsAdmin and message.content.startswith("setmentions"):
         reply = "Invalid input for setmentions command"
-        rolesToMention = " ".join(message.content.split("addping")[1:])
+        rolesToMention = " ".join(message.content.split("setmentions")[1:])
         if rolesToMention.strip() != "":
             reply = f"Added notification ping for mentions(s): {rolesToMention}"
             await redisConn.setGuildMentions(message.guild.id, rolesToMention)
@@ -63,7 +63,7 @@ async def handleCommand(client, message, userIsOwner, userIsAdmin):
         if mentions:
             reply = f"Mentions for this guild: {mentions}"
 
-        await client.safeSend(message.channel, mentions)
+        await client.safeSend(message.channel, reply)
 
     # Misc
 
