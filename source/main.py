@@ -1,16 +1,19 @@
 from modules.structure import setupLogging
-import logging
 
 setupLogging()
+
+import logging
+
 logger = logging.getLogger(__name__)
 logger.info("Starting")
 
-import discord
+import discord, asyncio
 from aredis import RedisError
 
 import config
 from modules import statics, apis, commands
 from modules.redisClient import redisConn
+
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -18,22 +21,8 @@ class SpaceXLaunchBotClient(discord.Client):
 
         self.dbl = apis.dblApi(self.user.id, config.DBL_TOKEN)
 
-        # Only needed when running for the first time / new db
-        if not await redisConn.exists("slb.notificationTaskStore"):
-            logger.info("notificationTaskStore does not exist, creating")
-            await redisConn.setNotificationTaskStore("False", statics.generalErrorEmbed)
-    
         # Create asyncio tasks now
-        # self.loop.create_task()
-    
-        totalSubbed = await redisConn.scard("slb.subscribedChannels")
-        totalGuilds = len(self.guilds)
-
-        logger.info(f"{self.user.id} / {self.user.name}")
-        logger.info(
-            f"{totalGuilds} guilds / {totalSubbed} subscribed channels / {len(self.users)} users"
-        )
-        logger.info("Ready")
+        # self.loop.create_task(func())
 
     async def on_ready(self):
         # Happens whenever the bot connects to the Discord API, includes when
@@ -56,6 +45,11 @@ class SpaceXLaunchBotClient(discord.Client):
         if deleted != 0:
             logger.info(f"Removed guild settings for {guild.id}")
 
+    async def on_error(self, event, *args, **kwargs):
+        # Overwriting this means there won't be a massive stack trace dumped to the log
+        # TODO: This function
+        logger.error(f"{event} caused an error")
+
     async def on_message(self, message):
         if not message.content.startswith(config.COMMAND_PREFIX):
             # Not a command, ignore it
@@ -65,7 +59,7 @@ class SpaceXLaunchBotClient(discord.Client):
             # Don't reply to bots (includes self)
             # Only reply to messages from guilds
             return
-   
+
         # Remove command prefix, we don't need it anymore
         message.replace(config.COMMAND_PREFIX, "")
 
@@ -120,5 +114,12 @@ class SpaceXLaunchBotClient(discord.Client):
             return -5
 
 
-client = SpaceXLaunchBotClient()
-client.run(config.DISCORD_TOKEN)
+async def startup():
+    await redisConn.initDefaults()
+
+
+if __name__ == "__main__":
+    asyncio.get_running_loop().run_until_complete(startup())
+
+    client = SpaceXLaunchBotClient()
+    client.run(config.DISCORD_TOKEN)

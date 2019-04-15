@@ -7,10 +7,12 @@ Key                   | Value
 ----------------------|-----------------------------------------------------------------
 subscribedChannels    | A Redis SET of channel IDs that are to be sent notifications
 str(Guild ID)         | A string containing Discord mentions (channels, users, etc.)
+metrics               | A Redis hash containing these fields:
+                      | "totalCommands" - The total number of commands issued
 notificationTaskStore | A Redis hash containing variables that need to persist between
                       | runs of the notification background task(s). This includes:
                       | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
-                      | "latestLaunchInfoEmbedDict" = pickled ( launchInfoEmbedDict )
+                      | "latestLaunchInfoEmbedDict" = pickled(launchInfoEmbedDict)
 """
 
 from aredis import StrictRedis
@@ -25,7 +27,15 @@ logger = logging.getLogger(__name__)
 class redisClient(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
         super().__init__(host=host, port=port, db=dbNum)
-        logger.info(f"Connected to {host}:{port} on DB {dbNum}")
+        logger.info(f"Connected to Redis at {host}:{port} on DB {dbNum}")
+
+    async def initDefaults(self):
+        """
+        If database is new, create default values for needed keys
+        """
+        if not await self.exists("slb.notificationTaskStore"):
+            logger.debug("slb.notificationTaskStore hash does not exist, creating")
+            await self.setNotificationTaskStore("False", generalErrorEmbed)
 
     async def getNotificationTaskStore(self):
         """
