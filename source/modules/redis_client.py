@@ -12,7 +12,7 @@ metrics               | A Redis hash containing these fields:
 notificationTaskStore | A Redis hash containing variables that need to persist between
                       | runs of the notification background task(s). This includes:
                       | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
-                      | "latestLaunchInfoEmbedDict" = pickled(launchInfoEmbedDict)
+                      | "latestlaunch_info_embedDict" = pickled(launch_info_embedDict)
 """
 
 from aredis import StrictRedis
@@ -24,7 +24,7 @@ from modules.statics import generalErrorEmbed
 logger = logging.getLogger(__name__)
 
 
-class redisClient(StrictRedis):
+class redis_client(StrictRedis):
     def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
         super().__init__(host=host, port=port, db=dbNum)
         logger.info(f"Connected to Redis at {host}:{port} on DB {dbNum}")
@@ -44,24 +44,24 @@ class redisClient(StrictRedis):
         launchingSoonNotifSent = await self.hget(
             "slb.notificationTaskStore", "launchingSoonNotifSent"
         )
-        latestLaunchInfoEmbedDict = await self.hget(
-            "slb.notificationTaskStore", "latestLaunchInfoEmbedDict"
+        latestlaunch_info_embedDict = await self.hget(
+            "slb.notificationTaskStore", "latestlaunch_info_embedDict"
         )
         return {
             "launchingSoonNotifSent": launchingSoonNotifSent.decode("UTF-8"),
-            "latestLaunchInfoEmbedDict": pickle.loads(latestLaunchInfoEmbedDict),
+            "latestlaunch_info_embedDict": pickle.loads(latestlaunch_info_embedDict),
         }
 
     async def setNotificationTaskStore(
-        self, launchingSoonNotifSent, latestLaunchInfoEmbedDict
+        self, launchingSoonNotifSent, latestlaunch_info_embedDict
     ):
         """
         Update / create the hash for notificationTaskStore
         Automatically encodes both arguments
         """
         launchingSoonNotifSent = launchingSoonNotifSent.encode("UTF-8")
-        latestLaunchInfoEmbedDict = pickle.dumps(
-            latestLaunchInfoEmbedDict, protocol=pickle.HIGHEST_PROTOCOL
+        latestlaunch_info_embedDict = pickle.dumps(
+            latestlaunch_info_embedDict, protocol=pickle.HIGHEST_PROTOCOL
         )
         await self.hset(
             "slb.notificationTaskStore",
@@ -70,8 +70,8 @@ class redisClient(StrictRedis):
         )
         await self.hset(
             "slb.notificationTaskStore",
-            "latestLaunchInfoEmbedDict",
-            latestLaunchInfoEmbedDict,
+            "latestlaunch_info_embedDict",
+            latestlaunch_info_embedDict,
         )
 
     async def setGuildMentions(self, guildID, rolesToMention):
@@ -80,9 +80,9 @@ class redisClient(StrictRedis):
         guildID can be int or str
         rolesToMention should be an string of roles / tags / etc.
         """
-        guildMentionsDBKey = f"slb.{str(guildID)}"
+        guild_mentions_db_key = f"slb.{str(guildID)}"
         rolesToMention = rolesToMention.encode("UTF-8")
-        await self.set(guildMentionsDBKey, rolesToMention)
+        await self.set(guild_mentions_db_key, rolesToMention)
 
     async def getGuildMentions(self, guildID):
         """
@@ -90,10 +90,10 @@ class redisClient(StrictRedis):
         guildID can be int or str
         returns False if guildID does not have any settings stored
         """
-        guildMentionsDBKey = f"slb.{str(guildID)}"
-        if not await self.exists(guildMentionsDBKey):
+        guild_mentions_db_key = f"slb.{str(guildID)}"
+        if not await self.exists(guild_mentions_db_key):
             return False
-        rolesToMention = await self.get(guildMentionsDBKey)
+        rolesToMention = await self.get(guild_mentions_db_key)
         return rolesToMention.decode("UTF-8")
 
 
@@ -101,4 +101,4 @@ class redisClient(StrictRedis):
 When this is imported for the first time, set up our Redis connection and save
 to a variable so anything importing this can access it
 """
-redisConn = redisClient()
+redis = redis_client()

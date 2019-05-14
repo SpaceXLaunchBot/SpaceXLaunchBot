@@ -16,7 +16,7 @@ import logging, asyncio
 
 import config
 from modules import apis, embedGenerators
-from modules.redisClient import redisConn
+from modules.redis_client import redis
 
 
 logger = logging.getLogger(__name__)
@@ -31,25 +31,27 @@ async def notificationTask(client):
         # At the end of this method, remove all channels that we can't access anymore
         channelsToRemove = []
 
-        nextLaunchJSON = await apis.spacexApi.getNextLaunchJSON()
+        next_launch_dict = await apis.SpacexApi.get_next_launch_dict()
 
-        if nextLaunchJSON != -1:
+        if next_launch_dict != -1:
 
-            launchInfoEmbed = await embedGenerators.genLaunchInfoEmbeds(nextLaunchJSON)
-            launchInfoEmbedDict = launchInfoEmbed.to_dict()
+            launch_info_embed = await embedGenerators.gen_launch_info_embeds(
+                next_launch_dict
+            )
+            launch_info_embedDict = launch_info_embed.to_dict()
 
-            subbedChannelIDs = await redisConn.smembers("subscribedChannels")
+            subbedChannelIDs = await redis.smembers("subscribedChannels")
             subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
 
-            notifTaskStore = await redisConn.getNotificationTaskStore()
+            notifTaskStore = await redis.getNotificationTaskStore()
             launchingSoonNotifSent = notifTaskStore["launchingSoonNotifSent"]
-            latestLaunchInfoEmbedDict = notifTaskStore["latestLaunchInfoEmbedDict"]
+            latestlaunch_info_embedDict = notifTaskStore["latestlaunch_info_embedDict"]
 
-            if launchInfoEmbedDict != latestLaunchInfoEmbedDict:
+            if launch_info_embedDict != latestlaunch_info_embedDict:
                 logger.info("Launch info changed, sending notifications")
 
                 launchingSoonNotifSent = "False"
-                latestLaunchInfoEmbedDict = launchInfoEmbedDict
+                latestlaunch_info_embedDict = launch_info_embedDict
 
                 # New launch found, send all "subscribed" channels the embed
                 for channelID in subbedChannelIDs:
@@ -57,7 +59,7 @@ async def notificationTask(client):
                     if channel == None:
                         channelsToRemove.append(channelID)
                     else:
-                        await client.safeSend(channel, launchInfoEmbed)
+                        await client.safe_send(channel, launch_info_embed)
 
         # TODO: Notifications for "launching soon"
 

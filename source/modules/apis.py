@@ -4,16 +4,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class spacexApi:
+class SpacexApi:
     """
     Handles interactions with the SpaceX API
     As of 13/01/19, API ratelimit is 50 req/sec per IP
     """
 
     @staticmethod
-    async def getNextLaunchJSON(previous=False):
+    async def get_next_launch_dict(previous=False):
         """
-        Using aiohttp, get the latest launch info in JSON format
+        Using aiohttp, get the latest launch info
         If previous=True, use data from previous launch (for debugging)
         Returns -1 on failure
         """
@@ -23,33 +23,33 @@ class spacexApi:
         else:
             route = "next"
 
-        upcomingLaunchesURL = f"https://api.spacexdata.com/v3/launches/{route}"
+        upcoming_launches_url = f"https://api.spacexdata.com/v3/launches/{route}"
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(upcomingLaunchesURL) as response:
+            async with session.get(upcoming_launches_url) as response:
                 if response.status == 200:
                     try:
-                        nextLaunchJSON = await response.json()
+                        next_launch_dict = await response.json()
                     except aiohttp.client_exceptions.ContentTypeError:
                         logger.error("SpaceX API: JSON decode failed")
                         return -1
                 else:
                     logger.error(f"SpaceX API: Response status: {response.status}")
                     return -1
-                return nextLaunchJSON
+                return next_launch_dict
 
 
-class dblApi:
+class DblApi:
     """
     Handles interactions with the discordbots.org API
     """
 
-    def __init__(self, clientID, dblToken):
-        self.dblURL = f"https://discordbots.org/api/bots/{clientID}/stats"
-        self.headers = {"Authorization": dblToken, "Content-Type": "application/json"}
+    def __init__(self, client_id, dbl_token):
+        self.dblURL = f"https://discordbots.org/api/bots/{client_id}/stats"
+        self.headers = {"Authorization": dbl_token, "Content-Type": "application/json"}
 
-    async def updateGuildCount(self, guildCount):
+    async def update_guild_count(self, guild_count):
         async with aiohttp.ClientSession() as session:
             await session.post(
-                self.dblURL, json={"server_count": guildCount}, headers=self.headers
+                self.dblURL, json={"server_count": guild_count}, headers=self.headers
             )

@@ -56,7 +56,7 @@ helpEmbed.add_field(
 
 nextLaunchErrorEmbed = Embed(
     title="Error",
-    description=f"An launchInfoEmbed error occurred, contact {ownerMention}",
+    description=f"An launch_info_embed error occurred, contact {ownerMention}",
     color=errorRed,
 )
 apiErrorEmbed = Embed(

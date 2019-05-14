@@ -12,7 +12,7 @@ from aredis import RedisError
 
 import config
 from modules import statics, apis, commands
-from modules.redisClient import redisConn
+from modules.redis_client import redis
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -25,21 +25,21 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         logger.info("Succesfully connected to Discord API")
 
-        self.dbl = apis.dblApi(self.user.id, config.DBL_TOKEN)
+        self.dbl = apis.DblApi(self.user.id, config.DBL_TOKEN)
 
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
-        await self.dbl.updateGuildCount(len(self.guilds))
+        await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_join(self, guild):
         logger.info(f"Joined guild, ID: {guild.id}")
-        await self.dbl.updateGuildCount(len(self.guilds))
+        await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_remove(self, guild):
         logger.info(f"Removed from guild, ID: {guild.id}")
-        await self.dbl.updateGuildCount(len(self.guilds))
+        await self.dbl.update_guild_count(len(self.guilds))
 
-        guildMentionsDBKey = f"slb.{str(guild.id)}"
-        deleted = await redisConn.delete(guildMentionsDBKey)
+        guild_mentions_db_key = f"slb.{str(guild.id)}"
+        deleted = await redis.delete(guild_mentions_db_key)
 
         if deleted != 0:
             logger.info(f"Removed guild settings for {guild.id}")
@@ -72,9 +72,9 @@ class SpaceXLaunchBotClient(discord.Client):
             await commands.handleCommand(self, message, userIsOwner, userIsAdmin)
         except RedisError as e:
             logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
-            await self.safeSend(message.channel, statics.dbErrorEmbed)
+            await self.safe_send(message.channel, statics.dbErrorEmbed)
 
-    async def safeSend(self, channel, toSend):
+    async def safe_send(self, channel, toSend):
         """
         Send a text / embed message to a user, and if an error occurs, safely
         supress it so the bot doesen't crash completely
@@ -106,7 +106,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
 
 async def startup():
-    await redisConn.initDefaults()
+    await redis.initDefaults()
 
 
 if __name__ == "__main__":
