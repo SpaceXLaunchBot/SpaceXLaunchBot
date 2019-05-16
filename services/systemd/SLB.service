@@ -5,8 +5,8 @@ After=systemd-user-sessions.service
 After=network-online.target
 
 [Service]
-Environment="SpaceXLaunchBotToken=DISCORD-TOKEN" "dblToken=DBL-TOKEN"
-User=SLB
+Environment="slb_discord_token=DISCORD_TOKEN" "slb_dbl_token=DBL_TOKEN"
+User=slb
 Type=idle
 WorkingDirectory=/opt/SpaceX-Launch-Bot/source
 # -u otherwise journal wont show print() output

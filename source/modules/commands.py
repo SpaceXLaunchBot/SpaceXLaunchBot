@@ -1,5 +1,5 @@
 import config
-from modules import apis, embedGenerators, statics
+from modules import apis, embed_generators, statics
 from modules.redis_client import redis
 
 
@@ -10,9 +10,9 @@ async def handleCommand(client, message, is_owner, is_admin):
     if message.content.startswith("nextlaunch"):
         next_launch_dict = await apis.SpacexApi.get_next_launch_dict()
         if next_launch_dict == -1:
-            launch_info_embed = statics.apiErrorEmbed
+            launch_info_embed = statics.api_error_embed
         else:
-            launch_info_embed = await embedGenerators.gen_launch_info_embeds(
+            launch_info_embed = await embed_generators.gen_launch_info_embeds(
                 next_launch_dict
             )
         await client.safe_send(message.channel, launch_info_embed)
@@ -22,7 +22,7 @@ async def handleCommand(client, message, is_owner, is_admin):
     elif is_admin and message.content.startswith("addchannel"):
         reply = "This channel has been added to the notification service"
         added = await redis.sadd(
-            "slb.subscribedChannels", str(message.channel.id).encode("UTF-8")
+            "slb.subscribed_channels", str(message.channel.id).encode("UTF-8")
         )
         if added == 0:
             reply = "This channel is already subscribed to the notification service"
@@ -31,7 +31,7 @@ async def handleCommand(client, message, is_owner, is_admin):
     elif is_admin and message.content.startswith("removechannel"):
         reply = "This channel has been removed from the launch notification service"
         removed = await redis.srem(
-            "slb.subscribedChannels", str(message.channel.id).encode("UTF-8")
+            "slb.subscribed_channels", str(message.channel.id).encode("UTF-8")
         )
         if removed == 0:
             reply = "This channel was not previously subscribed to the launch notification service"
@@ -41,18 +41,16 @@ async def handleCommand(client, message, is_owner, is_admin):
 
     elif is_admin and message.content.startswith("setmentions"):
         reply = "Invalid input for setmentions command"
-        rolesToMention = " ".join(message.content.split("setmentions")[1:])
-        if rolesToMention.strip() != "":
-            reply = f"Added notification ping for mentions(s): {rolesToMention}"
-            await redis.setGuildMentions(message.guild.id, rolesToMention)
+        roles_to_mention = " ".join(message.content.split("setmentions")[1:])
+        if roles_to_mention.strip() != "":
+            reply = f"Added notification ping for mentions(s): {roles_to_mention}"
+            await redis.set_guild_mentions(message.guild.id, roles_to_mention)
         await client.safe_send(message.channel, reply)
 
     elif is_admin and message.content.startswith("removementions"):
         reply = "Removed mentions succesfully"
 
-        guild_mentions_db_key = f"slb.{str(message.guild.id)}"
-        deleted = await redis.delete(guild_mentions_db_key)
-
+        deleted = await redis.delete_guild_mentions(message.guild.id)
         if deleted == 0:
             reply = "This guild has no mentions to be removed"
 
@@ -61,7 +59,7 @@ async def handleCommand(client, message, is_owner, is_admin):
     elif is_admin and message.content.startswith("getmentions"):
         reply = "This guild has no mentions set"
 
-        mentions = await redis.getGuildMentions(message.guild.id)
+        mentions = await redis.get_guild_mentions(message.guild.id)
         if mentions:
             reply = f"Mentions for this guild: {mentions}"
 
@@ -70,24 +68,24 @@ async def handleCommand(client, message, is_owner, is_admin):
     # Misc
 
     elif message.content.startswith("info"):
-        infoEmbed = await embedGenerators.getInfoEmbed()
-        await client.safe_send(message.channel, infoEmbed)
+        info_embed = await embed_generators.getInfoEmbed()
+        await client.safe_send(message.channel, info_embed)
 
     elif message.content.startswith("help"):
-        await client.safe_send(message.channel, statics.helpEmbed)
+        await client.safe_send(message.channel, statics.help_embed)
 
     # Debugging
 
     elif is_owner and message.content.startswith("dbgls"):
         # DeBugLaunchingSoon - Send launching soon embed for prev launch
         next_launch_dict = await apis.SpacexApi.get_next_launch_dict(previous=True)
-        lse = await embedGenerators.genLaunchingSoonEmbed(next_launch_dict)
+        lse = await embed_generators.genLaunchingSoonEmbed(next_launch_dict)
         await client.safe_send(message.channel, lse)
 
     elif is_owner and message.content.startswith("resetnts"):
-        # Reset notificationTaskStore to default values (triggers notifications)
-        await redis.setNotificationTaskStore("False", statics.generalErrorEmbed)
-        await client.safe_send(message.channel, "Reset notificationTaskStore")
+        # Reset notification_task_store to default values (triggers notifications)
+        await redis.set_notification_task_store("False", statics.general_error_embed)
+        await client.safe_send(message.channel, "Reset notification_task_store")
 
     elif is_owner and message.content.startswith("logdump"):
         # Reply with latest lines from bot.log

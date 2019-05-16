@@ -1,5 +1,4 @@
-"""
-General functions and variables used throughout the bot
+"""General functions and variables used throughout the bot
 """
 
 import sys
@@ -13,14 +12,8 @@ import config
 logger = logging.getLogger(__name__)
 
 
-def fatalError(message):
-    logger.critical(message)
-    sys.exit(-1)
-
-
-async def UTCFromTS(timestamp):
-    """
-    Get a UTC string from a unix timestamp
+async def utc_from_ts(timestamp):
+    """Get a UTC string from a unix timestamp
     """
     try:
         formattedDate = datetime.utcfromtimestamp(timestamp).strftime(
@@ -32,7 +25,7 @@ async def UTCFromTS(timestamp):
         return "To Be Announced"
 
 
-def setupLogging():
+def setup_logging():
     # Setup logging (direct logging to file, only log INFO level and above)
     logFileHandler = TimedRotatingFileHandler(
         filename=config.LOG_PATH, when="W0", backupCount=10, encoding="UTF-8"

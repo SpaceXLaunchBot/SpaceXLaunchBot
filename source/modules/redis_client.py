@@ -1,25 +1,24 @@
-"""
-Redis structure
+"""Redis structure
 ---------------
 All keys are prepended with "slb."
 
-Key                   | Value
-----------------------|-----------------------------------------------------------------
-subscribedChannels    | A Redis SET of channel IDs that are to be sent notifications
-str(Guild ID)         | A string containing Discord mentions (channels, users, etc.)
-metrics               | A Redis hash containing these fields:
-                      | "totalCommands" - The total number of commands issued
-notificationTaskStore | A Redis hash containing variables that need to persist between
-                      | runs of the notification background task(s). This includes:
-                      | "launchingSoonNotifSent" = "True" OR "False" (str not bool)
-                      | "latestlaunch_info_embedDict" = pickled(launch_info_embedDict)
+Key                     | Value
+------------------------|---------------------------------------------------------------
+subscribed_channels     | A Redis SET of channel IDs that are to be sent notifications
+str(Guild ID)           | A string containing Discord mentions (channels, users, etc.)
+metrics                 | A Redis hash containing these fields:
+                        | "totalCommands" - The total number of commands issued
+notification_task_store | A Redis hash containing variables that need to persist between
+                        | runs of the notification background task(s). This includes:
+                        | "launching_soon_notif_sent" = "True" OR "False" (str not bool)
+                        | "latest_launch_info_embed_dict" = pickled(embed_dict)
 """
 
 from aredis import StrictRedis
 import logging
 import pickle
 
-from modules.statics import generalErrorEmbed
+from modules.statics import general_error_embed
 
 logger = logging.getLogger(__name__)
 
@@ -29,54 +28,52 @@ class redis_client(StrictRedis):
         super().__init__(host=host, port=port, db=dbNum)
         logger.info(f"Connected to Redis at {host}:{port} on DB {dbNum}")
 
-    async def initDefaults(self):
+    async def init_defaults(self):
+        """If the database is new, create default values for needed keys
         """
-        If database is new, create default values for needed keys
-        """
-        if not await self.exists("slb.notificationTaskStore"):
-            logger.debug("slb.notificationTaskStore hash does not exist, creating")
-            await self.setNotificationTaskStore("False", generalErrorEmbed)
+        if not await self.exists("slb.notification_task_store"):
+            logger.debug("slb.notification_task_store hash does not exist, creating")
+            await self.set_notification_task_store("False", general_error_embed)
 
-    async def getNotificationTaskStore(self):
+    async def get_notification_task_store(self):
+        """Gets and decodes variables from notification_task_store
         """
-        Gets and decodes variables from notificationTaskStore
-        """
-        launchingSoonNotifSent = await self.hget(
-            "slb.notificationTaskStore", "launchingSoonNotifSent"
+        launching_soon_notif_sent = await self.hget(
+            "slb.notification_task_store", "launching_soon_notif_sent"
         )
-        latestlaunch_info_embedDict = await self.hget(
-            "slb.notificationTaskStore", "latestlaunch_info_embedDict"
+        latest_launch_info_embed_dict = await self.hget(
+            "slb.notification_task_store", "latest_launch_info_embed_dict"
         )
         return {
-            "launchingSoonNotifSent": launchingSoonNotifSent.decode("UTF-8"),
-            "latestlaunch_info_embedDict": pickle.loads(latestlaunch_info_embedDict),
+            "launching_soon_notif_sent": launching_soon_notif_sent.decode("UTF-8"),
+            "latest_launch_info_embed_dict": pickle.loads(
+                latest_launch_info_embed_dict
+            ),
         }
 
-    async def setNotificationTaskStore(
-        self, launchingSoonNotifSent, latestlaunch_info_embedDict
+    async def set_notification_task_store(
+        self, launching_soon_notif_sent, latest_launch_info_embed_dict
     ):
-        """
-        Update / create the hash for notificationTaskStore
+        """Update / create the hash for notification_task_store
         Automatically encodes both arguments
         """
-        launchingSoonNotifSent = launchingSoonNotifSent.encode("UTF-8")
-        latestlaunch_info_embedDict = pickle.dumps(
-            latestlaunch_info_embedDict, protocol=pickle.HIGHEST_PROTOCOL
+        launching_soon_notif_sent = launching_soon_notif_sent.encode("UTF-8")
+        latest_launch_info_embed_dict = pickle.dumps(
+            latest_launch_info_embed_dict, protocol=pickle.HIGHEST_PROTOCOL
         )
         await self.hset(
-            "slb.notificationTaskStore",
-            "launchingSoonNotifSent",
-            launchingSoonNotifSent,
+            "slb.notification_task_store",
+            "launching_soon_notif_sent",
+            launching_soon_notif_sent,
         )
         await self.hset(
-            "slb.notificationTaskStore",
-            "latestlaunch_info_embedDict",
-            latestlaunch_info_embedDict,
+            "slb.notification_task_store",
+            "latest_launch_info_embed_dict",
+            latest_launch_info_embed_dict,
         )
 
-    async def setGuildMentions(self, guildID, rolesToMention):
-        """
-        Set mentions for a guild
+    async def set_guild_mentions(self, guildID, rolesToMention):
+        """Set mentions for a guild
         guildID can be int or str
         rolesToMention should be an string of roles / tags / etc.
         """
@@ -84,9 +81,8 @@ class redis_client(StrictRedis):
         rolesToMention = rolesToMention.encode("UTF-8")
         await self.set(guild_mentions_db_key, rolesToMention)
 
-    async def getGuildMentions(self, guildID):
-        """
-        Returns a string of mentions for that guild
+    async def get_guild_mentions(self, guildID):
+        """Returns a string of mentions for that guild
         guildID can be int or str
         returns False if guildID does not have any settings stored
         """
@@ -96,9 +92,14 @@ class redis_client(StrictRedis):
         rolesToMention = await self.get(guild_mentions_db_key)
         return rolesToMention.decode("UTF-8")
 
+    async def delete_guild_mentions(self, guild_id):
+        """Deletes all mentions for the given guild_id
+        Returns the number of keys that were deleted
+        """
+        guild_mentions_db_key = f"slb.{str(guild_id)}"
+        return await redis.delete(guild_mentions_db_key)
 
-"""
-When this is imported for the first time, set up our Redis connection and save
-to a variable so anything importing this can access it
-"""
+
+# When this is imported for the first time, set up our Redis connection and save to a
+# variable so anything importing this can access it
 redis = redis_client()

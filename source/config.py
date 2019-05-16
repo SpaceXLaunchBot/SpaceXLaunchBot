@@ -1,8 +1,8 @@
 from os import environ
 
 # Load from environment variables
-DISCORD_TOKEN = environ["SpaceXLaunchBotToken"]
-DBL_TOKEN = environ["dblToken"]
+DISCORD_TOKEN = environ["slb_discord_token"]
+DBL_TOKEN = environ["slb_dbl_token"]
 
 # Discord ID of the person running the bot
 OWNER_ID = "263412940869206027"
@@ -22,7 +22,7 @@ LOG_PATH = "/var/log/SLB/bot.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(name)s.%(funcName)s : %(message)s"
 
 # Colours used for different situations
-EMBED_COLOURS = {"errorRed": [255, 0, 0], "falconRed": [238, 15, 70]}
+EMBED_COLOURS = {"error_red": [255, 0, 0], "falcon_red": [238, 15, 70]}
 
 # The "game" the bot is playing
 BOT_GAME = "with rockets"

@@ -1,6 +1,6 @@
-from modules.structure import setupLogging
+from modules.structure import setup_logging
 
-setupLogging()
+setup_logging()
 
 import logging
 
@@ -38,24 +38,23 @@ class SpaceXLaunchBotClient(discord.Client):
         logger.info(f"Removed from guild, ID: {guild.id}")
         await self.dbl.update_guild_count(len(self.guilds))
 
-        guild_mentions_db_key = f"slb.{str(guild.id)}"
-        deleted = await redis.delete(guild_mentions_db_key)
-
+        deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
             logger.info(f"Removed guild settings for {guild.id}")
 
     async def on_message(self, message):
-        if not message.content.startswith(config.COMMAND_PREFIX):
+        if (
+            not message.content.startswith(config.COMMAND_PREFIX)
+            or message.author.bot
+            or not message.guild
+        ):
             # Not a command, ignore it
-            return
-
-        if message.author.bot or not message.guild:
             # Don't reply to bots (includes self)
             # Only reply to messages from guilds
             return
 
-        # Remove command prefix, we don't need it anymore
-        message.content = message.content.replace(config.COMMAND_PREFIX, "")
+        # Remove the first occurance of the command prefix, it's not needed anymore
+        message.content = message.content.replace(config.COMMAND_PREFIX, "", 1)
 
         # Commands can be in any case
         message.content = message.content.lower()
@@ -65,36 +64,35 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             userIsAdmin = message.author.permissions_in(message.channel).administrator
         except AttributeError:
-            userIsAdmin = False  # If user has no roles
+            # AttributeError occurs if user has no roles
+            userIsAdmin = False
 
-        # If the command fails, the bot should keep running, but log the error
         try:
             await commands.handleCommand(self, message, userIsOwner, userIsAdmin)
         except RedisError as e:
-            logger.error(f"Redis operation failed: {type(e).__name__}: {e}")
-            await self.safe_send(message.channel, statics.dbErrorEmbed)
+            logger.error(f"RedisError occurred: {type(e).__name__}: {e}")
+            await self.safe_send(message.channel, statics.db_error_embed)
 
-    async def safe_send(self, channel, toSend):
-        """
-        Send a text / embed message to a user, and if an error occurs, safely
-        supress it so the bot doesen't crash completely
+    async def safe_send(self, channel, to_send):
+        """Send a text / embed message to a user, and if an error occurs, safely
+        supress it so the bot doesen't crash
         On success returns what the channel.send method returns
         On failure, returns:
             -1 : Message too big (string is >2k chars or len(embed) > 2048)
-            -2 : Nothing to send (toSend is not a string or Embed)
+            -2 : Nothing to send (to_send is not a string or Embed)
             -3 : Forbidden (No permission to message this channel)
             -4 : HTTPException (API down, Message too big, etc.)
             -5 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
         """
         try:
-            if type(toSend) == str:
-                if len(toSend) > 2000:
+            if type(to_send) == str:
+                if len(to_send) > 2000:
                     return -1
-                return await channel.send(toSend)
-            elif type(toSend) == discord.Embed:
-                if len(toSend) > 2048:
+                return await channel.send(to_send)
+            elif type(to_send) == discord.Embed:
+                if len(to_send) > 2048:
                     return -1
-                return await channel.send(embed=toSend)
+                return await channel.send(embed=to_send)
             else:
                 return -2
         except discord.errors.Forbidden:
@@ -106,7 +104,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
 
 async def startup():
-    await redis.initDefaults()
+    await redis.init_defaults()
 
 
 if __name__ == "__main__":

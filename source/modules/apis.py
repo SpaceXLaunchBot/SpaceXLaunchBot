@@ -5,15 +5,13 @@ logger = logging.getLogger(__name__)
 
 
 class SpacexApi:
-    """
-    Handles interactions with the SpaceX API
+    """Handles interactions with the SpaceX API
     As of 13/01/19, API ratelimit is 50 req/sec per IP
     """
 
     @staticmethod
     async def get_next_launch_dict(previous=False):
-        """
-        Using aiohttp, get the latest launch info
+        """Using aiohttp, get the latest launch info
         If previous=True, use data from previous launch (for debugging)
         Returns -1 on failure
         """
@@ -40,8 +38,7 @@ class SpacexApi:
 
 
 class DblApi:
-    """
-    Handles interactions with the discordbots.org API
+    """Handles interactions with the discordbots.org API
     """
 
     def __init__(self, client_id, dbl_token):
