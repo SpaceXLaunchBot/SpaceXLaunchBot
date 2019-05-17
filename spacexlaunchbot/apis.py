@@ -1,13 +1,13 @@
 import aiohttp
 import logging
 
-logger = logging.getLogger(__name__)
-
 
 class SpacexApi:
     """Handles interactions with the SpaceX API
     As of 13/01/19, API ratelimit is 50 req/sec per IP
     """
+
+    log = logging.getLogger(__name__)
 
     @staticmethod
     async def get_next_launch_dict(previous=False):
@@ -29,10 +29,11 @@ class SpacexApi:
                     try:
                         next_launch_dict = await response.json()
                     except aiohttp.client_exceptions.ContentTypeError:
-                        logger.error("SpaceX API: JSON decode failed")
+                        # TODO: Test if this makes sense in actual log file
+                        SpacexApi.log.error("JSON decode failed")
                         return -1
                 else:
-                    logger.error(f"SpaceX API: Response status: {response.status}")
+                    SpacexApi.log.error(f"Response status: {response.status}")
                     return -1
                 return next_launch_dict
 
@@ -42,10 +43,12 @@ class DblApi:
     """
 
     def __init__(self, client_id, dbl_token):
+        self.log = logging.getLogger(__name__)
         self.dblURL = f"https://discordbots.org/api/bots/{client_id}/stats"
         self.headers = {"Authorization": dbl_token, "Content-Type": "application/json"}
 
     async def update_guild_count(self, guild_count):
+        self.log.info(f"Sending a guild_count of {guild_count} to DBL")
         async with aiohttp.ClientSession() as session:
             await session.post(
                 self.dblURL, json={"server_count": guild_count}, headers=self.headers

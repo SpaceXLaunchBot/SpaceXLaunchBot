@@ -1,29 +1,27 @@
-from modules.structure import setup_logging
+from structure import setup_logging
 
 setup_logging()
 
-import logging
-
-logger = logging.getLogger(__name__)
-logger.info("Starting")
-
-import discord, asyncio
+import discord, asyncio, logging
 from aredis import RedisError
 
 import config
-from modules import statics, apis, commands
-from modules.redis_client import redis
+import statics, apis, commands
+from redisclient import redis
 
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.log = logging.getLogger(__name__)
+        self.log.info("Client initialised")
+
         # Create asyncio tasks now
         # self.loop.create_task(func())
 
     async def on_ready(self):
-        logger.info("Succesfully connected to Discord API")
+        self.log.info("Succesfully connected to Discord API")
 
         self.dbl = apis.DblApi(self.user.id, config.DBL_TOKEN)
 
@@ -31,16 +29,16 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_join(self, guild):
-        logger.info(f"Joined guild, ID: {guild.id}")
+        self.log.info(f"Joined guild, ID: {guild.id}")
         await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_remove(self, guild):
-        logger.info(f"Removed from guild, ID: {guild.id}")
+        self.log.info(f"Removed from guild, ID: {guild.id}")
         await self.dbl.update_guild_count(len(self.guilds))
 
         deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
-            logger.info(f"Removed guild settings for {guild.id}")
+            self.log.info(f"Removed guild settings for {guild.id}")
 
     async def on_message(self, message):
         if (
@@ -70,7 +68,7 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             await commands.handleCommand(self, message, userIsOwner, userIsAdmin)
         except RedisError as e:
-            logger.error(f"RedisError occurred: {type(e).__name__}: {e}")
+            self.log.error(f"RedisError occurred: {type(e).__name__}: {e}")
             await self.safe_send(message.channel, statics.db_error_embed)
 
     async def safe_send(self, channel, to_send):

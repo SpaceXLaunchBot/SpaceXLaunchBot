@@ -15,7 +15,7 @@ This script will install these dependenies:
     - The latest version of pip for python3
 Make sure:
     - Python 3.6+ exists under the "python3" command
-    - The SLB files exist in /opt/SpaceX-Launch-Bot
+    - The SLB files exist in /opt/SpaceXLaunchBot
     - You have a Discord bot token
     - You have a Discord-bot-list token
 EndOfMsg
@@ -32,16 +32,16 @@ wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
 rm get-pip.py
 
-cd /opt/SpaceX-Launch-Bot
+cd /opt/SpaceXLaunchBot
 
-echo "Setting correct owner and permissions for /opt/SpaceX-Launch-Bot"
-sudo adduser --system --group --no-create-home slb
-sudo chown -R slb:slb /opt/SpaceX-Launch-Bot
-sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceX-Launch-Bot
+echo "Setting correct owner and permissions for /opt/SpaceXLaunchBot"
+sudo adduser --system --group --no-create-home spacexlaunchbot
+sudo chown -R spacexlaunchbot:spacexlaunchbot /opt/SpaceXLaunchBot
+sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceXLaunchBot
 
-echo "Setting up /var/log/SLB"
-sudo mkdir /var/log/slb
-sudo chown slb:slb /var/log/slb
+echo "Setting up /var/log/spacexlaunchbot"
+sudo mkdir /var/log/spacexlaunchbot
+sudo chown spacexlaunchbot:spacexlaunchbot /var/log/spacexlaunchbot
 
 echo "Install Python3 requirements through pip3"
 sudo pip3 install -r requirements.txt
@@ -54,8 +54,8 @@ sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
 
-if askyn "Edit slb.service now? This will have to be done before running it";
-then sudo nano /etc/systemd/system/slb.service; fi
+if askyn "Edit spacexlaunchbot.service now? This will have to be done before running it";
+then sudo nano /etc/systemd/system/spacexlaunchbot.service; fi
 
 cat << EndOfMsg
 

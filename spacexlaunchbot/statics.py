@@ -4,7 +4,7 @@ import config
 
 # Use Github as image hosting
 logo_base_url = (
-    "https://raw.githubusercontent.com/r-spacex/SpaceX-Launch-Bot/master/images/logos"
+    "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )
 rocket_id_images = {
     "falcon9": f"{logo_base_url}/falcon9.png",
@@ -19,7 +19,7 @@ falcon_red = Colour.from_rgb(*config.EMBED_COLOURS["falcon_red"])
 owner_mention = f"<@{config.OWNER_ID}>"
 
 help_embed = Embed(
-    title="SpaceX-Launch-Bot Commands",
+    title="SpaceXLaunchBot Commands",
     description=f"Command prefix: {config.COMMAND_PREFIX}",
     color=falcon_red,
 )

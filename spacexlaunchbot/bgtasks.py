@@ -14,11 +14,10 @@ Get new embed dict
 import logging, asyncio
 
 import config
-from modules import apis, embed_generators
-from modules.redis_client import redis
+import apis, embedcreators
+from redisclient import redis
 
-logger = logging.getLogger(__name__)
-
+log = logging.getLogger(__name__)
 ONE_MINUTE = 60
 
 
@@ -33,7 +32,7 @@ async def notificationTask(client):
 
         if next_launch_dict != -1:
 
-            launch_info_embed = await embed_generators.gen_launch_info_embeds(
+            launch_info_embed = await embedcreators.get_launch_info_embeds(
                 next_launch_dict
             )
             launch_info_embed_dict = launch_info_embed.to_dict()
@@ -42,15 +41,15 @@ async def notificationTask(client):
             subbedChannelIDs = (int(cid) for cid in subbedChannelIDs)
 
             notifTaskStore = await redis.get_notification_task_store()
-            launching_soon_notif_sent = notifTaskStore["launching_soon_notif_sent"]
+            # ? launching_soon_notif_sent = notifTaskStore["launching_soon_notif_sent"]
             latest_launch_info_embed_dict = notifTaskStore[
                 "latest_launch_info_embed_dict"
             ]
 
             if launch_info_embed_dict != latest_launch_info_embed_dict:
-                logger.info("Launch info changed, sending notifications")
+                log.info("Launch info changed, sending notifications")
 
-                launching_soon_notif_sent = "False"
+                # ? launching_soon_notif_sent = "False"
                 latest_launch_info_embed_dict = launch_info_embed_dict
 
                 # New launch found, send all "subscribed" channels the embed

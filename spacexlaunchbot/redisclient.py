@@ -18,21 +18,22 @@ from aredis import StrictRedis
 import logging
 import pickle
 
-from modules.statics import general_error_embed
+from config import REDIS_HOST, REDIS_PORT, REDIS_DB
+from statics import general_error_embed
 
-logger = logging.getLogger(__name__)
 
+class RedisClient(StrictRedis):
+    def __init__(self, host, port, db_num):
+        super().__init__(host=host, port=port, db=db_num)
 
-class redis_client(StrictRedis):
-    def __init__(self, host="127.0.0.1", port=6379, dbNum=0):
-        super().__init__(host=host, port=port, db=dbNum)
-        logger.info(f"Connected to Redis at {host}:{port} on DB {dbNum}")
+        self.log = logging.getLogger(__name__)
+        self.log.info(f"Connected to Redis at {host}:{port} on DB {db_num}")
 
     async def init_defaults(self):
         """If the database is new, create default values for needed keys
         """
         if not await self.exists("slb.notification_task_store"):
-            logger.debug("slb.notification_task_store hash does not exist, creating")
+            self.log.debug("slb.notification_task_store hash does not exist, creating")
             await self.set_notification_task_store("False", general_error_embed)
 
     async def get_notification_task_store(self):
@@ -100,6 +101,5 @@ class redis_client(StrictRedis):
         return await redis.delete(guild_mentions_db_key)
 
 
-# When this is imported for the first time, set up our Redis connection and save to a
-# variable so anything importing this can access it
-redis = redis_client()
+# This is the instance that will be imported and used by all other files
+redis = RedisClient(REDIS_HOST, REDIS_PORT, REDIS_DB)

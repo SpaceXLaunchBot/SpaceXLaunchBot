@@ -1,6 +1,6 @@
 import config
-from modules import apis, embed_generators, statics
-from modules.redis_client import redis
+import apis, embedcreators, statics
+from redisclient import redis
 
 
 async def handleCommand(client, message, is_owner, is_admin):
@@ -12,7 +12,7 @@ async def handleCommand(client, message, is_owner, is_admin):
         if next_launch_dict == -1:
             launch_info_embed = statics.api_error_embed
         else:
-            launch_info_embed = await embed_generators.gen_launch_info_embeds(
+            launch_info_embed = await embedcreators.get_launch_info_embeds(
                 next_launch_dict
             )
         await client.safe_send(message.channel, launch_info_embed)
@@ -68,7 +68,7 @@ async def handleCommand(client, message, is_owner, is_admin):
     # Misc
 
     elif message.content.startswith("info"):
-        info_embed = await embed_generators.getInfoEmbed()
+        info_embed = await embedcreators.get_info_embed()
         await client.safe_send(message.channel, info_embed)
 
     elif message.content.startswith("help"):
@@ -79,7 +79,7 @@ async def handleCommand(client, message, is_owner, is_admin):
     elif is_owner and message.content.startswith("dbgls"):
         # DeBugLaunchingSoon - Send launching soon embed for prev launch
         next_launch_dict = await apis.SpacexApi.get_next_launch_dict(previous=True)
-        lse = await embed_generators.genLaunchingSoonEmbed(next_launch_dict)
+        lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
         await client.safe_send(message.channel, lse)
 
     elif is_owner and message.content.startswith("resetnts"):

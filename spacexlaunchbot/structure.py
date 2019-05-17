@@ -1,15 +1,10 @@
 """General functions and variables used throughout the bot
 """
 
-import sys
-import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from os import path
 from datetime import datetime
 import config
-
-logger = logging.getLogger(__name__)
 
 
 async def utc_from_ts(timestamp):

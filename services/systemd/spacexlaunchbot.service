@@ -1,15 +1,15 @@
 [Unit]
-Description=SpaceX-Launch-Bot Service
+Description=SpaceXLaunchBot Service
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
 
 [Service]
 Environment="slb_discord_token=DISCORD_TOKEN" "slb_dbl_token=DBL_TOKEN"
-User=slb
+User=spacexlaunchbot
 Type=idle
-WorkingDirectory=/opt/SpaceX-Launch-Bot/source
-# -u otherwise journal wont show print() output
+WorkingDirectory=/opt/SpaceXLaunchBot/source
+# -u otherwise journal wont show stdout output
 ExecStart=/usr/bin/python3 -u main.py
 Restart=always
 RestartSec=10
