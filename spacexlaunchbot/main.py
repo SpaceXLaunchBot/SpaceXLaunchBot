@@ -5,8 +5,7 @@ setup_logging()
 import discord, asyncio, logging
 from aredis import RedisError
 
-import config
-import statics, apis, commands
+import config, statics, apis, commands
 from redisclient import redis
 
 

@@ -13,16 +13,17 @@ COMMAND_PREFIX = "!"
 # The interval time, in minutes, between checking the SpaceX API for updates
 API_CHECK_INTERVAL = 1
 
-# How far into the future to look for launches that are happening soon (in minutes)
-# Should be more >1 as the launching soon notification task is run every minute
+# How many minutes to look into the future for an upcoming launch time
+# Must be > API_CHECK_INTERVAL else you risk skipping a launch
 LAUNCHING_SOON_DELTA = 30
 
 # Log settings
+# Save log in current dir if on win
 LOG_PATH = "/var/log/spacexlaunchbot/bot.log" if os.name != "nt" else "bot.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(name)s.%(funcName)s : %(message)s"
 
 # Colours used for different situations
-EMBED_COLOURS = {"error_red": [255, 0, 0], "falcon_red": [238, 15, 70]}
+EMBED_COLOURS = {"error_red": (255, 0, 0), "falcon_red": (238, 15, 70)}
 
 # The title of the "game" that the bot is playing
 BOT_GAME = "with rockets"

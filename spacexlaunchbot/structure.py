@@ -1,9 +1,7 @@
-"""General functions and variables used throughout the bot
-"""
-
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
+
 import config
 
 
@@ -21,7 +19,8 @@ async def utc_from_ts(timestamp):
 
 
 def setup_logging():
-    # Setup logging (direct logging to file, only log INFO level and above)
+    """Setup logging (direct logging to file, only log INFO level and above)
+    """
     logFileHandler = TimedRotatingFileHandler(
         filename=config.LOG_PATH, when="W0", backupCount=10, encoding="UTF-8"
     )

@@ -1,5 +1,4 @@
-import config
-import apis, embedcreators, statics
+import config, apis, embedcreators, statics
 from redisclient import redis
 
 

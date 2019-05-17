@@ -13,8 +13,7 @@ Get new embed dict
 
 import logging, asyncio
 
-import config
-import apis, embedcreators
+import config, apis, embedcreators
 from redisclient import redis
 
 log = logging.getLogger(__name__)

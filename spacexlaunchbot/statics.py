@@ -7,8 +7,8 @@ logo_base_url = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )
 rocket_id_images = {
-    "falcon9": f"{logo_base_url}/falcon9.png",
-    "falconheavy": f"{logo_base_url}/falconHeavy.png",
+    "falcon9": f"{logo_base_url}/falcon_9.png",
+    "falconheavy": f"{logo_base_url}/falcon_heavy.png",
     "falcon1": f"{logo_base_url}/logo.jpg",
 }
 
