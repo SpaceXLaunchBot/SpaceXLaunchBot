@@ -12,6 +12,7 @@ notification_task_store | A Redis hash containing variables that need to persist
                         | runs of the notification background task(s). This includes:
                         | "launching_soon_notif_sent" = "True" OR "False" (str not bool)
                         | "latest_launch_info_embed_dict" = pickled(embed_dict)
+                        | TODO: Find better, shorter names for these 2 vars
 """
 
 from aredis import StrictRedis
