@@ -21,7 +21,7 @@ Precision: {}
 """
 
 
-async def get_launch_info_embeds(next_launch_dict):
+async def get_launch_info_embed(next_launch_dict):
 
     # Having desc set to `None` breaks things
     if next_launch_dict["details"] == None:
@@ -59,7 +59,7 @@ async def get_launch_info_embeds(next_launch_dict):
     )
 
     # Basic embed structure built, copy into small version
-    launch_info_embedSmall = deepcopy(launch_info_embed)
+    launch_info_embed_small = deepcopy(launch_info_embed)
 
     discussion_url = next_launch_dict["links"]["reddit_campaign"]
     if discussion_url != None:
@@ -104,7 +104,7 @@ async def get_launch_info_embeds(next_launch_dict):
         return general_error_embed
     elif len(launch_info_embed) > 2048:
         # If body is too big, send small embed
-        return launch_info_embedSmall
+        return launch_info_embed_small
     return launch_info_embed
 
 

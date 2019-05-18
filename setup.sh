@@ -10,29 +10,29 @@ askyn() {
 }
 
 cat << EndOfMsg
+
 This script will install these dependenies:
-    - The latest version of Redis from apt
-    - The latest version of pip for python3
+ - The latest version of the "redis-server" package from apt
+ - The latest version of pip for python3
 Make sure:
-    - Python 3.6+ exists under the "python3" command
-    - The SLB files exist in /opt/SpaceXLaunchBot
-    - You have a Discord bot token
-    - You have a Discord-bot-list token
+ - Python 3.6+ exists under the "python3" command
+ - The SLB files exist in /opt/SpaceXLaunchBot
+ - You have a Discord bot token
+ - You have a Discord Bot List token
+
 EndOfMsg
 
 askyn "Is this correct?" || exit
 
+cd /opt/SpaceXLaunchBot
+
 echo "Installing apt dependencies"
 sudo apt install python3-distutils redis-server -y
-
-cd /tmp
 
 echo "Installing pip for Python3"
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python3 get-pip.py
 rm get-pip.py
-
-cd /opt/SpaceXLaunchBot
 
 echo "Setting correct owner and permissions for /opt/SpaceXLaunchBot"
 sudo adduser --system --group --no-create-home spacexlaunchbot
@@ -50,6 +50,7 @@ echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
 
 echo "Copying redis config to /etc/redis"
+# Redis looks for a config file here by default
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis
@@ -66,6 +67,6 @@ To start SLB enable and start it using systemd
 EndOfMsg
 
 # To get a copy of dump.rdb:
-# sudo cp /var/lib/redis/dump.rdb ~/
-# sudo chwon USER dump.rdb
+# $ sudo cp /var/lib/redis/dump.rdb ~/
+# $ sudo chwon USER dump.rdb
 # --> Download from server

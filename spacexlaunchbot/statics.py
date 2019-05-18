@@ -16,11 +16,11 @@ rocket_id_images = {
 error_red = Colour.from_rgb(*config.EMBED_COLOURS["error_red"])
 falcon_red = Colour.from_rgb(*config.EMBED_COLOURS["falcon_red"])
 
-owner_mention = f"<@{config.OWNER_ID}>"
+owner_mention = f"<@{config.BOT_OWNER_ID}>"
 
 help_embed = Embed(
     title="SpaceXLaunchBot Commands",
-    description=f"Command prefix: {config.COMMAND_PREFIX}",
+    description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
     color=falcon_red,
 )
 help_embed.add_field(

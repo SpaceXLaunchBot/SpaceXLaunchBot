@@ -15,8 +15,7 @@ notification_task_store | A Redis hash containing variables that need to persist
 """
 
 from aredis import StrictRedis
-import logging
-import pickle
+import logging, pickle
 
 from config import REDIS_HOST, REDIS_PORT, REDIS_DB
 from statics import general_error_embed
@@ -37,64 +36,68 @@ class RedisClient(StrictRedis):
             await self.set_notification_task_store("False", general_error_embed)
 
     async def get_notification_task_store(self):
-        """Gets and decodes variables from notification_task_store
+        """Gets and decodes / deserializes variables from notification_task_store
+        Returns a list with these indexes:
+        0: launching_soon_notif_sent
+        1: latest_launch_info_embed_dict
         """
+        hash_key = "slb.notification_task_store"
+
         launching_soon_notif_sent = await self.hget(
-            "slb.notification_task_store", "launching_soon_notif_sent"
+            hash_key, "launching_soon_notif_sent"
         )
         latest_launch_info_embed_dict = await self.hget(
-            "slb.notification_task_store", "latest_launch_info_embed_dict"
+            hash_key, "latest_launch_info_embed_dict"
         )
-        return {
-            "launching_soon_notif_sent": launching_soon_notif_sent.decode("UTF-8"),
-            "latest_launch_info_embed_dict": pickle.loads(
-                latest_launch_info_embed_dict
-            ),
-        }
+
+        return (
+            launching_soon_notif_sent.decode("UTF-8"),
+            pickle.loads(latest_launch_info_embed_dict),
+        )
 
     async def set_notification_task_store(
         self, launching_soon_notif_sent, latest_launch_info_embed_dict
     ):
         """Update / create the hash for notification_task_store
-        Automatically encodes both arguments
+        Automatically encodes / serializes both arguments
         """
+        hash_key = "slb.notification_task_store"
+
         launching_soon_notif_sent = launching_soon_notif_sent.encode("UTF-8")
         latest_launch_info_embed_dict = pickle.dumps(
             latest_launch_info_embed_dict, protocol=pickle.HIGHEST_PROTOCOL
         )
+
         await self.hset(
-            "slb.notification_task_store",
-            "launching_soon_notif_sent",
-            launching_soon_notif_sent,
+            hash_key, "launching_soon_notif_sent", launching_soon_notif_sent
         )
         await self.hset(
-            "slb.notification_task_store",
-            "latest_launch_info_embed_dict",
-            latest_launch_info_embed_dict,
+            hash_key, "latest_launch_info_embed_dict", latest_launch_info_embed_dict
         )
 
-    async def set_guild_mentions(self, guildID, rolesToMention):
+    async def set_guild_mentions(self, guild_id, to_mention):
         """Set mentions for a guild
-        guildID can be int or str
-        rolesToMention should be an string of roles / tags / etc.
+        guild_id can be int or str
+        to_mention should be an string of roles / tags / etc.
         """
-        guild_mentions_db_key = f"slb.{str(guildID)}"
-        rolesToMention = rolesToMention.encode("UTF-8")
-        await self.set(guild_mentions_db_key, rolesToMention)
+        guild_mentions_db_key = f"slb.{str(guild_id)}"
+        to_mention = to_mention.encode("UTF-8")
+        await self.set(guild_mentions_db_key, to_mention)
 
-    async def get_guild_mentions(self, guildID):
+    async def get_guild_mentions(self, guild_id):
         """Returns a string of mentions for that guild
-        guildID can be int or str
-        returns False if guildID does not have any settings stored
+        guild_id can be int or str
+        returns False if guild_id does not have any settings stored
         """
-        guild_mentions_db_key = f"slb.{str(guildID)}"
+        guild_mentions_db_key = f"slb.{str(guild_id)}"
         if not await self.exists(guild_mentions_db_key):
             return False
-        rolesToMention = await self.get(guild_mentions_db_key)
-        return rolesToMention.decode("UTF-8")
+        to_mention = await self.get(guild_mentions_db_key)
+        return to_mention.decode("UTF-8")
 
     async def delete_guild_mentions(self, guild_id):
         """Deletes all mentions for the given guild_id
+        guild_id can be int or str
         Returns the number of keys that were deleted
         """
         guild_mentions_db_key = f"slb.{str(guild_id)}"

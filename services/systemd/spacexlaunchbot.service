@@ -5,10 +5,10 @@ After=systemd-user-sessions.service
 After=network-online.target
 
 [Service]
-Environment="slb_discord_token=DISCORD_TOKEN" "slb_dbl_token=DBL_TOKEN"
+Environment="slb_api_token_discord=inserttokenhere" "slb_api_token_dbl=inserttokenhere"
 User=spacexlaunchbot
 Type=idle
-WorkingDirectory=/opt/SpaceXLaunchBot/source
+WorkingDirectory=/opt/SpaceXLaunchBot/spacexlaunchbot
 # -u otherwise journal wont show stdout output
 ExecStart=/usr/bin/python3 -u main.py
 Restart=always

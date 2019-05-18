@@ -7,11 +7,11 @@ async def handleCommand(client, message, is_owner, is_admin):
     # Info command
 
     if message.content.startswith("nextlaunch"):
-        next_launch_dict = await apis.SpacexApi.get_next_launch_dict()
+        next_launch_dict = await apis.spacex.get_next_launch_dict()
         if next_launch_dict == -1:
             launch_info_embed = statics.api_error_embed
         else:
-            launch_info_embed = await embedcreators.get_launch_info_embeds(
+            launch_info_embed = await embedcreators.get_launch_info_embed(
                 next_launch_dict
             )
         await client.safe_send(message.channel, launch_info_embed)
@@ -77,7 +77,7 @@ async def handleCommand(client, message, is_owner, is_admin):
 
     elif is_owner and message.content.startswith("dbgls"):
         # DeBugLaunchingSoon - Send launching soon embed for prev launch
-        next_launch_dict = await apis.SpacexApi.get_next_launch_dict(previous=True)
+        next_launch_dict = await apis.spacex.get_next_launch_dict(previous=True)
         lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
         await client.safe_send(message.channel, lse)
 
@@ -91,7 +91,7 @@ async def handleCommand(client, message, is_owner, is_admin):
         log_message = "```\n{}```"
 
         with open(config.LOG_PATH, "r") as f:
-            # Code formatting in message takes up 7 of the 2k allowed chars
-            logContent = f.read()[-(2000 - 7) :]
+            # Code block markdown in log_message takes up 7 of the 2k allowed chars
+            log_content = f.read()[-(2000 - 7) :]
 
-        await client.safe_send(message.channel, log_message.format(logContent))
+        await client.safe_send(message.channel, log_message.format(log_content))

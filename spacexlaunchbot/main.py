@@ -1,12 +1,13 @@
-from structure import setup_logging
-
-setup_logging()
-
 import discord, asyncio, logging
 from aredis import RedisError
 
-import config, statics, apis, commands
+from structure import setup_logging
+
+# Setup logging before creating & importing the redis instance
+setup_logging()
+
 from redisclient import redis
+import config, statics, apis, commands
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -22,7 +23,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         self.log.info("Succesfully connected to Discord API")
 
-        self.dbl = apis.DblApi(self.user.id, config.DBL_TOKEN)
+        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
 
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
         await self.dbl.update_guild_count(len(self.guilds))
@@ -41,7 +42,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_message(self, message):
         if (
-            not message.content.startswith(config.COMMAND_PREFIX)
+            not message.content.startswith(config.BOT_COMMAND_PREFIX)
             or message.author.bot
             or not message.guild
         ):
@@ -51,21 +52,21 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         # Remove the first occurance of the command prefix, it's not needed anymore
-        message.content = message.content.replace(config.COMMAND_PREFIX, "", 1)
+        message.content = message.content.replace(config.BOT_COMMAND_PREFIX, "", 1)
 
         # Commands can be in any case
         message.content = message.content.lower()
 
         # Gather permission related vars
-        userIsOwner = message.author.id == int(config.OWNER_ID)
+        is_owner = message.author.id == int(config.BOT_OWNER_ID)
         try:
-            userIsAdmin = message.author.permissions_in(message.channel).administrator
+            is_admin = message.author.permissions_in(message.channel).administrator
         except AttributeError:
             # AttributeError occurs if user has no roles
-            userIsAdmin = False
+            is_admin = False
 
         try:
-            await commands.handleCommand(self, message, userIsOwner, userIsAdmin)
+            await commands.handleCommand(self, message, is_owner, is_admin)
         except RedisError as e:
             self.log.error(f"RedisError occurred: {type(e).__name__}: {e}")
             await self.safe_send(message.channel, statics.db_error_embed)
@@ -75,7 +76,7 @@ class SpaceXLaunchBotClient(discord.Client):
         supress it so the bot doesen't crash
         On success returns what the channel.send method returns
         On failure, returns:
-            -1 : Message too big (string is >2k chars or len(embed) > 2048)
+            -1 : Message too big (see this methods code for the given size constraints)
             -2 : Nothing to send (to_send is not a string or Embed)
             -3 : Forbidden (No permission to message this channel)
             -4 : HTTPException (API down, Message too big, etc.)
@@ -87,7 +88,7 @@ class SpaceXLaunchBotClient(discord.Client):
                     return -1
                 return await channel.send(to_send)
             elif type(to_send) == discord.Embed:
-                if len(to_send) > 2048:
+                if len(to_send) > 2048 or len(to_send.title) > 256:
                     return -1
                 return await channel.send(embed=to_send)
             else:
@@ -108,4 +109,4 @@ if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(startup())
 
     client = SpaceXLaunchBotClient()
-    client.run(config.DISCORD_TOKEN)
+    client.run(config.API_TOKEN_DISCORD)
