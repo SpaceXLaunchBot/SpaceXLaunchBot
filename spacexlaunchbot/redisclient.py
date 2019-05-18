@@ -7,12 +7,12 @@ Key                     | Value
 subscribed_channels     | A Redis SET of channel IDs that are to be sent notifications
 str(Guild ID)           | A string containing Discord mentions (channels, users, etc.)
 metrics                 | A Redis hash containing these fields:
-                        | "totalCommands" - The total number of commands issued
+                        | "totalCommands" - Total number of commands issued by users
 notification_task_store | A Redis hash containing variables that need to persist between
-                        | runs of the notification background task(s). This includes:
-                        | "launching_soon_notif_sent" = "True" OR "False" (str not bool)
-                        | "latest_launch_info_embed_dict" = pickled(embed_dict)
-                        | TODO: Find better, shorter names for these 2 vars
+                        | runs of bgtasks.notification_task. This includes:
+                        | "ls_notif_sent" = "True" OR "False" (str not bool)
+                        | "li_embed_dict" = pickled(embed_dict)
+                        | See bgtasks.notification_task to see how each var is used
 """
 
 from aredis import StrictRedis
@@ -39,42 +39,27 @@ class RedisClient(StrictRedis):
     async def get_notification_task_store(self):
         """Gets and decodes / deserializes variables from notification_task_store
         Returns a list with these indexes:
-        0: launching_soon_notif_sent
-        1: latest_launch_info_embed_dict
+        0: ls_notif_sent
+        1: li_embed_dict
         """
         hash_key = "slb.notification_task_store"
 
-        launching_soon_notif_sent = await self.hget(
-            hash_key, "launching_soon_notif_sent"
-        )
-        latest_launch_info_embed_dict = await self.hget(
-            hash_key, "latest_launch_info_embed_dict"
-        )
+        ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
+        li_embed_dict = await self.hget(hash_key, "li_embed_dict")
 
-        return (
-            launching_soon_notif_sent.decode("UTF-8"),
-            pickle.loads(latest_launch_info_embed_dict),
-        )
+        return (ls_notif_sent.decode("UTF-8"), pickle.loads(li_embed_dict))
 
-    async def set_notification_task_store(
-        self, launching_soon_notif_sent, latest_launch_info_embed_dict
-    ):
+    async def set_notification_task_store(self, ls_notif_sent, li_embed_dict):
         """Update / create the hash for notification_task_store
         Automatically encodes / serializes both arguments
         """
         hash_key = "slb.notification_task_store"
 
-        launching_soon_notif_sent = launching_soon_notif_sent.encode("UTF-8")
-        latest_launch_info_embed_dict = pickle.dumps(
-            latest_launch_info_embed_dict, protocol=pickle.HIGHEST_PROTOCOL
-        )
+        ls_notif_sent = ls_notif_sent.encode("UTF-8")
+        li_embed_dict = pickle.dumps(li_embed_dict, protocol=pickle.HIGHEST_PROTOCOL)
 
-        await self.hset(
-            hash_key, "launching_soon_notif_sent", launching_soon_notif_sent
-        )
-        await self.hset(
-            hash_key, "latest_launch_info_embed_dict", latest_launch_info_embed_dict
-        )
+        await self.hset(hash_key, "ls_notif_sent", ls_notif_sent)
+        await self.hset(hash_key, "li_embed_dict", li_embed_dict)
 
     async def set_guild_mentions(self, guild_id, to_mention):
         """Set mentions for a guild

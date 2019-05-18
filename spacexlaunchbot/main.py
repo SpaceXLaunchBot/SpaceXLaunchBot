@@ -7,6 +7,7 @@ from structure import setup_logging
 setup_logging()
 
 from redisclient import redis
+from bgtasks import notification_task
 import config, statics, apis, commands
 
 
@@ -18,7 +19,7 @@ class SpaceXLaunchBotClient(discord.Client):
         self.log.info("Client initialised")
 
         # Create asyncio tasks now
-        # self.loop.create_task(func())
+        self.loop.create_task(notification_task(self))
 
     async def on_ready(self):
         self.log.info("Succesfully connected to Discord API")
@@ -68,7 +69,7 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             await commands.handleCommand(self, message, is_owner, is_admin)
         except RedisError as e:
-            self.log.error(f"RedisError occurred: {type(e).__name__}: {e}")
+            self.log.error(f"RedisError occurred: {e}")
             await self.safe_send(message.channel, statics.db_error_embed)
 
     async def safe_send(self, channel, to_send):
