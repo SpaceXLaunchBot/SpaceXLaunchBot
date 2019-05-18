@@ -6,9 +6,10 @@ from structure import setup_logging
 # Setup logging before creating & importing the redis instance
 setup_logging()
 
-from redisclient import redis
 from bgtasks import notification_task
-import config, statics, apis, commands
+import config, statics, commands
+from redisclient import redis
+from apis import dbl
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -24,7 +25,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         self.log.info("Succesfully connected to Discord API")
 
-        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
+        self.dbl = dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
 
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
         await self.dbl.update_guild_count(len(self.guilds))

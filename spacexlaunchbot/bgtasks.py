@@ -2,8 +2,9 @@ import logging, asyncio
 from datetime import datetime, timedelta
 from aredis import RedisError
 
-import config, apis, embedcreators
 from redisclient import redis
+import config, embedcreators
+from apis import spacex
 
 log = logging.getLogger(__name__)
 ONE_MINUTE = 60
@@ -33,7 +34,7 @@ async def _check_and_send_notifs(client):
     """Checks what notification messages need to be sent, and send them
     Also updates Redis values if necesseary
     """
-    next_launch_dict = await apis.spacex.get_next_launch_dict()
+    next_launch_dict = await spacex.get_next_launch_dict()
 
     # If the API is misbehaving, don't do anything, as we risk sending incorrect data
     if next_launch_dict == -1:
