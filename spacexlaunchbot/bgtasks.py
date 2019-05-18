@@ -60,7 +60,7 @@ async def _check_and_send_notifs(client):
         li_embed_dict = new_li_embed_dict
 
         # New launch found, send all "subscribed" channels the embed
-        invalid_channels = _send_all(client, new_li_embed, subbed_channel_ids)
+        invalid_channels = await _send_all(client, new_li_embed, subbed_channel_ids)
         channels_to_remove |= invalid_channels
 
     try:
@@ -82,7 +82,7 @@ async def _check_and_send_notifs(client):
     ):
         log.info("Launch is soon, sending out notifications")
         launching_soon_embed = embedcreators.get_launching_soon_embed(next_launch_dict)
-        invalid_channels = _send_all(
+        invalid_channels = await _send_all(
             client, launching_soon_embed, subbed_channel_ids, True
         )
         channels_to_remove |= invalid_channels
