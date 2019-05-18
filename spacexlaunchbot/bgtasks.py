@@ -89,7 +89,7 @@ async def _check_and_send_notifs(client):
         ls_notif_sent = True
 
     # Save any changed data to redis
-    await redis.setNotificationTaskStore(ls_notif_sent, li_embed_dict)
+    await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
     for channel_id in channels_to_remove:
         log.info(f"{channel_id} is an invalid channel ID, removing")
         await redis.srem("slb.subscribed_channels", str(channel_id).encode("UTF-8"))
