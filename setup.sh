@@ -13,7 +13,7 @@ cat << EndOfMsg
 
 This script will install these dependenies:
  - The latest version of the "redis-server" package from apt
- - The latest version of pip for python3
+ - The latest version of pip for python3 using pypa's get-pip.py
 Make sure:
  - Python 3.6+ exists under the "python3" command
  - The SLB files exist in /opt/SpaceXLaunchBot
@@ -30,7 +30,9 @@ echo "Installing apt dependencies"
 sudo apt install python3-venv redis-server -y
 
 echo "Installing pip"
-# This means venv uses the most recent version of pip
+# pip is not actually required to make the venv, but installing this means that:
+# - There is no confusion between system-wide pip and the pip that's copied to the venv
+# - The default packages (setuptools, wheel) are installed correctly
 curl https://bootstrap.pypa.io/get-pip.py | sudo python3
 
 echo "Setting up slb-venv"
@@ -62,7 +64,8 @@ then sudo nano /etc/systemd/system/spacexlaunchbot.service; fi
 cat << EndOfMsg
 
 Setup finished
-If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again"
+--------------
+If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again
 To start SLB enable and start it using systemd
 
 EndOfMsg
