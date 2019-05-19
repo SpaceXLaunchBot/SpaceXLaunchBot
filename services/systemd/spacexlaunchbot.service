@@ -10,7 +10,7 @@ User=spacexlaunchbot
 Type=idle
 WorkingDirectory=/opt/SpaceXLaunchBot/spacexlaunchbot
 # -u otherwise journal wont show stdout output
-ExecStart=/usr/bin/python3 -u main.py
+ExecStart=/opt/SpaceXLaunchBot/slb-venv/bin/python3 -u main.py
 Restart=always
 RestartSec=10
 StandardOutput=journal

@@ -30,9 +30,14 @@ echo "Installing apt dependencies"
 sudo apt install python3-distutils redis-server -y
 
 echo "Installing pip for Python3"
-wget https://bootstrap.pypa.io/get-pip.py
-sudo python3 get-pip.py
-rm get-pip.py
+curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+
+echo "Installing virtualenv"
+sudo pip3 install virtualenv
+echo "Setting up slb-venv"
+sudo virtualenv slb-venv
+echo "Installing Py3 requirements inside slb-venv"
+sudo slb-venv/bin/pip3 install -r requirements.txt
 
 echo "Setting correct owner and permissions for /opt/SpaceXLaunchBot"
 sudo adduser --system --group --no-create-home spacexlaunchbot
@@ -42,9 +47,6 @@ sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceXLaunchBot
 echo "Setting up /var/log/spacexlaunchbot"
 sudo mkdir /var/log/spacexlaunchbot
 sudo chown spacexlaunchbot:spacexlaunchbot /var/log/spacexlaunchbot
-
-echo "Install Python3 requirements through pip3"
-sudo pip3 install -r requirements.txt
 
 echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
