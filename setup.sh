@@ -11,14 +11,20 @@ askyn() {
 
 cat << EndOfMsg
 
-This script will install these dependenies:
- - The latest version of the "redis-server" package from apt
- - The latest version of pip for python3 using pypa's get-pip.py
+SpaceXLaunchBot Setup
+---------------------
+
+This script will install these dependencies:
+- The latest version of these packages from apt:
+ - python3-venv
+ - redis-server
+- The latest version of pip for python3 using pypa's get-pip.py
+
 Make sure:
- - Python 3.6+ exists under the "python3" command
- - The SLB files exist in /opt/SpaceXLaunchBot
- - You have a Discord bot token
- - You have a Discord Bot List token
+- Python 3.6+ exists under the "python3" command
+- The SLB files exist in /opt/SpaceXLaunchBot
+- You have a Discord bot token
+- You have a Discord Bot List token
 
 EndOfMsg
 
