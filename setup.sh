@@ -27,15 +27,14 @@ askyn "Is this correct?" || exit
 cd /opt/SpaceXLaunchBot
 
 echo "Installing apt dependencies"
-sudo apt install python3-distutils redis-server -y
+sudo apt install python3-venv redis-server -y
 
-echo "Installing pip for Python3"
+echo "Installing pip"
+# This means venv uses the most recent version of pip
 curl https://bootstrap.pypa.io/get-pip.py | sudo python3
 
-echo "Installing virtualenv"
-sudo pip3 install virtualenv
 echo "Setting up slb-venv"
-sudo virtualenv slb-venv
+sudo python3 -m venv slb-venv
 echo "Installing Py3 requirements inside slb-venv"
 sudo slb-venv/bin/pip3 install -r requirements.txt
 
