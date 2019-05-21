@@ -1,0 +1,19 @@
+[Unit]
+Description=SpaceXLaunchBot Service
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Environment="slb_api_token_discord=inserttokenhere" "slb_api_token_dbl=inserttokenhere"
+User=spacexlaunchbot
+Type=idle
+WorkingDirectory=/opt/SpaceXLaunchBot/spacexlaunchbot
+# -u otherwise journal wont show stdout output
+ExecStart=/opt/SpaceXLaunchBot/slb-venv/bin/python3 -u main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
