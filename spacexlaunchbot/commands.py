@@ -7,21 +7,6 @@ from apis import spacex
 
 log = logging.getLogger(__name__)
 
-cmd_prefix = config.BOT_COMMAND_PREFIX
-commands = {
-    f"{cmd_prefix}nextlaunch": _next_launch,
-    f"{cmd_prefix}addchannel": _add_channel,
-    f"{cmd_prefix}removechannel": _remove_channel,
-    f"{cmd_prefix}setmentions": _set_mentions,
-    f"{cmd_prefix}getmentions": _get_mentions,
-    f"{cmd_prefix}removementions": _remove_mentions,
-    f"{cmd_prefix}info": _info,
-    f"{cmd_prefix}help": _help,
-    f"{cmd_prefix}dbgls": _debug_launching_soon,
-    f"{cmd_prefix}resetnts": _reset_notif_task_store,
-    f"{cmd_prefix}logdump": _log_dump,
-}
-
 
 async def _from_owner(message):
     """Returns True/False depending on the sender of the message
@@ -149,6 +134,23 @@ async def _log_dump(client, message):
         log_content = f.read()[-(2000 - 7) :]
 
     await client.safe_send(message.channel, log_message.format(log_content))
+
+
+# Construct after definitions
+cmd_prefix = config.BOT_COMMAND_PREFIX
+commands = {
+    f"{cmd_prefix}nextlaunch": _next_launch,
+    f"{cmd_prefix}addchannel": _add_channel,
+    f"{cmd_prefix}removechannel": _remove_channel,
+    f"{cmd_prefix}setmentions": _set_mentions,
+    f"{cmd_prefix}getmentions": _get_mentions,
+    f"{cmd_prefix}removementions": _remove_mentions,
+    f"{cmd_prefix}info": _info,
+    f"{cmd_prefix}help": _help,
+    f"{cmd_prefix}dbgls": _debug_launching_soon,
+    f"{cmd_prefix}resetnts": _reset_notif_task_store,
+    f"{cmd_prefix}logdump": _log_dump,
+}
 
 
 async def handle_command(client, message):
