@@ -5,9 +5,8 @@ All keys are prepended with "slb."
 Key                     | Value
 ------------------------|---------------------------------------------------------------
 subscribed_channels     | A Redis SET of channel IDs that are to be sent notifications
-str(Guild ID)           | A string containing Discord mentions (channels, users, etc.)
-metrics                 | A Redis hash containing these fields:
-                        | "totalCommands" - Total number of commands issued by users
+str(guild.id)           | A string containing Discord mentions (channels, users, etc.)
+metrics.metric_name     | Currently not used. E.g. slb.metrics.commands_used
 notification_task_store | A Redis hash containing variables that need to persist between
                         | runs of bgtasks.notification_task. This includes:
                         | "ls_notif_sent" = "True" OR "False" (str not bool)

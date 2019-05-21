@@ -47,7 +47,7 @@ class SpaceXLaunchBotClient(discord.Client):
             or message.author.bot
             or not message.guild
         ):
-            # Not a command, ignore it
+            # Not possibly a command (doesen't start with prefix)
             # Don't reply to bots (includes self)
             # Only reply to messages from guilds
             return

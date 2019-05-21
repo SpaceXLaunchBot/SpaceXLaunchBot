@@ -18,10 +18,8 @@ async def _from_admin(message):
     """Returns True/False depending on the sender of the message
     """
     try:
-        # TODO: Check latest docs for this
         is_admin = message.author.permissions_in(message.channel).administrator
     except AttributeError:
-        # AttributeError occurs if user has no roles
         is_admin = False
     return is_admin
 
@@ -162,7 +160,7 @@ async def handle_command(client, message):
 
     try:
         command_function = commands[used_command]
-        command_function(client, message)
+        await command_function(client, message)
     except KeyError as e:
         pass  # Not a command
     except RedisError as e:

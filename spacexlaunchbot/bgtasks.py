@@ -99,7 +99,6 @@ async def notification_task(client):
     """An async task to send out launching soon & launch info notifications
     """
     await client.wait_until_ready()
-    # TODO: Does this log variable work for all functions (distinguishable?)
     log.info("Starting")
     while not client.is_closed():
         try:

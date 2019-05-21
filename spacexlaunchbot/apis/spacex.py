@@ -26,7 +26,6 @@ async def get_next_launch_dict(previous=False):
                 try:
                     next_launch_dict = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
-                    # TODO: Test if this makes sense in actual log file
                     log.error("JSON decode failed")
                     return -1
             else:
