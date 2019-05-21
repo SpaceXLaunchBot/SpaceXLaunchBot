@@ -38,7 +38,7 @@ async def _add_channel(client, message):
         return
     reply = "This channel has been added to the notification service"
     added = await redis.sadd(
-        "slb.subscribed_channels", str(message.channel.id).encode("UTF-8")
+        "slb:subscribed_channels", str(message.channel.id).encode("UTF-8")
     )
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
@@ -50,7 +50,7 @@ async def _remove_channel(client, message):
         return
     reply = "This channel has been removed from the launch notification service"
     removed = await redis.srem(
-        "slb.subscribed_channels", str(message.channel.id).encode("UTF-8")
+        "slb:subscribed_channels", str(message.channel.id).encode("UTF-8")
     )
     if removed == 0:
         reply = "This channel was not previously subscribed to the launch notification service"

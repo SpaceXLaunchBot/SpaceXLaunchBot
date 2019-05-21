@@ -70,7 +70,7 @@ echo "Copying over systemd file(s)"
 sudo cp -R -p services/systemd/. /etc/systemd/system
 
 echo "Copying redis config to /etc/redis"
-# Redis looks for a config file here by default
+# The apt installed version of redis-server looks for a config file here by default
 sudo cp -R services/redis/. /etc/redis
 echo "Restarting Redis"
 sudo systemctl restart redis

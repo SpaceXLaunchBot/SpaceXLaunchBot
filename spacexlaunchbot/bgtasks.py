@@ -43,7 +43,7 @@ async def _check_and_send_notifs(client):
     # At the end of this method, remove all channels that we can't access anymore
     channels_to_remove = set()
 
-    subbed_channel_ids = await redis.smembers("slb.subscribed_channels")
+    subbed_channel_ids = await redis.smembers("slb:subscribed_channels")
     subbed_channel_ids = tuple(int(cid) for cid in subbed_channel_ids)
 
     # Names shortened to save space, ls = launching soon, li = launch information
@@ -92,7 +92,7 @@ async def _check_and_send_notifs(client):
     await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
     for channel_id in channels_to_remove:
         log.info(f"{channel_id} is an invalid channel ID, removing")
-        await redis.srem("slb.subscribed_channels", str(channel_id).encode("UTF-8"))
+        await redis.srem("slb:subscribed_channels", str(channel_id).encode("UTF-8"))
 
 
 async def notification_task(client):

@@ -1,17 +1,19 @@
-"""Redis structure
----------------
-All keys are prepended with "slb."
+"""Redis Structure
+All keys are prepended with "slb:"
+Variables in the keys described below are enclosed in (brackets)
+TODO: Find a better way to document the server structure?
 
-Key                     | Value
-------------------------|---------------------------------------------------------------
-subscribed_channels     | A Redis SET of channel IDs that are to be sent notifications
-str(guild.id)           | A string containing Discord mentions (channels, users, etc.)
-metrics.metric_name     | Currently not used. E.g. slb.metrics.commands_used
-notification_task_store | A Redis hash containing variables that need to persist between
-                        | runs of bgtasks.notification_task. This includes:
-                        | "ls_notif_sent" = "True" OR "False" (str not bool)
-                        | "li_embed_dict" = pickled(embed_dict)
-                        | See bgtasks.notification_task to see how each var is used
+Key                       | Value
+--------------------------|-------------------------------------------------------------
+subscribed_channels       | A Redis SET of channel IDs that are to be sent notifications
+guild:(guild_id)          | A hash containing options for that guild. This includes:
+                          | "mentions": String of channels, users, etc. to ping for a launch
+metric:(metric_name)      | Currently not used. Example use: slb:metric:commands_used
+notification_task_store   | A Redis hash containing variables that need to persist
+                          | between runs of the notification task. This includes:
+                          | "ls_notif_sent": "True" OR "False" (str not bool)
+                          | "li_embed_dict": pickled(embed_dict)
+                          | See bgtasks.notification_task to see how each var is used
 """
 
 from aredis import StrictRedis
@@ -31,8 +33,8 @@ class RedisClient(StrictRedis):
     async def init_defaults(self):
         """If the database is new, create default values for needed keys
         """
-        if not await self.exists("slb.notification_task_store"):
-            self.log.info("slb.notification_task_store hash does not exist, creating")
+        if not await self.exists("slb:notification_task_store"):
+            self.log.info("slb:notification_task_store does not exist, creating")
             await self.set_notification_task_store("False", general_error_embed)
 
     async def get_notification_task_store(self):
@@ -41,7 +43,7 @@ class RedisClient(StrictRedis):
         0: ls_notif_sent
         1: li_embed_dict
         """
-        hash_key = "slb.notification_task_store"
+        hash_key = "slb:notification_task_store"
 
         ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
         li_embed_dict = await self.hget(hash_key, "li_embed_dict")
@@ -52,7 +54,7 @@ class RedisClient(StrictRedis):
         """Update / create the hash for notification_task_store
         Automatically encodes / serializes both arguments
         """
-        hash_key = "slb.notification_task_store"
+        hash_key = "slb:notification_task_store"
 
         ls_notif_sent = ls_notif_sent.encode("UTF-8")
         li_embed_dict = pickle.dumps(li_embed_dict, protocol=pickle.HIGHEST_PROTOCOL)
@@ -65,19 +67,18 @@ class RedisClient(StrictRedis):
         guild_id can be int or str
         to_mention should be an string of roles / tags / etc.
         """
-        guild_mentions_db_key = f"slb.{str(guild_id)}"
+        guild_key = f"slb:guild:{str(guild_id)}"
         to_mention = to_mention.encode("UTF-8")
-        await self.set(guild_mentions_db_key, to_mention)
+        await self.hset(guild_key, "mentions", to_mention)
 
     async def get_guild_mentions(self, guild_id):
         """Returns a string of mentions for that guild
         guild_id can be int or str
         returns False if guild_id does not have any settings stored
         """
-        guild_mentions_db_key = f"slb.{str(guild_id)}"
-        if not await self.exists(guild_mentions_db_key):
-            return False
-        to_mention = await self.get(guild_mentions_db_key)
+        guild_key = f"slb:guild:{str(guild_id)}"
+        to_mention = await self.hget(guild_key, "mentions")
+        # TODO: What happens if the hash doesen't exist? (test delete method as well)
         return to_mention.decode("UTF-8")
 
     async def delete_guild_mentions(self, guild_id):
@@ -85,8 +86,8 @@ class RedisClient(StrictRedis):
         guild_id can be int or str
         Returns the number of keys that were deleted
         """
-        guild_mentions_db_key = f"slb.{str(guild_id)}"
-        return await redis.delete(guild_mentions_db_key)
+        guild_key = f"slb:guild:{str(guild_id)}"
+        return await redis.hdel(guild_key, "mentions")
 
 
 # This is the instance that will be imported and used by all other files
