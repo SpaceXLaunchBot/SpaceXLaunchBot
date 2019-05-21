@@ -83,10 +83,10 @@ async def _check_and_send_notifs(client):
         log.info("Launch is soon, sending out notifications")
         launching_soon_embed = embedcreators.get_launching_soon_embed(next_launch_dict)
         invalid_channels = await _send_all(
-            client, launching_soon_embed, subbed_channel_ids, True
+            client, launching_soon_embed, subbed_channel_ids, send_mentions=True
         )
         channels_to_remove |= invalid_channels
-        ls_notif_sent = True
+        ls_notif_sent = "True"
 
     # Save any changed data to redis
     await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
@@ -99,11 +99,12 @@ async def notification_task(client):
     """An async task to send out launching soon & launch info notifications
     """
     await client.wait_until_ready()
+    # TODO: Does this log variable work for all functions (distinguishable?)
+    log.info("Starting")
     while not client.is_closed():
         try:
             await _check_and_send_notifs(client)
         except RedisError as e:
-            # TODO: Does this log variable work for both functions (distinguishable?)
             log.error(f"RedisError occurred: {e}")
 
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)

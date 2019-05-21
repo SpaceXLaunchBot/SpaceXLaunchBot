@@ -9,6 +9,11 @@ askyn() {
     done
 }
 
+# https://stackoverflow.com/a/34143401/6396652
+exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
 cat << EndOfMsg
 
 SpaceXLaunchBot Setup
@@ -18,7 +23,7 @@ This script will install these dependencies:
 - The latest version of these packages from apt:
  - python3-venv
  - redis-server
-- The latest version of pip for python3 using pypa's get-pip.py
+- If pip3 is not installed, the latest version of pip for Py3 using pypa's get-pip.py
 
 Make sure:
 - Python 3.6+ exists under the "python3" command
@@ -35,11 +40,13 @@ cd /opt/SpaceXLaunchBot
 echo "Installing apt dependencies"
 sudo apt install python3-venv redis-server -y
 
-echo "Installing pip"
 # pip is not actually required to make the venv, but installing this means that:
 # - There is no confusion between system-wide pip and the pip that's copied to the venv
 # - The default packages (setuptools, wheel) are installed correctly
-curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+if ! exists pip3; then
+    echo "Installing pip"
+    curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+fi
 
 echo "Setting up slb-venv"
 sudo python3 -m venv slb-venv
@@ -49,6 +56,10 @@ sudo slb-venv/bin/pip3 install -r requirements.txt
 echo "Setting correct owner and permissions for /opt/SpaceXLaunchBot"
 sudo adduser --system --group --no-create-home spacexlaunchbot
 sudo chown -R spacexlaunchbot:spacexlaunchbot /opt/SpaceXLaunchBot
+# Permissions Explanation
+# Capital X --> https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
+# Give owner of the file (spacexlaunchbot) the ability to r, w, and X all files
+# Allow everyone else to r and X, don't allow anyone else to w
 sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceXLaunchBot
 
 echo "Setting up /var/log/spacexlaunchbot"
@@ -69,10 +80,10 @@ then sudo nano /etc/systemd/system/spacexlaunchbot.service; fi
 
 cat << EndOfMsg
 
-Setup finished
+Setup Finished
 --------------
 If you have a dump.rdb, stop redis, move it to /var/lib/redis and then start it again
-To start SLB enable and start it using systemd
+To start SLB enable and start it using systemctl
 
 EndOfMsg
 

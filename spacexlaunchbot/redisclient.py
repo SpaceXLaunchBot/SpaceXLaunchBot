@@ -33,12 +33,12 @@ class RedisClient(StrictRedis):
         """If the database is new, create default values for needed keys
         """
         if not await self.exists("slb.notification_task_store"):
-            self.log.debug("slb.notification_task_store hash does not exist, creating")
+            self.log.info("slb.notification_task_store hash does not exist, creating")
             await self.set_notification_task_store("False", general_error_embed)
 
     async def get_notification_task_store(self):
         """Gets and decodes / deserializes variables from notification_task_store
-        Returns a list with these indexes:
+        Returns a tuple with these indexes:
         0: ls_notif_sent
         1: li_embed_dict
         """

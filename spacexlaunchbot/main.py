@@ -1,5 +1,4 @@
 import discord, asyncio, logging
-from aredis import RedisError
 
 from structure import setup_logging
 
@@ -52,37 +51,18 @@ class SpaceXLaunchBotClient(discord.Client):
             # Don't reply to bots (includes self)
             # Only reply to messages from guilds
             return
-
-        # Remove the first occurance of the command prefix, it's not needed anymore
-        message.content = message.content.replace(config.BOT_COMMAND_PREFIX, "", 1)
-
-        # Commands can be in any case
-        message.content = message.content.lower()
-
-        # Gather permission related vars
-        is_owner = message.author.id == int(config.BOT_OWNER_ID)
-        try:
-            is_admin = message.author.permissions_in(message.channel).administrator
-        except AttributeError:
-            # AttributeError occurs if user has no roles
-            is_admin = False
-
-        try:
-            await commands.handleCommand(self, message, is_owner, is_admin)
-        except RedisError as e:
-            self.log.error(f"RedisError occurred: {e}")
-            await self.safe_send(message.channel, statics.db_error_embed)
+        await commands.handle_command(self, message)
 
     async def safe_send(self, channel, to_send):
-        """Send a text / embed message to a user, and if an error occurs, safely
-        supress it so the bot doesen't crash
+        """Sends a text / embed message to a channel
+        If an error occurs, safely supress it so the bot doesen't crash
         On success returns what the channel.send method returns
         On failure, returns:
-            -1 : Message too big (see this methods code for the given size constraints)
+            -1 : Message / embed too big
             -2 : Nothing to send (to_send is not a string or Embed)
             -3 : Forbidden (No permission to message this channel)
-            -4 : HTTPException (API down, Message too big, etc.)
-            -5 : InvalidArgument (Invalid channel ID / cannot "see" that channel)
+            -4 : HTTPException (API down, network issues, etc.)
+            -5 : InvalidArgument (Invalid channel --> cannot "see" that channel)
         """
         try:
             if type(to_send) == str:
