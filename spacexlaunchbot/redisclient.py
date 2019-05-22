@@ -16,26 +16,21 @@ notification_task_store   | A Redis hash containing variables that need to persi
                           | See bgtasks.notification_task to see how each var is used
 """
 
-from aredis import StrictRedis
-import logging, pickle
-
-from config import REDIS_HOST, REDIS_PORT, REDIS_DB
-from statics import general_error_embed
+import logging, pickle, aredis
+import statics, config
 
 
-class RedisClient(StrictRedis):
+class RedisClient(aredis.StrictRedis):
     def __init__(self, host, port, db_num):
         super().__init__(host=host, port=port, db=db_num)
-
-        self.log = logging.getLogger(__name__)
-        self.log.info(f"Connected to Redis at {host}:{port} on DB {db_num}")
+        logging.info(f"Connected to Redis at {host}:{port} on DB {db_num}")
 
     async def init_defaults(self):
         """If the database is new, create default values for needed keys
         """
         if not await self.exists("slb:notification_task_store"):
-            self.log.info("slb:notification_task_store does not exist, creating")
-            await self.set_notification_task_store("False", general_error_embed)
+            logging.info("slb:notification_task_store does not exist, creating")
+            await self.set_notification_task_store("False", statics.general_error_embed)
 
     async def get_notification_task_store(self):
         """Gets and decodes / deserializes variables from notification_task_store
@@ -91,4 +86,4 @@ class RedisClient(StrictRedis):
 
 
 # This is the instance that will be imported and used by all other files
-redis = RedisClient(REDIS_HOST, REDIS_PORT, REDIS_DB)
+redis = RedisClient(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)

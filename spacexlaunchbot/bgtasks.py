@@ -1,14 +1,9 @@
-import logging, asyncio
-from datetime import datetime, timedelta
-from aredis import RedisError
-
+import logging, asyncio, datetime, aredis
+import config, embedcreators, apis
 from redisclient import redis
-import config, embedcreators
-from apis import spacex
 
-log = logging.getLogger(__name__)
 ONE_MINUTE = 60
-LAUNCHING_SOON_DELTA = timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
+LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
 async def _send_all(client, to_send, channel_ids, send_mentions=False):
@@ -34,7 +29,7 @@ async def _check_and_send_notifs(client):
     """Checks what notification messages need to be sent, and send them
     Also updates Redis values if necesseary
     """
-    next_launch_dict = await spacex.get_next_launch_dict()
+    next_launch_dict = await apis.spacex.get_next_launch_dict()
 
     # If the API is misbehaving, don't do anything, as we risk sending incorrect data
     if next_launch_dict == -1:
@@ -54,7 +49,7 @@ async def _check_and_send_notifs(client):
 
     # Send out a launch information embed if it has changed from the previous one
     if new_li_embed_dict != li_embed_dict:
-        log.info("Launch info changed, sending notifications")
+        logging.info("Launch info changed, sending notifications")
 
         ls_notif_sent = "False"
         li_embed_dict = new_li_embed_dict
@@ -69,7 +64,7 @@ async def _check_and_send_notifs(client):
         # Doesen't have a date, don't trigger notifications
         launch_timestamp = 0
 
-    current_time = datetime.utcnow()
+    current_time = datetime.datetime.utcnow()
     curr_time_plus_delta = (current_time + LAUNCHING_SOON_DELTA).timestamp()
 
     # Send out a launching soon notification if these criteria are met:
@@ -80,7 +75,7 @@ async def _check_and_send_notifs(client):
         and launch_timestamp >= current_time.timestamp()
         and ls_notif_sent == "False"
     ):
-        log.info("Launch is soon, sending out notifications")
+        logging.info("Launch is soon, sending out notifications")
         launching_soon_embed = embedcreators.get_launching_soon_embed(next_launch_dict)
         invalid_channels = await _send_all(
             client, launching_soon_embed, subbed_channel_ids, send_mentions=True
@@ -91,7 +86,7 @@ async def _check_and_send_notifs(client):
     # Save any changed data to redis
     await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
     for channel_id in channels_to_remove:
-        log.info(f"{channel_id} is an invalid channel ID, removing")
+        logging.info(f"{channel_id} is an invalid channel ID, removing")
         await redis.srem("slb:subscribed_channels", str(channel_id).encode("UTF-8"))
 
 
@@ -99,11 +94,11 @@ async def notification_task(client):
     """An async task to send out launching soon & launch info notifications
     """
     await client.wait_until_ready()
-    log.info("Starting")
+    logging.info("Starting")
     while not client.is_closed():
         try:
             await _check_and_send_notifs(client)
-        except RedisError as e:
-            log.error(f"RedisError occurred: {e}")
+        except aredis.RedisError as e:
+            logging.error(f"RedisError occurred: {e}")
 
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)

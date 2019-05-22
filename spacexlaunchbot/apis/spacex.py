@@ -4,8 +4,6 @@ As of 13/01/19, API ratelimit is 50 req/sec per IP
 
 import aiohttp, logging
 
-log = logging.getLogger(__name__)
-
 
 async def get_next_launch_dict(previous=False):
     """Using aiohttp, get the latest launch info
@@ -26,9 +24,9 @@ async def get_next_launch_dict(previous=False):
                 try:
                     next_launch_dict = await response.json()
                 except aiohttp.client_exceptions.ContentTypeError:
-                    log.error("JSON decode failed")
+                    logging.error("JSON decode failed")
                     return -1
             else:
-                log.error(f"Response status: {response.status}")
+                logging.error(f"Response status: {response.status}")
                 return -1
             return next_launch_dict

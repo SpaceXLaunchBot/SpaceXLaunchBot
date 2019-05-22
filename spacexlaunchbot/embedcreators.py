@@ -1,6 +1,4 @@
-from copy import deepcopy
-from discord import Embed
-
+import copy, discord
 from structure import utc_from_ts
 from statics import falcon_red, rocket_id_images, general_error_embed, owner_mention
 
@@ -27,7 +25,7 @@ async def get_launch_info_embed(next_launch_dict):
     if next_launch_dict["details"] == None:
         next_launch_dict["details"] = ""
 
-    launch_info_embed = Embed(
+    launch_info_embed = discord.Embed(
         color=falcon_red,
         description=next_launch_dict["details"],
         title="Launch #{} - {}".format(
@@ -59,7 +57,7 @@ async def get_launch_info_embed(next_launch_dict):
     )
 
     # Basic embed structure built, copy into small version
-    launch_info_embed_small = deepcopy(launch_info_embed)
+    launch_info_embed_small = copy.deepcopy(launch_info_embed)
 
     discussion_url = next_launch_dict["links"]["reddit_campaign"]
     if discussion_url != None:
@@ -111,7 +109,7 @@ async def get_launch_info_embed(next_launch_dict):
 async def get_launching_soon_embed(next_launch_dict):
     embed_desc = ""
 
-    notif_embed = Embed(
+    notif_embed = discord.Embed(
         color=falcon_red,
         title="{} is launching soon!".format(next_launch_dict["mission_name"]),
     )
@@ -123,7 +121,7 @@ async def get_launching_soon_embed(next_launch_dict):
             url=rocket_id_images[next_launch_dict["rocket"]["rocket_id"]]
         )
 
-    # Embed links [using](markdown)
+    # discord.Embed links [using](markdown)
     if next_launch_dict["links"]["video_link"] != None:
         embed_desc += f"[Livestream]({next_launch_dict['links']['video_link']})\n"
     if next_launch_dict["links"]["reddit_launch"] != None:
@@ -151,7 +149,7 @@ async def get_info_embed():
     - API latency?
     - Let user know about !help
     """
-    info_embed = Embed(
+    info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",
         color=falcon_red,
         description="A Discord bot for getting news, information, and notifications about upcoming SpaceX launches",

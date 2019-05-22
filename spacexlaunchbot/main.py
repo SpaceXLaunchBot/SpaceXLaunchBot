@@ -1,45 +1,39 @@
 import discord, asyncio, logging
-
-from structure import setup_logging
+import config, statics, commands, bgtasks, apis, structure
 
 # Setup logging before creating & importing the redis instance
-setup_logging()
+structure.setup_logging()
 
-from bgtasks import notification_task
-import config, statics, commands
 from redisclient import redis
-from apis import dbl
 
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.log = logging.getLogger(__name__)
-        self.log.info("Client initialised")
+        logging.info("Client initialised")
 
         # Create asyncio tasks now
-        self.loop.create_task(notification_task(self))
+        self.loop.create_task(bgtasks.notification_task(self))
 
     async def on_ready(self):
-        self.log.info("Succesfully connected to Discord API")
+        logging.info("Succesfully connected to Discord API")
 
-        self.dbl = dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
+        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
 
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
         await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_join(self, guild):
-        self.log.info(f"Joined guild, ID: {guild.id}")
+        logging.info(f"Joined guild, ID: {guild.id}")
         await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_remove(self, guild):
-        self.log.info(f"Removed from guild, ID: {guild.id}")
+        logging.info(f"Removed from guild, ID: {guild.id}")
         await self.dbl.update_guild_count(len(self.guilds))
 
         deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
-            self.log.info(f"Removed guild settings for {guild.id}")
+            logging.info(f"Removed guild settings for {guild.id}")
 
     async def on_message(self, message):
         if (

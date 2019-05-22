@@ -1,11 +1,6 @@
-from aredis import RedisError
-import logging
-
-import config, embedcreators, statics
+import logging, aredis
+import config, embedcreators, statics, apis
 from redisclient import redis
-from apis import spacex
-
-log = logging.getLogger(__name__)
 
 
 async def _from_owner(message):
@@ -25,7 +20,7 @@ async def _from_admin(message):
 
 
 async def _next_launch(client, message):
-    next_launch_dict = await spacex.get_next_launch_dict()
+    next_launch_dict = await apis.spacex.get_next_launch_dict()
     if next_launch_dict == -1:
         launch_info_embed = statics.api_error_embed
     else:
@@ -106,7 +101,7 @@ async def _debug_launching_soon(client, message):
     """
     if not _from_owner(message):
         return
-    next_launch_dict = await spacex.get_next_launch_dict(previous=True)
+    next_launch_dict = await apis.spacex.get_next_launch_dict(previous=True)
     lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
     await client.safe_send(message.channel, lse)
 
@@ -163,6 +158,6 @@ async def handle_command(client, message):
         await command_function(client, message)
     except KeyError as e:
         pass  # Not a command
-    except RedisError as e:
-        log.error(f"RedisError occurred: {e}")
+    except aredis.RedisError as e:
+        logging.error(f"RedisError occurred: {e}")
         await client.safe_send(message.channel, statics.db_error_embed)

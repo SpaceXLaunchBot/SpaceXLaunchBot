@@ -1,11 +1,11 @@
-import os
+import os, logging
 
 
 # API TOKENS
 
 # Load from environment variables
-API_TOKEN_DISCORD = os.environ["slb_api_token_discord"]
-API_TOKEN_DBL = os.environ["slb_api_token_dbl"]
+API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
+API_TOKEN_DBL = os.environ["SLB_API_TOKEN_DBL"]
 
 
 # BOT SETTINGS
@@ -36,7 +36,7 @@ NOTIF_TASK_LAUNCH_DELTA = 30
 # Save log in current dir if on win
 LOG_PATH = "/var/log/spacexlaunchbot/bot.log" if os.name != "nt" else "bot.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(name)s.%(funcName)s : %(message)s"
-
+LOG_LEVEL = logging.INFO
 
 # EMBED SETTINGS
 
