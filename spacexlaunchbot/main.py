@@ -1,9 +1,10 @@
-import discord, asyncio, logging
-import config, statics, commands, bgtasks, apis, structure
+import structure
 
-# Setup logging before creating & importing the redis instance
+# See comment inside of setup_logging as to why this must be run here
 structure.setup_logging()
 
+import discord, asyncio, logging
+import config, statics, commands, bgtasks, apis, structure
 from redisclient import redis
 
 
