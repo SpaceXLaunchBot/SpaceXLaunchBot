@@ -49,3 +49,9 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 - A **launching soon message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
 
 ![launch_soon](images/screenshots/launch_soon.png)
+
+## New Features
+
+I am currently using a Trello board to keep track of new feautures, todos, etc.
+
+You can see it [here](https://trello.com/b/5zLV8wR3/spacexlaunchbot)

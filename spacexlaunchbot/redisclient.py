@@ -1,7 +1,6 @@
 """Redis Structure
 All keys are prepended with "slb:"
 Variables in the keys described below are enclosed in (brackets)
-TODO: Find a better way to document the server structure?
 
 Key                       | Value
 --------------------------|-------------------------------------------------------------

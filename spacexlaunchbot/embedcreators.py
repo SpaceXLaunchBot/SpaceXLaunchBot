@@ -68,7 +68,6 @@ async def get_launch_info_embed(next_launch_dict):
     )
 
     if next_launch_dict["rocket"]["rocket_id"] == "falcon9":
-        # TODO: Allow "Core Info" section for FH
         # Falcon 9 always has 1 core, FH (or others) will be different
         launch_info_embed.add_field(
             name="Core info",

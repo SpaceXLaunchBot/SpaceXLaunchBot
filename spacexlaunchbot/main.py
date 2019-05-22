@@ -1,6 +1,5 @@
 import structure
 
-# See comment inside of setup_logging as to why this must be run here
 structure.setup_logging()
 
 import discord, asyncio, logging
@@ -53,11 +52,11 @@ class SpaceXLaunchBotClient(discord.Client):
         If an error occurs, safely supress it so the bot doesen't crash
         On success returns what the channel.send method returns
         On failure, returns:
-            -1 : Message / embed too big
-            -2 : Nothing to send (to_send is not a string or Embed)
-            -3 : Forbidden (No permission to message this channel)
-            -4 : HTTPException (API down, network issues, etc.)
-            -5 : InvalidArgument (Invalid channel --> cannot "see" that channel)
+         -1 : Message / embed too big
+         -2 : Nothing to send (to_send is not a string or Embed)
+         -3 : Forbidden (No permission to message this channel)
+         -4 : HTTPException (API down, network issues, etc.)
+         -5 : InvalidArgument (Invalid channel --> cannot "see" that channel)
         """
         try:
             if type(to_send) == str:
