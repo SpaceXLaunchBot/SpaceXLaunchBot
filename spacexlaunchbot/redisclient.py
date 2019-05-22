@@ -73,7 +73,8 @@ class RedisClient(aredis.StrictRedis):
         """
         guild_key = f"slb:guild:{str(guild_id)}"
         to_mention = await self.hget(guild_key, "mentions")
-        # TODO: What happens if the hash doesen't exist? (test delete method as well)
+        if not to_mention:
+            return False
         return to_mention.decode("UTF-8")
 
     async def delete_guild_mentions(self, guild_id):

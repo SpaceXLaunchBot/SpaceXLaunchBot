@@ -3,13 +3,13 @@ import config, embedcreators, statics, apis
 from redisclient import redis
 
 
-async def _from_owner(message):
+def _from_owner(message):
     """Returns True/False depending on the sender of the message
     """
     return message.author.id == int(config.BOT_OWNER_ID)
 
 
-async def _from_admin(message):
+def _from_admin(message):
     """Returns True/False depending on the sender of the message
     """
     try:
