@@ -97,23 +97,44 @@ async def _help(client, message):
 
 
 async def _debug_launching_soon(client, message):
-    """Send launching soon embed for prev launch
+    """Send launching soon embed for the given launch
+    prefix + dbgls number
     """
     if not _from_owner(message):
         return
 
     try:
-        launch_number = int(message.content.split(" ")[1:])
+        launch_number = "".join(message.content.split(" ")[1:])
+        launch_number = int(launch_number)
     except ValueError:
-        return await client.safe_send(message.channel, "Incorrect launch number")
+        return await client.safe_send(message.channel, "Invalid launch number")
 
     next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
     lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
     await client.safe_send(message.channel, lse)
 
 
+async def _debug_launch_information(client, message):
+    """Send launch information embed for the given launch
+    prefix + dbgli number
+    """
+    if not _from_owner(message):
+        return
+
+    try:
+        launch_number = "".join(message.content.split(" ")[1:])
+        launch_number = int(launch_number)
+    except ValueError:
+        return await client.safe_send(message.channel, "Invalid launch number")
+
+    next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
+    lie = await embedcreators.get_launch_info_embed(next_launch_dict)
+    await client.safe_send(message.channel, lie)
+
+
 async def _reset_notif_task_store(client, message):
     """Reset notification_task_store to default values (triggers notifications)
+    prefix + resetnts
     """
     if not _from_owner(message):
         return
@@ -123,6 +144,7 @@ async def _reset_notif_task_store(client, message):
 
 async def _log_dump(client, message):
     """Reply with latest lines from bot.log
+    prefix + logdump
     """
     if not _from_owner(message):
         return
@@ -147,6 +169,7 @@ commands = {
     f"{cmd_prefix}info": _info,
     f"{cmd_prefix}help": _help,
     f"{cmd_prefix}dbgls": _debug_launching_soon,
+    f"{cmd_prefix}dbgli": _debug_launch_information,
     f"{cmd_prefix}resetnts": _reset_notif_task_store,
     f"{cmd_prefix}logdump": _log_dump,
 }
