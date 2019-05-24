@@ -82,7 +82,12 @@ class RedisClient(aredis.StrictRedis):
         Returns the number of keys that were deleted
         """
         guild_key = f"slb:guild:{str(guild_id)}"
-        return await redis.hdel(guild_key, "mentions")
+        return await self.hdel(guild_key, "mentions")
+
+    async def subbed_channels_count(self):
+        """Small helper function, returns the number of subscribed channels
+        """
+        return await self.scard("slb:subscribed_channels")
 
 
 # This is the instance that will be imported and used by all other files

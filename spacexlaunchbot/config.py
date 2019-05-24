@@ -20,6 +20,13 @@ BOT_COMMAND_PREFIX = "!"
 BOT_GAME = "with rockets"
 
 
+# BOT INFO
+
+BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
+
+BOT_INVITE = "https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456"
+
+
 # NOTIFICATION TASK SETTINGS
 
 # The interval time, in minutes, between checking the SpaceX API for updates

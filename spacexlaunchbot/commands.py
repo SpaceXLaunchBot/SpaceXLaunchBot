@@ -88,7 +88,7 @@ async def _remove_mentions(client, message):
 
 
 async def _info(client, message):
-    info_embed = await embedcreators.get_info_embed()
+    info_embed = await embedcreators.get_info_embed(client)
     await client.safe_send(message.channel, info_embed)
 
 
