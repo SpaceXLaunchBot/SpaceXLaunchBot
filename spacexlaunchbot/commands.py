@@ -101,7 +101,13 @@ async def _debug_launching_soon(client, message):
     """
     if not _from_owner(message):
         return
-    next_launch_dict = await apis.spacex.get_next_launch_dict(previous=True)
+
+    try:
+        launch_number = int(message.content.split(" ")[1:])
+    except ValueError:
+        return await client.safe_send(message.channel, "Incorrect launch number")
+
+    next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
     lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
     await client.safe_send(message.channel, lse)
 

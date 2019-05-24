@@ -82,6 +82,20 @@ async def get_launch_info_embed(next_launch_dict):
             ),
         )
 
+    elif next_launch_dict["rocket"]["rocket_id"] == "falconheavy":
+        for core_num in next_launch_dict["rocket"]["first_stage"]["cores"]:
+            core_dict = next_launch_dict["rocket"]["first_stage"]["cores"][core_num]
+            launch_info_embed.add_field(
+                name=f"Core {core_num} info",
+                value=core_info.format(
+                    core_dict["core_serial"],
+                    core_dict["flight"],
+                    core_dict["landing_intent"],
+                    core_dict["landing_type"],
+                    core_dict["landing_vehicle"],
+                ),
+            )
+
     # Add a field for each payload, with basic information
     for payload in next_launch_dict["rocket"]["second_stage"]["payloads"]:
         launch_info_embed.add_field(

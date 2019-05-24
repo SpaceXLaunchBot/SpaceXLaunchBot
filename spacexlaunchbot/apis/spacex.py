@@ -5,14 +5,14 @@ As of 13/01/19, API ratelimit is 50 req/sec per IP
 import aiohttp, logging
 
 
-async def get_next_launch_dict(previous=False):
+async def get_next_launch_dict(launch_number=False):
     """Using aiohttp, get the latest launch info
     If previous=True, use data from previous launch (for debugging)
     Returns -1 on failure
     """
 
-    if previous:
-        route = "latest"
+    if launch_number:
+        route = launch_number
     else:
         route = "next"
 
