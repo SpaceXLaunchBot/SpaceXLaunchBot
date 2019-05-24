@@ -4,7 +4,8 @@ import config
 
 async def utc_from_ts(timestamp):
     """Get a UTC string from a unix timestamp
-    If timestamp is not an int, returns "To Be Announced"
+    Specifically, for getting the launch time, so if timestamp is not an int, returns
+    "To Be Announced"
     """
     try:
         formatted_date = datetime.datetime.utcfromtimestamp(timestamp).strftime(
