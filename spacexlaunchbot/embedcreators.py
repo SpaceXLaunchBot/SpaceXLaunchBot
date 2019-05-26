@@ -33,8 +33,12 @@ async def get_launch_info_embed(next_launch_dict):
         ),
     )
 
-    # Set thumbnail depending on rocket ID
-    if next_launch_dict["rocket"]["rocket_id"] in statics.rocket_id_images:
+    # Set thumbnail depending on rocket ID, use mission patch if available
+    if next_launch_dict["links"]["mission_patch_small"] != None:
+        launch_info_embed.set_thumbnail(
+            url=next_launch_dict["links"]["mission_patch_small"]
+        )
+    elif next_launch_dict["rocket"]["rocket_id"] in statics.rocket_id_images:
         launch_info_embed.set_thumbnail(
             url=statics.rocket_id_images[next_launch_dict["rocket"]["rocket_id"]]
         )
@@ -135,7 +139,7 @@ async def get_launching_soon_embed(next_launch_dict):
             url=statics.rocket_id_images[next_launch_dict["rocket"]["rocket_id"]]
         )
 
-    # discord.Embed links [using](markdown)
+    # Embed links [using](markdown)
     if next_launch_dict["links"]["video_link"] != None:
         embed_desc += f"[Livestream]({next_launch_dict['links']['video_link']})\n"
     if next_launch_dict["links"]["reddit_launch"] != None:
