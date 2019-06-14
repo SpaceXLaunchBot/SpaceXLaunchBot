@@ -14,7 +14,7 @@ async def _send_all(client, to_send, channel_ids, send_mentions=False):
     invalid_ids = set()
     for channel_id in channel_ids:
         channel = client.get_channel(channel_id)
-        if channel == None:
+        if channel is None:
             invalid_ids.add(channel_id)
         else:
             await client.safe_send(channel, to_send)
@@ -61,7 +61,7 @@ async def _check_and_send_notifs(client):
     try:
         launch_timestamp = int(next_launch_dict["launch_date_unix"])
     except ValueError:
-        # Doesen't have a date, don't trigger notifications
+        # Doesn't have a date, don't trigger notifications
         launch_timestamp = 0
 
     current_time = datetime.datetime.utcnow()

@@ -179,7 +179,7 @@ async def handle_command(client, message):
     # Commands can be in any case
     message.content = message.content.lower()
 
-    # Must be a space in inbetween the command and the paramter(s)
+    # Must be a space in in between the command and the parameter(s)
     used_command = message.content.split(" ")[0]
 
     try:

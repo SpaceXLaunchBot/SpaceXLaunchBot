@@ -22,7 +22,7 @@ import statics, config
 class RedisClient(aredis.StrictRedis):
     def __init__(self, host, port, db_num):
         super().__init__(host=host, port=port, db=db_num)
-        logging.info(f"Connected to Redis at {host}:{port} on DB {db_num}")
+        logging.info(f"Connecting to Redis at {host}:{port} on DB {db_num}")
 
     async def init_defaults(self):
         """If the database is new, create default values for needed keys
@@ -33,7 +33,7 @@ class RedisClient(aredis.StrictRedis):
 
     async def get_notification_task_store(self):
         """Gets and decodes / deserializes variables from notification_task_store
-        Returns a tuple with these indexes:
+        Returns a list with these indexes:
         0: ls_notif_sent
         1: li_embed_dict
         """
@@ -42,7 +42,7 @@ class RedisClient(aredis.StrictRedis):
         ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
         li_embed_dict = await self.hget(hash_key, "li_embed_dict")
 
-        return (ls_notif_sent.decode("UTF-8"), pickle.loads(li_embed_dict))
+        return ls_notif_sent.decode("UTF-8"), pickle.loads(li_embed_dict)
 
     async def set_notification_task_store(self, ls_notif_sent, li_embed_dict):
         """Update / create the hash for notification_task_store

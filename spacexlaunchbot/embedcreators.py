@@ -22,7 +22,7 @@ Precision: {}
 async def get_launch_info_embed(next_launch_dict):
 
     # Having desc set to `None` breaks things
-    if next_launch_dict["details"] == None:
+    if next_launch_dict["details"] is None:
         next_launch_dict["details"] = ""
 
     launch_info_embed = discord.Embed(
@@ -34,7 +34,7 @@ async def get_launch_info_embed(next_launch_dict):
     )
 
     # Set thumbnail depending on rocket ID, use mission patch if available
-    if next_launch_dict["links"]["mission_patch_small"] != None:
+    if next_launch_dict["links"]["mission_patch_small"] is not None:
         launch_info_embed.set_thumbnail(
             url=next_launch_dict["links"]["mission_patch_small"]
         )
@@ -52,11 +52,11 @@ async def get_launch_info_embed(next_launch_dict):
     )
 
     # Add a field for the launch date
-    UTCLaunchDate = await structure.utc_from_ts(next_launch_dict["launch_date_unix"])
+    utc_launch_date = await structure.utc_from_ts(next_launch_dict["launch_date_unix"])
     launch_info_embed.add_field(
         name="Launch date",
         value=launch_date_info.format(
-            UTCLaunchDate, next_launch_dict["tentative_max_precision"]
+            utc_launch_date, next_launch_dict["tentative_max_precision"]
         ),
     )
 
@@ -64,7 +64,7 @@ async def get_launch_info_embed(next_launch_dict):
     launch_info_embed_small = copy.deepcopy(launch_info_embed)
 
     discussion_url = next_launch_dict["links"]["reddit_campaign"]
-    if discussion_url != None:
+    if discussion_url is not None:
         launch_info_embed.add_field(name="r/SpaceX discussion", value=discussion_url)
 
     launch_info_embed.add_field(
@@ -132,7 +132,7 @@ async def get_launching_soon_embed(next_launch_dict):
         title="{} is launching soon!".format(next_launch_dict["mission_name"]),
     )
 
-    if next_launch_dict["links"]["mission_patch_small"] != None:
+    if next_launch_dict["links"]["mission_patch_small"] is not None:
         notif_embed.set_thumbnail(url=next_launch_dict["links"]["mission_patch_small"])
     elif next_launch_dict["rocket"]["rocket_id"] in statics.rocket_id_images:
         notif_embed.set_thumbnail(
@@ -140,18 +140,18 @@ async def get_launching_soon_embed(next_launch_dict):
         )
 
     # Embed links [using](markdown)
-    if next_launch_dict["links"]["video_link"] != None:
+    if next_launch_dict["links"]["video_link"] is not None:
         embed_desc += f"[Livestream]({next_launch_dict['links']['video_link']})\n"
-    if next_launch_dict["links"]["reddit_launch"] != None:
+    if next_launch_dict["links"]["reddit_launch"] is not None:
         embed_desc += (
             f"[r/SpaceX Launch Thread]({next_launch_dict['links']['reddit_launch']})\n"
         )
-    if next_launch_dict["links"]["presskit"] != None:
+    if next_launch_dict["links"]["presskit"] is not None:
         embed_desc += f"[Press kit]({next_launch_dict['links']['presskit']})\n"
     notif_embed.description = embed_desc
 
-    UTCLaunchDate = await structure.utc_from_ts(next_launch_dict["launch_date_unix"])
-    notif_embed.add_field(name="Launch date", value=UTCLaunchDate)
+    utc_launch_date = await structure.utc_from_ts(next_launch_dict["launch_date_unix"])
+    notif_embed.add_field(name="Launch date", value=utc_launch_date)
 
     return notif_embed
 
