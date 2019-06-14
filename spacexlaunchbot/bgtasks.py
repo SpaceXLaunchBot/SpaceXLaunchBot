@@ -82,7 +82,9 @@ async def _check_and_send_notifs(client):
         and ls_notif_sent == "False"
     ):
         logging.info("Launch is soon, sending out notifications")
-        launching_soon_embed = embedcreators.get_launching_soon_embed(next_launch_dict)
+        launching_soon_embed = await embedcreators.get_launching_soon_embed(
+            next_launch_dict
+        )
         invalid_channels = await _send_all(
             client, launching_soon_embed, subbed_channel_ids, send_mentions=True
         )
