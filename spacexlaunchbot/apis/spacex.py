@@ -1,8 +1,9 @@
 """Handles interactions with the SpaceX API
-As of 13/01/19, API ratelimit is 50 req/sec per IP
+As of 13/01/19, API rate limit is 50 req/sec per IP
 """
 
-import aiohttp, logging
+import aiohttp
+import logging
 
 
 async def get_next_launch_dict(launch_number=False):
@@ -23,7 +24,7 @@ async def get_next_launch_dict(launch_number=False):
             if response.status == 200:
                 try:
                     next_launch_dict = await response.json()
-                except aiohttp.client_exceptions.ContentTypeError:
+                except aiohttp.ContentTypeError:
                     logging.error("JSON decode failed")
                     return -1
             else:

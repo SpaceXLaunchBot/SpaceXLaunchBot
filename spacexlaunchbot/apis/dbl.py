@@ -1,4 +1,5 @@
-import aiohttp, logging
+import aiohttp
+import logging
 
 
 class DblApi:

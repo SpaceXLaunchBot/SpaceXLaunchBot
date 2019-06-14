@@ -1,4 +1,7 @@
-import logging, logging.handlers, datetime
+import logging
+import logging.handlers
+import datetime
+
 import config
 
 
@@ -17,7 +20,7 @@ async def utc_from_ts(timestamp):
         return "To Be Announced"
 
 
-def setup_logging():
+async def setup_logging():
     """Setup logging
     These settings will apply to any logging.info, error, debug, etc. call from now on
     This uses logging.basicConfig to setup the logging usage, which means this function

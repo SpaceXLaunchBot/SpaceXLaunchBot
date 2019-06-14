@@ -1,5 +1,11 @@
-import logging, asyncio, datetime, aredis
-import config, embedcreators, apis
+import logging
+import asyncio
+import datetime
+import aredis
+
+import config
+import embedcreators
+import apis
 from redisclient import redis
 
 ONE_MINUTE = 60
@@ -27,7 +33,7 @@ async def _send_all(client, to_send, channel_ids, send_mentions=False):
 
 async def _check_and_send_notifs(client):
     """Checks what notification messages need to be sent, and send them
-    Also updates Redis values if necesseary
+    Also updates Redis values if necessary
     """
     next_launch_dict = await apis.spacex.get_next_launch_dict()
 

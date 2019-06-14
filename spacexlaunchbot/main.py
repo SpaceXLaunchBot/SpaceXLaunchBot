@@ -1,12 +1,15 @@
 import structure
+import asyncio
+import logging
+import aredis
 
-structure.setup_logging()
-
-import asyncio, logging, aredis
-import config, client, redisclient
+import config
+import client
+import redisclient
 
 
 async def startup():
+    await structure.setup_logging()
     try:
         await redisclient.redis.init_defaults()
     except aredis.exceptions.ConnectionError:

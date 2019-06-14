@@ -1,5 +1,10 @@
-import logging, aredis
-import config, embedcreators, statics, apis
+import logging
+import aredis
+
+import config
+import embedcreators
+import statics
+import apis
 from redisclient import redis
 
 

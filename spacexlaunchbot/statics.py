@@ -1,4 +1,5 @@
 from discord import Embed, Colour
+
 import config
 
 # Use Github as image hosting

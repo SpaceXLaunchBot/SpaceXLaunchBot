@@ -1,5 +1,9 @@
-import copy, discord
-import config, structure, statics
+import copy
+import discord
+
+import config
+import structure
+import statics
 from redisclient import redis
 
 payload_info = """Type: {}

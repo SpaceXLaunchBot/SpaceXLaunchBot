@@ -1,28 +1,31 @@
-"""Redis Structure
-All keys are prepended with "slb:"
-Variables in the keys described below are enclosed in (brackets)
+import logging
+import pickle
+import aredis
 
-Key                       | Value
---------------------------|-------------------------------------------------------------
-subscribed_channels       | A Redis SET of channel IDs that are to be sent notifications
-guild:(guild_id)          | A hash containing options for that guild. This includes:
-                          | "mentions": String of channels, users, etc. to ping for a launch
-metric:(metric_name)      | Currently not used. Example use: slb:metric:commands_used
-notification_task_store   | A Redis hash containing variables that need to persist
-                          | between runs of the notification task. This includes:
-                          | "ls_notif_sent": "True" OR "False" (str not bool)
-                          | "li_embed_dict": pickled(embed_dict)
-                          | See bgtasks.notification_task to see how each var is used
-"""
-
-import logging, pickle, aredis
-import statics, config
+import statics
+import config
 
 
 class RedisClient(aredis.StrictRedis):
+    """Redis Structure
+    All keys are prepended with "slb:"
+    Variables in the keys described below are enclosed in (brackets)
+
+    Key                       | Value
+    --------------------------|-------------------------------------------------------------
+    subscribed_channels       | A Redis SET of channel IDs that are to be sent notifications
+    guild:(guild_id)          | A hash containing options for that guild. This includes:
+                              | "mentions": String of channels, users, etc. to ping for a launch
+    metric:(metric_name)      | Currently not used. Example use: slb:metric:commands_used
+    notification_task_store   | A Redis hash containing variables that need to persist
+                              | between runs of the notification task. This includes:
+                              | "ls_notif_sent": "True" OR "False" (str not bool)
+                              | "li_embed_dict": pickled(embed_dict)
+                              | See bgtasks.notification_task to see how each var is used
+    """
+
     def __init__(self, host, port, db_num):
         super().__init__(host=host, port=port, db=db_num)
-        logging.info(f"Connecting to Redis at {host}:{port} on DB {db_num}")
 
     async def init_defaults(self):
         """If the database is new, create default values for needed keys

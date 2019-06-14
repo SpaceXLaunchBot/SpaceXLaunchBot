@@ -1,5 +1,10 @@
-import discord, logging
-import commands, bgtasks, apis, config
+import discord
+import logging
+
+import commands
+import bgtasks
+import apis
+import config
 from redisclient import redis
 
 
