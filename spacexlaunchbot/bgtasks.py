@@ -77,8 +77,7 @@ async def _check_and_send_notifs(client):
     # If the launch time is within the next NOTIF_TASK_LAUNCH_DELTA, and if the
     # launch_timestamp is not in the past, and we haven't already sent the notif
     if (
-        curr_time_plus_delta >= launch_timestamp
-        and launch_timestamp >= current_time.timestamp()
+        curr_time_plus_delta >= launch_timestamp >= current_time.timestamp()
         and ls_notif_sent == "False"
     ):
         logging.info("Launch is soon, sending out notifications")

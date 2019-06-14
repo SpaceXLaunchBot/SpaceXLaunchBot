@@ -1,8 +1,9 @@
-import structure
 import asyncio
 import logging
 import aredis
+import sys
 
+import structure
 import config
 import client
 import redisclient
@@ -14,7 +15,7 @@ async def startup():
         await redisclient.redis.init_defaults()
     except aredis.exceptions.ConnectionError:
         logging.error("Cannot connect to Redis, exiting")
-        quit()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
