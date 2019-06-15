@@ -19,9 +19,9 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         logging.info("Successfully connected to Discord API")
 
-        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
-
         await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
+
+        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
         await self.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_join(self, guild):
@@ -50,14 +50,13 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def safe_send(self, channel, to_send):
         """Sends a text / embed message to a channel
-        If an error occurs, safely supress it so the bot doesen't crash
+        If an error occurs, safely suppress it so the bot doesn't crash
         On success returns what the channel.send method returns
         On failure, returns:
          -1 : Message / embed too big
          -2 : Nothing to send (to_send is not a string or Embed)
          -3 : Forbidden (No permission to message this channel)
          -4 : HTTPException (API down, network issues, etc.)
-         -5 : InvalidArgument (Invalid channel --> cannot "see" that channel)
         """
         try:
             if type(to_send) == str:
@@ -74,5 +73,3 @@ class SpaceXLaunchBotClient(discord.Client):
             return -3
         except discord.errors.HTTPException:
             return -4
-        except discord.errors.InvalidArgument:
-            return -5

@@ -30,7 +30,7 @@ async def _next_launch(client, message):
         launch_info_embed = statics.api_error_embed
     else:
         launch_info_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
-    await client.safe_send(message.channel, launch_info_embed)
+    return launch_info_embed
 
 
 async def _add_channel(client, message):
@@ -42,7 +42,7 @@ async def _add_channel(client, message):
     )
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
-    await client.safe_send(message.channel, reply)
+    return reply
 
 
 async def _remove_channel(client, message):
@@ -54,7 +54,7 @@ async def _remove_channel(client, message):
     )
     if removed == 0:
         reply = "This channel was not previously subscribed to the launch notification service"
-    await client.safe_send(message.channel, reply)
+    return reply
 
 
 async def _set_mentions(client, message):
@@ -65,7 +65,7 @@ async def _set_mentions(client, message):
     if roles_to_mention.strip() != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
         await redis.set_guild_mentions(message.guild.id, roles_to_mention)
-    await client.safe_send(message.channel, reply)
+    return reply
 
 
 async def _get_mentions(client, message):
@@ -77,7 +77,7 @@ async def _get_mentions(client, message):
     if mentions:
         reply = f"Mentions for this guild: {mentions}"
 
-    await client.safe_send(message.channel, reply)
+    return reply
 
 
 async def _remove_mentions(client, message):
@@ -89,21 +89,20 @@ async def _remove_mentions(client, message):
     if deleted == 0:
         reply = "This guild has no mentions to be removed"
 
-    await client.safe_send(message.channel, reply)
+    return reply
 
 
 async def _info(client, message):
     info_embed = await embedcreators.get_info_embed(client)
-    await client.safe_send(message.channel, info_embed)
+    return info_embed
 
 
 async def _help(client, message):
-    await client.safe_send(message.channel, statics.help_embed)
+    return statics.help_embed
 
 
 async def _debug_launching_soon(client, message):
     """Send launching soon embed for the given launch
-    prefix + dbgls number
     """
     if not _from_owner(message):
         return
@@ -112,16 +111,15 @@ async def _debug_launching_soon(client, message):
         launch_number = "".join(message.content.split(" ")[1:])
         launch_number = int(launch_number)
     except ValueError:
-        return await client.safe_send(message.channel, "Invalid launch number")
+        return "Invalid launch number"
 
     next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
     lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
-    await client.safe_send(message.channel, lse)
+    return lse
 
 
 async def _debug_launch_information(client, message):
     """Send launch information embed for the given launch
-    prefix + dbgli number
     """
     if not _from_owner(message):
         return
@@ -130,11 +128,11 @@ async def _debug_launch_information(client, message):
         launch_number = "".join(message.content.split(" ")[1:])
         launch_number = int(launch_number)
     except ValueError:
-        return await client.safe_send(message.channel, "Invalid launch number")
+        return "Invalid launch number"
 
     next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
     lie = await embedcreators.get_launch_info_embed(next_launch_dict)
-    await client.safe_send(message.channel, lie)
+    return lie
 
 
 async def _reset_notif_task_store(client, message):
@@ -144,7 +142,7 @@ async def _reset_notif_task_store(client, message):
     if not _from_owner(message):
         return
     await redis.set_notification_task_store("False", statics.general_error_embed)
-    await client.safe_send(message.channel, "Reset notification_task_store")
+    return "Reset notification_task_store"
 
 
 async def _log_dump(client, message):
@@ -156,15 +154,15 @@ async def _log_dump(client, message):
     log_message = "```\n{}```"
 
     with open(config.LOG_PATH, "r") as f:
-        # Code block markdown in log_message takes up 7 of the 2k allowed chars
-        log_content = f.read()[-(2000 - 7) :]
+        # Code block markdown in log_message takes up 7 of the 2000 allowed chars
+        log_content = f.read()[-1993:]
 
-    await client.safe_send(message.channel, log_message.format(log_content))
+    return log_message.format(log_content)
 
 
 # Construct after definitions
 cmd_prefix = config.BOT_COMMAND_PREFIX
-commands = {
+command_function_lookup = {
     f"{cmd_prefix}nextlaunch": _next_launch,
     f"{cmd_prefix}addchannel": _add_channel,
     f"{cmd_prefix}removechannel": _remove_channel,
@@ -183,15 +181,17 @@ commands = {
 async def handle_command(client, message):
     # Commands can be in any case
     message.content = message.content.lower()
-
-    # Must be a space in in between the command and the parameter(s)
     used_command = message.content.split(" ")[0]
 
     try:
-        command_function = commands[used_command]
-        await command_function(client, message)
-    except KeyError as e:
-        pass  # Not a command
+        run_command = command_function_lookup[used_command]
+        to_send = await run_command(client, message)
+
+    except KeyError:
+        to_send = None
+
     except aredis.RedisError as e:
         logging.error(f"RedisError occurred: {e}")
-        await client.safe_send(message.channel, statics.db_error_embed)
+        to_send = statics.db_error_embed
+
+    await client.safe_send(message.channel, to_send)
