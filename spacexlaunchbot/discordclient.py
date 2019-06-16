@@ -19,7 +19,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         logging.info("Successfully connected to Discord API")
 
-        await self.change_presence(activity=discord.Game(name=config.BOT_GAME))
+        await self.set_playing(config.BOT_GAME)
 
         self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
         await self.dbl.update_guild_count(len(self.guilds))
@@ -48,7 +48,8 @@ class SpaceXLaunchBotClient(discord.Client):
             return
         await commands.handle_command(self, message)
 
-    async def safe_send(self, channel, to_send):
+    @staticmethod
+    async def safe_send(channel, to_send):
         """Sends a text / embed message to a channel
         If an error occurs, safely suppress it so the bot doesn't crash
         On success returns what the channel.send method returns
@@ -73,3 +74,11 @@ class SpaceXLaunchBotClient(discord.Client):
             return -3
         except discord.errors.HTTPException:
             return -4
+
+    async def set_watching(self, title):
+        await self.change_presence(
+            activity=discord.Activity(name=title, type=discord.ActivityType.watching)
+        )
+
+    async def set_playing(self, title):
+        await self.change_presence(activity=discord.Game(name=title))

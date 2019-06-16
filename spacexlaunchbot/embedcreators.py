@@ -180,7 +180,8 @@ async def get_info_embed(client):
     )
     info_embed.add_field(name="Contact", value=f"{statics.owner_mention}")
     info_embed.add_field(
-        name="Help", value="Use the command !help to get a list of commands"
+        name="Help",
+        value=f"Use the command {config.BOT_COMMAND_PREFIX}help to get a list of commands",
     )
 
     return info_embed

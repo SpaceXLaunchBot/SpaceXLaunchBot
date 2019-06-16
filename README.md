@@ -23,7 +23,7 @@
     </a>
 </p>
 
-A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information, and reminders for launches that will be happening soon.
+A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
 
 ## Commands
 
@@ -52,6 +52,6 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 
 ## New Features
 
-I am currently using a Trello board to keep track of new feautures, todos, etc.
+I am currently using a Trello board to keep track of new features, todos, etc.
 
 You can see it [here](https://trello.com/b/5zLV8wR3/spacexlaunchbot)

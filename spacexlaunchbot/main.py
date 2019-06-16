@@ -5,7 +5,7 @@ import sys
 
 import structure
 import config
-import client
+import discordclient
 import redisclient
 
 
@@ -21,5 +21,5 @@ async def startup():
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(startup())
 
-    client = client.SpaceXLaunchBotClient()
+    client = discordclient.SpaceXLaunchBotClient()
     client.run(config.API_TOKEN_DISCORD)
