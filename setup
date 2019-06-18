@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 askyn() {
     while true; do
         read -p "$1 [Yy/Nn]" yn
