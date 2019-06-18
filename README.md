@@ -11,7 +11,7 @@
         <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
-    <a href="https://travis-ci.com/r-spacex/SpaceXLaunchBot/builds/116010586">
+    <a href="https://travis-ci.com/r-spacex/SpaceXLaunchBot/builds/">
         <img src="https://img.shields.io/travis/com/r-spacex/SpaceXLaunchBot.svg?style=flat&colorA=35383d" alt="Travis CI build status" />
     </a>
     <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
