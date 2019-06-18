@@ -8,19 +8,18 @@
         <img src="https://discordbots.org/api/widget/servers/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot server count" />
     </a>
     <a href="https://discordbots.org/bot/411618411169447950" >
-        <img src="https://discordbots.org/api/widget/upvotes/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot upvote count" />
+        <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
+    <a href="https://travis-ci.com/r-spacex/SpaceXLaunchBot/builds/116010586">
+        <img src="https://img.shields.io/travis/com/r-spacex/SpaceXLaunchBot.svg?style=flat&colorA=35383d" alt="Travis CI build status" />
+    </a>
     <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
         <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
-    </a>
-    <br/>
-    <a href="https://discordbots.org/bot/411618411169447950" >
-        <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
-    </a>
+    </a>    
 </p>
 
 A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
