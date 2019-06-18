@@ -6,7 +6,7 @@ import aredis
 import config
 import embedcreators
 import apis
-from redisclient import redis
+from redisclient import REDIS
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
@@ -25,7 +25,7 @@ async def _send_all(client, to_send, channel_ids, send_mentions=False):
         else:
             await client.safe_send(channel, to_send)
             if send_mentions:
-                mentions = await redis.get_guild_mentions(channel.guild.id)
+                mentions = await REDIS.get_guild_mentions(channel.guild.id)
                 if mentions:
                     await client.safe_send(channel, mentions)
     return invalid_ids
@@ -44,11 +44,11 @@ async def _check_and_send_notifs(client):
     # At the end of this method, remove all channels that we can't access anymore
     channels_to_remove = set()
 
-    subbed_channel_ids = await redis.smembers("slb:subscribed_channels")
+    subbed_channel_ids = await REDIS.smembers("slb:subscribed_channels")
     subbed_channel_ids = tuple(int(cid) for cid in subbed_channel_ids)
 
     # Names shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, li_embed_dict = await redis.get_notification_task_store()
+    ls_notif_sent, li_embed_dict = await REDIS.get_notification_task_store()
 
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
     new_li_embed_dict = new_li_embed.to_dict()
@@ -91,10 +91,10 @@ async def _check_and_send_notifs(client):
         ls_notif_sent = "True"
 
     # Save any changed data to redis
-    await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
+    await REDIS.set_notification_task_store(ls_notif_sent, li_embed_dict)
     for channel_id in channels_to_remove:
         logging.info(f"{channel_id} is an invalid channel ID, removing")
-        await redis.srem("slb:subscribed_channels", str(channel_id).encode("UTF-8"))
+        await REDIS.srem("slb:subscribed_channels", str(channel_id).encode("UTF-8"))
 
 
 async def notification_task(client):
@@ -105,7 +105,7 @@ async def notification_task(client):
     while not client.is_closed():
         try:
             await _check_and_send_notifs(client)
-        except aredis.RedisError as e:
-            logging.error(f"RedisError occurred: {e}")
+        except aredis.RedisError as ex:
+            logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
 
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)

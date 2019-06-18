@@ -5,12 +5,13 @@ import commands
 import bgtasks
 import apis
 import config
-from redisclient import redis
+from redisclient import REDIS
 
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         logging.info("Client initialised")
 
         # Create asyncio tasks now
@@ -18,21 +19,18 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_ready(self):
         logging.info("Successfully connected to Discord API")
-
         await self.set_playing(config.BOT_GAME)
-
-        self.dbl = apis.dbl.DblApi(self.user.id, config.API_TOKEN_DBL)
-        await self.dbl.update_guild_count(len(self.guilds))
+        await apis.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_join(self, guild):
         logging.info(f"Joined guild, ID: {guild.id}")
-        await self.dbl.update_guild_count(len(self.guilds))
+        await apis.dbl.update_guild_count(len(self.guilds))
 
     async def on_guild_remove(self, guild):
         logging.info(f"Removed from guild, ID: {guild.id}")
-        await self.dbl.update_guild_count(len(self.guilds))
+        await apis.dbl.update_guild_count(len(self.guilds))
 
-        deleted = await redis.delete_guild_mentions(guild.id)
+        deleted = await REDIS.delete_guild_mentions(guild.id)
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
@@ -54,22 +52,21 @@ class SpaceXLaunchBotClient(discord.Client):
         If an error occurs, safely suppress it so the bot doesn't crash
         On success returns what the channel.send method returns
         On failure, returns:
-         -1 : Message / embed too big
+         -1 : Message / embed / embed.title too long
          -2 : Nothing to send (to_send is not a string or Embed)
          -3 : Forbidden (No permission to message this channel)
          -4 : HTTPException (API down, network issues, etc.)
         """
         try:
-            if type(to_send) == str:
+            if isinstance(to_send, str):
                 if len(to_send) > 2000:
                     return -1
                 return await channel.send(to_send)
-            elif type(to_send) == discord.Embed:
+            if isinstance(to_send, discord.Embed):
                 if len(to_send) > 2048 or len(to_send.title) > 256:
                     return -1
                 return await channel.send(embed=to_send)
-            else:
-                return -2
+            return -2
         except discord.errors.Forbidden:
             return -3
         except discord.errors.HTTPException:

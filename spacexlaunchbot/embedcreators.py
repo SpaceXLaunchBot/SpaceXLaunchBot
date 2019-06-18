@@ -4,21 +4,21 @@ import discord
 import config
 import structure
 import statics
-from redisclient import redis
+from redisclient import REDIS
 
-payload_info = """Type: {}
+PAYLOAD_INFO = """Type: {}
 Orbit: {}
 Mass: {}
 Manufacturer: {}
 Customer{}: {}
 """
-core_info = """Serial: {}
+CORE_INFO = """Serial: {}
 Flight: {}
 Landing: {}
 Landing Type: {}
 Landing Vehicle: {}
 """
-launch_date_info = """{}
+LAUNCH_DATE_INFO = """{}
 Precision: {}
 """
 
@@ -30,7 +30,7 @@ async def get_launch_info_embed(next_launch_dict):
         next_launch_dict["details"] = ""
 
     launch_info_embed = discord.Embed(
-        color=statics.falcon_red,
+        color=statics.FALCON_RED,
         description=next_launch_dict["details"],
         title="Launch #{} - {}".format(
             next_launch_dict["flight_number"], next_launch_dict["mission_name"]
@@ -42,9 +42,9 @@ async def get_launch_info_embed(next_launch_dict):
         launch_info_embed.set_thumbnail(
             url=next_launch_dict["links"]["mission_patch_small"]
         )
-    elif next_launch_dict["rocket"]["rocket_id"] in statics.rocket_id_images:
+    elif next_launch_dict["rocket"]["rocket_id"] in statics.ROCKET_ID_IMAGES:
         launch_info_embed.set_thumbnail(
-            url=statics.rocket_id_images[next_launch_dict["rocket"]["rocket_id"]]
+            url=statics.ROCKET_ID_IMAGES[next_launch_dict["rocket"]["rocket_id"]]
         )
 
     launch_info_embed.add_field(
@@ -59,7 +59,7 @@ async def get_launch_info_embed(next_launch_dict):
     utc_launch_date = await structure.utc_from_ts(next_launch_dict["launch_date_unix"])
     launch_info_embed.add_field(
         name="Launch date",
-        value=launch_date_info.format(
+        value=LAUNCH_DATE_INFO.format(
             utc_launch_date, next_launch_dict["tentative_max_precision"]
         ),
     )
@@ -79,7 +79,7 @@ async def get_launch_info_embed(next_launch_dict):
         # Falcon 9 always has 1 core, FH (or others) will be different
         launch_info_embed.add_field(
             name="Core info",
-            value=core_info.format(
+            value=CORE_INFO.format(
                 next_launch_dict["rocket"]["first_stage"]["cores"][0]["core_serial"],
                 next_launch_dict["rocket"]["first_stage"]["cores"][0]["flight"],
                 next_launch_dict["rocket"]["first_stage"]["cores"][0]["landing_intent"],
@@ -96,7 +96,7 @@ async def get_launch_info_embed(next_launch_dict):
         ):
             launch_info_embed.add_field(
                 name=f"Core {core_num} info",
-                value=core_info.format(
+                value=CORE_INFO.format(
                     core_dict["core_serial"],
                     core_dict["flight"],
                     core_dict["landing_intent"],
@@ -109,7 +109,7 @@ async def get_launch_info_embed(next_launch_dict):
     for payload in next_launch_dict["rocket"]["second_stage"]["payloads"]:
         launch_info_embed.add_field(
             name="Payload: {}".format(payload["payload_id"]),
-            value=payload_info.format(
+            value=PAYLOAD_INFO.format(
                 payload["payload_type"],
                 payload["orbit"],
                 payload["payload_mass_kg"],
@@ -121,8 +121,8 @@ async def get_launch_info_embed(next_launch_dict):
 
     if len(launch_info_embed.title) > 256:
         # Title too big to send, no way around this other than send an err
-        return statics.general_error_embed
-    elif len(launch_info_embed) > 2048:
+        return statics.GENERAL_ERROR_EMBED
+    if len(launch_info_embed) > 2048:
         # If body is too big, send small embed
         return launch_info_embed_small
     return launch_info_embed
@@ -132,15 +132,15 @@ async def get_launching_soon_embed(next_launch_dict):
     embed_desc = ""
 
     notif_embed = discord.Embed(
-        color=statics.falcon_red,
+        color=statics.FALCON_RED,
         title="{} is launching soon!".format(next_launch_dict["mission_name"]),
     )
 
     if next_launch_dict["links"]["mission_patch_small"] is not None:
         notif_embed.set_thumbnail(url=next_launch_dict["links"]["mission_patch_small"])
-    elif next_launch_dict["rocket"]["rocket_id"] in statics.rocket_id_images:
+    elif next_launch_dict["rocket"]["rocket_id"] in statics.ROCKET_ID_IMAGES:
         notif_embed.set_thumbnail(
-            url=statics.rocket_id_images[next_launch_dict["rocket"]["rocket_id"]]
+            url=statics.ROCKET_ID_IMAGES[next_launch_dict["rocket"]["rocket_id"]]
         )
 
     # Embed links [using](markdown)
@@ -162,12 +162,13 @@ async def get_launching_soon_embed(next_launch_dict):
 
 async def get_info_embed(client):
     guild_count = len(client.guilds)
-    subbed_channel_count = await redis.subbed_channels_count()
+    subbed_channel_count = await REDIS.subbed_channels_count()
 
     info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",
-        color=statics.falcon_red,
-        description="A Discord bot for getting news, information, and notifications about upcoming SpaceX launches",
+        color=statics.FALCON_RED,
+        description="A Discord bot for getting news, information, and notifications "
+        "about upcoming SpaceX launches",
     )
 
     info_embed.add_field(name="Guild Count", value=f"{guild_count}")
@@ -178,10 +179,10 @@ async def get_info_embed(client):
         name="Links",
         value=f"[GitHub]({config.BOT_GITHUB}), [Bot Invite]({config.BOT_INVITE})",
     )
-    info_embed.add_field(name="Contact", value=f"{statics.owner_mention}")
+    info_embed.add_field(name="Contact", value=f"{statics.OWNER_MENTION}")
     info_embed.add_field(
         name="Help",
-        value=f"Use the command {config.BOT_COMMAND_PREFIX}help to get a list of commands",
+        value=f"Use {config.BOT_COMMAND_PREFIX}help to get a list of commands",
     )
 
     return info_embed

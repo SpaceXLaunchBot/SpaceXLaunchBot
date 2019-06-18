@@ -9,19 +9,21 @@ import config
 class RedisClient(aredis.StrictRedis):
     """Redis Structure
     All keys are prepended with "slb:"
-    Variables in the keys described below are enclosed in (brackets)
+    Variables in the keys described below are enclosed in {braces}
 
     Key                       | Value
-    --------------------------|-------------------------------------------------------------
-    subscribed_channels       | A Redis SET of channel IDs that are to be sent notifications
-    guild:(guild_id)          | A hash containing options for that guild. This includes:
-                              | "mentions": String of channels, users, etc. to ping for a launch
-    metric:(metric_name)      | Currently not used. Example use: slb:metric:commands_used
+    --------------------------|---------------------------------------------------------
+    subscribed_channels       | A Redis SET of channel IDs to be sent notifications
+    guild:{guild_id}          | A hash containing options for that guild. This includes:
+                              | "mentions": String of channels, users, etc. to ping for
+                              | a "launching soon" message
+    metric:{metric_name}      | Currently not used.
+                              | Example use: slb:metric:commands_used
     notification_task_store   | A Redis hash containing variables that need to persist
                               | between runs of the notification task. This includes:
                               | "ls_notif_sent": "True" OR "False" (str not bool)
                               | "li_embed_dict": pickled(embed_dict)
-                              | See bgtasks.notification_task to see how each var is used
+                              | See bgtasks.notification_task to see usage
     """
 
     def __init__(self, host, port, db_num):
@@ -32,7 +34,7 @@ class RedisClient(aredis.StrictRedis):
         """
         if not await self.exists("slb:notification_task_store"):
             logging.info("slb:notification_task_store does not exist, creating")
-            await self.set_notification_task_store("False", statics.general_error_embed)
+            await self.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
 
     async def get_notification_task_store(self):
         """Gets and decodes / deserializes variables from notification_task_store
@@ -94,4 +96,4 @@ class RedisClient(aredis.StrictRedis):
 
 
 # This is the instance that will be imported and used by all other files
-redis = RedisClient(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)
+REDIS = RedisClient(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)

@@ -12,7 +12,7 @@ import redisclient
 async def startup():
     await structure.setup_logging()
     try:
-        await redisclient.redis.init_defaults()
+        await redisclient.REDIS.init_defaults()
     except aredis.exceptions.ConnectionError:
         logging.error("Cannot connect to Redis, exiting")
         sys.exit(1)
@@ -21,5 +21,5 @@ async def startup():
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(startup())
 
-    client = discordclient.SpaceXLaunchBotClient()
-    client.run(config.API_TOKEN_DISCORD)
+    CLIENT = discordclient.SpaceXLaunchBotClient()
+    CLIENT.run(config.API_TOKEN_DISCORD)
