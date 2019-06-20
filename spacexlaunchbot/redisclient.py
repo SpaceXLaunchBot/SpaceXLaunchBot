@@ -1,6 +1,7 @@
 import logging
 import pickle
 import aredis
+from typing import Tuple, Set, ByteString
 
 import statics
 import config
@@ -26,7 +27,7 @@ class RedisClient(aredis.StrictRedis):
                               | See bgtasks.notification_task to see usage
     """
 
-    def __init__(self, host, port, db_num):
+    def __init__(self, host: str, port: int, db_num: int):
         super().__init__(host=host, port=port, db=db_num)
 
     async def init_defaults(self):
@@ -36,7 +37,7 @@ class RedisClient(aredis.StrictRedis):
             logging.info("slb:notification_task_store does not exist, creating")
             await self.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
 
-    async def get_notification_task_store(self):
+    async def get_notification_task_store(self) -> Tuple[str, dict]:
         """Gets and decodes / deserializes variables from notification_task_store
         Returns a list with these indexes:
         0: ls_notif_sent
@@ -49,48 +50,66 @@ class RedisClient(aredis.StrictRedis):
 
         return ls_notif_sent.decode("UTF-8"), pickle.loads(li_embed_dict)
 
-    async def set_notification_task_store(self, ls_notif_sent, li_embed_dict):
+    async def set_notification_task_store(
+        self, ls_notif_sent: str, li_embed_dict: dict
+    ):
         """Update / create the hash for notification_task_store
         Automatically encodes / serializes both arguments
         """
         hash_key = "slb:notification_task_store"
 
-        ls_notif_sent = ls_notif_sent.encode("UTF-8")
-        li_embed_dict = pickle.dumps(li_embed_dict, protocol=pickle.HIGHEST_PROTOCOL)
+        ls_notif_sent_bytes = ls_notif_sent.encode("UTF-8")
+        li_embed_dict_bytes = pickle.dumps(li_embed_dict)
 
-        await self.hset(hash_key, "ls_notif_sent", ls_notif_sent)
-        await self.hset(hash_key, "li_embed_dict", li_embed_dict)
+        await self.hset(hash_key, "ls_notif_sent", ls_notif_sent_bytes)
+        await self.hset(hash_key, "li_embed_dict", li_embed_dict_bytes)
 
-    async def set_guild_mentions(self, guild_id, to_mention):
+    async def set_guild_mentions(self, guild_id: int, to_mention: str):
         """Set mentions for a guild
-        guild_id can be int or str
-        to_mention should be an string of roles / tags / etc.
+        to_mention is a string of roles / tags / etc.
         """
-        guild_key = f"slb:guild:{str(guild_id)}"
-        to_mention = to_mention.encode("UTF-8")
-        await self.hset(guild_key, "mentions", to_mention)
+        guild_key = f"slb:guild:{guild_id}"
+        to_mention_bytes = to_mention.encode("UTF-8")
+        await self.hset(guild_key, "mentions", to_mention_bytes)
 
-    async def get_guild_mentions(self, guild_id):
+    async def get_guild_mentions(self, guild_id: int) -> str:
         """Returns a string of mentions for that guild
-        guild_id can be int or str
-        returns False if guild_id does not have any settings stored
         """
-        guild_key = f"slb:guild:{str(guild_id)}"
+        guild_key = f"slb:guild:{guild_id}"
         to_mention = await self.hget(guild_key, "mentions")
         if not to_mention:
-            return False
+            # TODO: Is to_mention already an empty string?
+            return ""
         return to_mention.decode("UTF-8")
 
-    async def delete_guild_mentions(self, guild_id):
+    async def delete_guild_mentions(self, guild_id: int):
         """Deletes all mentions for the given guild_id
-        guild_id can be int or str
-        Returns the number of keys that were deleted
+        Returns 0 if nothing was removed, 1 if the mentions were removed
         """
-        guild_key = f"slb:guild:{str(guild_id)}"
+        guild_key = f"slb:guild:{guild_id}"
         return await self.hdel(guild_key, "mentions")
 
-    async def subbed_channels_count(self):
-        """Small helper function, returns the number of subscribed channels
+    async def get_subbed_channels(self) -> Set[ByteString]:
+        """Returns all the members of the subscribed_channels set
+        """
+        return await self.smembers("slb:subscribed_channels")
+
+    async def add_subbed_channel(self, channel_id: int) -> int:
+        """Add a channel ID to the subscribed_channels set
+        Returns 0 if nothing was added, 1 if the channel was added
+        """
+        channel_id_bytes = str(channel_id).encode("UTF-8")
+        return await self.sadd("slb:subscribed_channels", channel_id_bytes)
+
+    async def remove_subbed_channel(self, channel_id: int) -> int:
+        """Remove a channel ID from the subscribed_channels set
+        Returns 0 if nothing was removed, 1 if the channel was removed
+        """
+        channel_id_bytes = str(channel_id).encode("UTF-8")
+        return await self.srem("slb:subscribed_channels", channel_id_bytes)
+
+    async def subbed_channels_count(self) -> int:
+        """Returns the number of subscribed channels
         """
         return await self.scard("slb:subscribed_channels")
 

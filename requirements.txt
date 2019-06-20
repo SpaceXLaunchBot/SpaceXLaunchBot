@@ -1,5 +1,3 @@
 discord.py
 aredis
 aiohttp
-pylint
-bandit

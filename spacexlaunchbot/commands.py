@@ -42,9 +42,7 @@ async def _add_channel(**kwargs):
 
     reply = "This channel has been added to the notification service"
 
-    added = await REDIS.sadd(
-        "slb:subscribed_channels", str(message.channel.id).encode("UTF-8")
-    )
+    added = await REDIS.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
 
@@ -58,9 +56,7 @@ async def _remove_channel(**kwargs):
 
     reply = "This channel has been removed from the notification service"
 
-    removed = await REDIS.srem(
-        "slb:subscribed_channels", str(message.channel.id).encode("UTF-8")
-    )
+    removed = await REDIS.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
 
@@ -210,6 +206,7 @@ async def handle_command(client, message):
 
     try:
         run_command = CMD_FUNC_LOOKUP[command_used]
+        # All commands are passed the client and the message objects
         to_send = await run_command(client=client, message=message)
 
     except KeyError:
