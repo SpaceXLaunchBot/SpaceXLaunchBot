@@ -1,7 +1,7 @@
 import logging
 import pickle
 import aredis
-from typing import Tuple, Set, ByteString
+from typing import Tuple, Set
 
 import statics
 import config
@@ -27,14 +27,19 @@ class RedisClient(aredis.StrictRedis):
                               | See bgtasks.notification_task to see usage
     """
 
+    key_prefix = "slb:"
+    key_subscribed_channels = key_prefix + "subscribed_channels"
+    key_notification_task_store = key_prefix + "notification_task_store"
+    key_guild = key_prefix + "guild:{}"
+
     def __init__(self, host: str, port: int, db_num: int):
         super().__init__(host=host, port=port, db=db_num)
 
     async def init_defaults(self):
         """If the database is new, create default values for needed keys
         """
-        if not await self.exists("slb:notification_task_store"):
-            logging.info("slb:notification_task_store does not exist, creating")
+        if not await self.exists(self.key_notification_task_store):
+            logging.info(f"{self.key_notification_task_store} does not exist, creating")
             await self.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
 
     async def get_notification_task_store(self) -> Tuple[str, dict]:
@@ -43,7 +48,7 @@ class RedisClient(aredis.StrictRedis):
         0: ls_notif_sent
         1: li_embed_dict
         """
-        hash_key = "slb:notification_task_store"
+        hash_key = self.key_notification_task_store
 
         ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
         li_embed_dict = await self.hget(hash_key, "li_embed_dict")
@@ -56,7 +61,7 @@ class RedisClient(aredis.StrictRedis):
         """Update / create the hash for notification_task_store
         Automatically encodes / serializes both arguments
         """
-        hash_key = "slb:notification_task_store"
+        hash_key = self.key_notification_task_store
 
         ls_notif_sent_bytes = ls_notif_sent.encode("UTF-8")
         li_embed_dict_bytes = pickle.dumps(li_embed_dict)
@@ -68,17 +73,14 @@ class RedisClient(aredis.StrictRedis):
         """Set mentions for a guild
         to_mention is a string of roles / tags / etc.
         """
-        guild_key = f"slb:guild:{guild_id}"
         to_mention_bytes = to_mention.encode("UTF-8")
-        await self.hset(guild_key, "mentions", to_mention_bytes)
+        await self.hset(self.key_guild.format(guild_id), "mentions", to_mention_bytes)
 
     async def get_guild_mentions(self, guild_id: int) -> str:
         """Returns a string of mentions for that guild
         """
-        guild_key = f"slb:guild:{guild_id}"
-        to_mention = await self.hget(guild_key, "mentions")
-        if not to_mention:
-            # TODO: Is to_mention already an empty string?
+        to_mention = await self.hget(self.key_guild.format(guild_id), "mentions")
+        if to_mention is None:
             return ""
         return to_mention.decode("UTF-8")
 
@@ -86,33 +88,33 @@ class RedisClient(aredis.StrictRedis):
         """Deletes all mentions for the given guild_id
         Returns 0 if nothing was removed, 1 if the mentions were removed
         """
-        guild_key = f"slb:guild:{guild_id}"
-        return await self.hdel(guild_key, "mentions")
+        return await self.hdel(self.key_guild.format(guild_id), "mentions")
 
-    async def get_subbed_channels(self) -> Set[ByteString]:
+    async def get_subbed_channels(self) -> Set[int]:
         """Returns all the members of the subscribed_channels set
         """
-        return await self.smembers("slb:subscribed_channels")
+        byte_id_set = await self.smembers(self.key_subscribed_channels)
+        return set(int(cid) for cid in byte_id_set)
 
     async def add_subbed_channel(self, channel_id: int) -> int:
         """Add a channel ID to the subscribed_channels set
         Returns 0 if nothing was added, 1 if the channel was added
         """
         channel_id_bytes = str(channel_id).encode("UTF-8")
-        return await self.sadd("slb:subscribed_channels", channel_id_bytes)
+        return await self.sadd(self.key_subscribed_channels, channel_id_bytes)
 
     async def remove_subbed_channel(self, channel_id: int) -> int:
         """Remove a channel ID from the subscribed_channels set
         Returns 0 if nothing was removed, 1 if the channel was removed
         """
         channel_id_bytes = str(channel_id).encode("UTF-8")
-        return await self.srem("slb:subscribed_channels", channel_id_bytes)
+        return await self.srem(self.key_subscribed_channels, channel_id_bytes)
 
     async def subbed_channels_count(self) -> int:
         """Returns the number of subscribed channels
         """
-        return await self.scard("slb:subscribed_channels")
+        return await self.scard(self.key_subscribed_channels)
 
 
 # This is the instance that will be imported and used by all other files
-REDIS = RedisClient(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)
+redis = RedisClient(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)

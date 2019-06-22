@@ -6,35 +6,10 @@ import aredis
 import config
 import embedcreators
 import apis
-from redisclient import REDIS
+from redisclient import redis
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
-
-
-async def _send_all(client, to_send, send_mentions=False):
-    """Send all subscribed channels to_send
-    If send_mentions is true, get mentions from redis and send as well
-    Returns a set of channels that are invalid --> should be removed
-    """
-    channel_ids = set(int(cid) for cid in await REDIS.get_subbed_channels())
-    invalid_ids = set()
-
-    for channel_id in channel_ids:
-        channel = client.get_channel(channel_id)
-
-        if channel is None:
-            invalid_ids.add(channel_id)
-
-        else:
-            await client.safe_send(channel, to_send)
-
-            if send_mentions:
-                mentions = await REDIS.get_guild_mentions(channel.guild.id)
-                if mentions:
-                    await client.safe_send(channel, mentions)
-
-    return invalid_ids
 
 
 async def _check_and_send_notifs(client):
@@ -51,7 +26,7 @@ async def _check_and_send_notifs(client):
     channels_to_remove = set()
 
     # Names shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, li_embed_dict = await REDIS.get_notification_task_store()
+    ls_notif_sent, li_embed_dict = await redis.get_notification_task_store()
 
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
     new_li_embed_dict = new_li_embed.to_dict()
@@ -64,7 +39,7 @@ async def _check_and_send_notifs(client):
         li_embed_dict = new_li_embed_dict
 
         # New launch found, send all "subscribed" channels the embed
-        invalid_channels = await _send_all(client, new_li_embed)
+        invalid_channels = await client.send_all_subscribed(new_li_embed)
         channels_to_remove |= invalid_channels
 
     try:
@@ -87,17 +62,15 @@ async def _check_and_send_notifs(client):
         launching_soon_embed = await embedcreators.get_launching_soon_embed(
             next_launch_dict
         )
-        invalid_channels = await _send_all(
-            client, launching_soon_embed, send_mentions=True
-        )
+        invalid_channels = await client.send_all_subscribed(launching_soon_embed, True)
         channels_to_remove |= invalid_channels
         ls_notif_sent = "True"
 
     # Save any changed data to redis
-    await REDIS.set_notification_task_store(ls_notif_sent, li_embed_dict)
+    await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
     for channel_id in channels_to_remove:
         logging.info(f"{channel_id} is an invalid channel ID, removing")
-        await REDIS.remove_subbed_channel(channel_id)
+        await redis.remove_subbed_channel(channel_id)
 
 
 async def notification_task(client):

@@ -31,10 +31,10 @@ Command|Description|Permissions needed
 `!nextlaunch`|Send the latest launch information message to the current channel|None
 `!addchannel`|Add the current channel to the notification service|Admin
 `!removechannel`|Remove the current channel from the notification service|Admin
-`!setmentions @mention`|Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `!setmentions @role1 @user1 @role2`. Calling `!setmentions` multiple times will not stack the roles, it will just overwrite your previous mentions|Admin
+`!setmentions @mention`|Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `!setmentions @role1 @user1 @role2`. Calling `setmentions` multiple times will not stack the mentions, it will just overwrite your previous mentions|Admin
 `!removementions`|Remove all mentions set for the current guild|Admin
-`!getmentions`|Get mentions set for the current guild|Admin
-`!info`|Show information about the bot|None
+`!getmentions`|Send the mentions set for the current guild to the current channel|Admin
+`!info`|Send information about the bot to the current channel|None
 `!help`|List these commands|None
 
 ## Notifications

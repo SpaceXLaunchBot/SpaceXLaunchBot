@@ -25,23 +25,24 @@ HELP_EMBED = Embed(
 )
 HELP_EMBED.add_field(
     name="nextlaunch",
-    value="Show info about the next upcoming launch\n*Any user can use this command*",
+    value="Send the latest launch information message to the current channel\n"
+    "*Any user can use this command*",
 )
 HELP_EMBED.add_field(
     name="addchannel",
-    value="Add the current channel to the bots notification service\n"
+    value="Add the current channel to the notification service\n"
     "*Only admins can use this command*",
 )
 HELP_EMBED.add_field(
     name="removechannel",
-    value="Remove the current channel to the bots notification service"
+    value="Remove the current channel from the notification service"
     "*Only admins can use this command*",
 )
 HELP_EMBED.add_field(
     name="setmentions @mention",
     value="Set roles/users to be mentioned when a 'launching soon' message is sent. "
     "Can be formatted with multiple mentions in any order, like this: "
-    "`!addping @role1 @user1 @role2`. Calling `!addping` multiple times will not "
+    "`!addping @role1 @user1 @role2`. Calling `setmentions` multiple times will not "
     "stack the mentions, it will just overwrite your previous mentions\n"
     "*Only admins can use this command*",
 )
@@ -52,10 +53,13 @@ HELP_EMBED.add_field(
 )
 HELP_EMBED.add_field(
     name="getmentions",
-    value="Get mentions set for the current guild\n*Only admins can use this command*",
+    value="Send the mentions set for the current guild to the current channel\n"
+    "*Only admins can use this command*",
 )
 HELP_EMBED.add_field(
-    name="info", value="Information about this bot\n*Any user can use this command*"
+    name="info",
+    value="Send information about the bot to the current channel\n"
+    "*Any user can use this command*",
 )
 HELP_EMBED.add_field(
     name="help", value="List these commands\n*Any user can use this command*"

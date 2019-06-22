@@ -5,7 +5,7 @@ import config
 import embedcreators
 import statics
 import apis
-from redisclient import REDIS
+from redisclient import redis
 
 
 def _from_owner(message):
@@ -42,7 +42,7 @@ async def _add_channel(**kwargs):
 
     reply = "This channel has been added to the notification service"
 
-    added = await REDIS.add_subbed_channel(message.channel.id)
+    added = await redis.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
 
@@ -56,7 +56,7 @@ async def _remove_channel(**kwargs):
 
     reply = "This channel has been removed from the notification service"
 
-    removed = await REDIS.remove_subbed_channel(message.channel.id)
+    removed = await redis.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
 
@@ -70,10 +70,11 @@ async def _set_mentions(**kwargs):
 
     reply = "Invalid input for setmentions command"
     roles_to_mention = " ".join(message.content.split("setmentions")[1:])
+    roles_to_mention = roles_to_mention.strip()
 
-    if roles_to_mention.strip() != "":
+    if roles_to_mention != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
-        await REDIS.set_guild_mentions(message.guild.id, roles_to_mention)
+        await redis.set_guild_mentions(message.guild.id, roles_to_mention)
 
     return reply
 
@@ -85,7 +86,7 @@ async def _get_mentions(**kwargs):
 
     reply = "This guild has no mentions set"
 
-    mentions = await REDIS.get_guild_mentions(message.guild.id)
+    mentions = await redis.get_guild_mentions(message.guild.id)
     if mentions:
         reply = f"Mentions for this guild: {mentions}"
 
@@ -99,7 +100,7 @@ async def _remove_mentions(**kwargs):
 
     reply = "Removed mentions succesfully"
 
-    deleted = await REDIS.delete_guild_mentions(message.guild.id)
+    deleted = await redis.delete_guild_mentions(message.guild.id)
     if deleted == 0:
         reply = "This guild has no mentions to be removed"
 
@@ -160,7 +161,7 @@ async def _reset_notif_task_store(**kwargs):
     if not _from_owner(message):
         return
 
-    await REDIS.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
+    await redis.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
     return "Reset notification_task_store"
 
 
@@ -216,4 +217,7 @@ async def handle_command(client, message):
         logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
         to_send = statics.DB_ERROR_EMBED
 
-    await client.safe_send(message.channel, to_send)
+    if to_send is None:
+        return
+
+    await client.send_s(message.channel, to_send)

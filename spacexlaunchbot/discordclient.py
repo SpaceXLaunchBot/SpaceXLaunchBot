@@ -5,7 +5,7 @@ import commands
 import bgtasks
 import apis
 import config
-from redisclient import REDIS
+from redisclient import redis
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -30,7 +30,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await apis.dbl.update_guild_count(len(self.guilds))
 
-        deleted = await REDIS.delete_guild_mentions(guild.id)
+        deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
@@ -46,9 +46,12 @@ class SpaceXLaunchBotClient(discord.Client):
             return
         await commands.handle_command(self, message)
 
+    async def set_playing(self, title):
+        await self.change_presence(activity=discord.Game(name=title))
+
     @staticmethod
-    async def safe_send(channel, to_send):
-        """Sends a text / embed message to a channel
+    async def send_s(channel, to_send):
+        """Sends a text / embed message to a channel safely
         If an error occurs, safely suppress it so the bot doesn't crash
         On success returns what the channel.send method returns
         On failure, returns:
@@ -72,10 +75,26 @@ class SpaceXLaunchBotClient(discord.Client):
         except discord.errors.HTTPException:
             return -4
 
-    async def set_watching(self, title):
-        await self.change_presence(
-            activity=discord.Activity(name=title, type=discord.ActivityType.watching)
-        )
+    async def send_all_subscribed(self, to_send, send_mentions=False):
+        """Send all subscribed channels to_send
+        If send_mentions is true, get mentions from redis and send as well
+        Returns a set of channels that are invalid -> should be removed
+        """
+        channel_ids = await redis.get_subbed_channels()
+        invalid_ids = set()
 
-    async def set_playing(self, title):
-        await self.change_presence(activity=discord.Game(name=title))
+        for channel_id in channel_ids:
+            channel = self.get_channel(channel_id)
+
+            if channel is None:
+                invalid_ids.add(channel_id)
+
+            else:
+                await self.send_s(channel, to_send)
+
+                if send_mentions:
+                    mentions = await redis.get_guild_mentions(channel.guild.id)
+                    if mentions != "":
+                        await self.send_s(channel, mentions)
+
+        return invalid_ids

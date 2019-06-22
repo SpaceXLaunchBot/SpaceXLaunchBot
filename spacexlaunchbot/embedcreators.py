@@ -4,7 +4,7 @@ import discord
 import config
 import structure
 import statics
-from redisclient import REDIS
+from redisclient import redis
 
 PAYLOAD_INFO = """Type: {}
 Orbit: {}
@@ -162,7 +162,7 @@ async def get_launching_soon_embed(next_launch_dict):
 
 async def get_info_embed(client):
     guild_count = len(client.guilds)
-    subbed_channel_count = await REDIS.subbed_channels_count()
+    subbed_channel_count = await redis.subbed_channels_count()
 
     info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",
