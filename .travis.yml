@@ -7,5 +7,9 @@ install:
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
 script:
+  # Lint
+  - bash scripts/pylint_ci
+  # Static analysis of type hints
+  - mypy spacexlaunchbot
+  # Static security analysis
   - bandit -r spacexlaunchbot -c .bandit
-  - bash scripts/ci
