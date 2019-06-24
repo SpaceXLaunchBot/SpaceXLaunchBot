@@ -1,7 +1,9 @@
 import discord
+import aredis
 import logging
 
 import commands
+import statics
 import bgtasks
 import apis
 import config
@@ -44,7 +46,30 @@ class SpaceXLaunchBotClient(discord.Client):
             # Don't reply to bots (includes self)
             # Only reply to messages from guilds
             return
-        await commands.handle_command(self, message)
+
+        # Commands can be in any case
+        message_lower = message.content.lower()
+        # Grab first word in the message (the command)
+        first_word = message_lower.split(" ")[0]
+        # Remove the command prefix so we can lookup the command
+        command_used = first_word.replace(config.BOT_COMMAND_PREFIX, "")
+
+        try:
+            run_command = commands.CMD_FUNC_LOOKUP[command_used]
+            # All commands are passed the client and the message objects
+            to_send = await run_command(client=self, message=message)
+
+        except KeyError:
+            to_send = None
+
+        except aredis.RedisError as ex:
+            logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
+            to_send = statics.DB_ERROR_EMBED
+
+        if to_send is None:
+            return
+
+        await self.send_s(message.channel, to_send)
 
     async def set_playing(self, title):
         await self.change_presence(activity=discord.Game(name=title))

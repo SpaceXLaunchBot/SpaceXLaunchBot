@@ -1,6 +1,3 @@
-import logging
-import aredis
-
 import config
 import embedcreators
 import statics
@@ -25,9 +22,9 @@ def _from_admin(message):
 
 
 async def _next_launch(**kwargs):
-    next_launch_dict = await apis.spacex.get_next_launch_dict()
+    next_launch_dict = await apis.spacex.get_launch_dict()
 
-    if next_launch_dict == -1:
+    if next_launch_dict == {}:
         launch_info_embed = statics.API_ERROR_EMBED
     else:
         launch_info_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
@@ -130,8 +127,12 @@ async def _debug_launching_soon(**kwargs):
     except ValueError:
         return "Invalid launch number"
 
-    next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
-    lse = await embedcreators.get_launching_soon_embed(next_launch_dict)
+    launch_dict = await apis.spacex.get_launch_dict(launch_number)
+
+    if launch_dict == {}:
+        return
+
+    lse = await embedcreators.get_launching_soon_embed(launch_dict)
     return lse
 
 
@@ -148,8 +149,12 @@ async def _debug_launch_information(**kwargs):
     except ValueError:
         return "Invalid launch number"
 
-    next_launch_dict = await apis.spacex.get_next_launch_dict(launch_number)
-    lie = await embedcreators.get_launch_info_embed(next_launch_dict)
+    launch_dict = await apis.spacex.get_launch_dict(launch_number)
+
+    if launch_dict == {}:
+        return
+
+    lie = await embedcreators.get_launch_info_embed(launch_dict)
     return lie
 
 
@@ -182,42 +187,17 @@ async def _log_dump(**kwargs):
     return log_message.format(log_content)
 
 
-# Define after commands function definitions
-CMD_PREFIX = config.BOT_COMMAND_PREFIX
 CMD_FUNC_LOOKUP = {
-    f"{CMD_PREFIX}nextlaunch": _next_launch,
-    f"{CMD_PREFIX}addchannel": _add_channel,
-    f"{CMD_PREFIX}removechannel": _remove_channel,
-    f"{CMD_PREFIX}setmentions": _set_mentions,
-    f"{CMD_PREFIX}getmentions": _get_mentions,
-    f"{CMD_PREFIX}removementions": _remove_mentions,
-    f"{CMD_PREFIX}info": _info,
-    f"{CMD_PREFIX}help": _help,
-    f"{CMD_PREFIX}dbgls": _debug_launching_soon,
-    f"{CMD_PREFIX}dbgli": _debug_launch_information,
-    f"{CMD_PREFIX}resetnts": _reset_notif_task_store,
-    f"{CMD_PREFIX}logdump": _log_dump,
+    "nextlaunch": _next_launch,
+    "addchannel": _add_channel,
+    "removechannel": _remove_channel,
+    "setmentions": _set_mentions,
+    "getmentions": _get_mentions,
+    "removementions": _remove_mentions,
+    "info": _info,
+    "help": _help,
+    "dbgls": _debug_launching_soon,
+    "dbgli": _debug_launch_information,
+    "resetnts": _reset_notif_task_store,
+    "logdump": _log_dump,
 }
-
-
-async def handle_command(client, message):
-    # Commands can be in any case
-    message.content = message.content.lower()
-    command_used = message.content.split(" ")[0]
-
-    try:
-        run_command = CMD_FUNC_LOOKUP[command_used]
-        # All commands are passed the client and the message objects
-        to_send = await run_command(client=client, message=message)
-
-    except KeyError:
-        to_send = None
-
-    except aredis.RedisError as ex:
-        logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
-        to_send = statics.DB_ERROR_EMBED
-
-    if to_send is None:
-        return
-
-    await client.send_s(message.channel, to_send)

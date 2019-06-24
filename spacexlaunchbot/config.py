@@ -10,10 +10,6 @@ BOT_GAME = "with rockets"
 BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = "411618411169447950"
 BOT_INVITE_PERMISSIONS = "19456"
-BOT_INVITE = (
-    "https://discordapp.com/oauth2/authorize?scope=bot"
-    f"&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
-)
 
 LOG_PATH = "/var/log/spacexlaunchbot/bot.log" if os.name != "nt" else "bot.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
@@ -22,9 +18,6 @@ LOG_LEVEL = logging.INFO
 REDIS_HOST = "127.0.0.1"
 REDIS_PORT = 6379
 REDIS_DB = 0
-
-DBL_URL = f"https://discordbots.org/api/bots/{BOT_CLIENT_ID}/stats"
-DBL_HEADERS = {"Authorization": API_TOKEN_DBL, "Content-Type": "application/json"}
 
 # error_red --> used for error embeds
 # falcon_red --> used for launch embeds

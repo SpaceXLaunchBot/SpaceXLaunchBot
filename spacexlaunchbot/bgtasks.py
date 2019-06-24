@@ -16,10 +16,10 @@ async def _check_and_send_notifs(client):
     """Checks what notification messages need to be sent, and send them
     Updates Redis values if necessary
     """
-    next_launch_dict = await apis.spacex.get_next_launch_dict()
+    next_launch_dict = await apis.spacex.get_launch_dict()
 
     # If the API is misbehaving, don't do anything, as we risk sending incorrect data
-    if next_launch_dict == -1:
+    if next_launch_dict == {}:
         return
 
     # At the end of this method, remove all channels that we can't access anymore
