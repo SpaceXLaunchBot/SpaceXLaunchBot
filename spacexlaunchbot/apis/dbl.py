@@ -18,7 +18,5 @@ async def update_guild_count(guild_count: int):
 
     async with aiohttp.ClientSession() as session:
         await session.post(
-            config.DBL_URL,
-            json={"server_count": guild_count},
-            headers=config.DBL_HEADERS,
+            DBL_URL, json={"server_count": guild_count}, headers=DBL_HEADERS
         )
