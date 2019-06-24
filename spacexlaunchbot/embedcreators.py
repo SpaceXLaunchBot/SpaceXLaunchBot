@@ -1,7 +1,8 @@
-import copy
 import discord
+import copy
 from typing import Dict
 
+import discordclient
 import config
 import structure
 import statics
@@ -166,7 +167,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     return notif_embed
 
 
-async def get_info_embed(client: discord.Client) -> discord.Embed:
+async def get_info_embed(client: discordclient.SpaceXLaunchBotClient) -> discord.Embed:
     """Creates an info embed
     """
 

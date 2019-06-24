@@ -5,7 +5,7 @@ import datetime
 import config
 
 
-async def utc_from_ts(timestamp):
+async def utc_from_ts(timestamp: int) -> str:
     """Get a UTC string from a unix timestamp
     Specifically, for getting the launch time, so if timestamp is not an int, returns
     "To Be Announced"

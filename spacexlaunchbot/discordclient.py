@@ -1,6 +1,7 @@
 import discord
 import aredis
 import logging
+from typing import Union, Set
 
 import commands
 import statics
@@ -66,20 +67,22 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
             to_send = statics.DB_ERROR_EMBED
 
-        if to_send is None:
+        if to_send is None or to_send.strip() == "":
             return
 
         await self.send_s(message.channel, to_send)
 
-    async def set_playing(self, title):
+    async def set_playing(self, title: str):
         await self.change_presence(activity=discord.Game(name=title))
 
     @staticmethod
-    async def send_s(channel, to_send):
+    async def send_s(
+        channel: discord.TextChannel, to_send: Union[str, discord.Embed]
+    ) -> int:
         """Sends a text / embed message to a channel safely
         If an error occurs, safely suppress it so the bot doesn't crash
-        On success returns what the channel.send method returns
-        On failure, returns:
+        Returns:
+          0 : Success
          -1 : Message / embed / embed.title too long
          -2 : Nothing to send (to_send is not a string or Embed)
          -3 : Forbidden (No permission to message this channel)
@@ -89,21 +92,25 @@ class SpaceXLaunchBotClient(discord.Client):
             if isinstance(to_send, str):
                 if len(to_send) > 2000:
                     return -1
-                return await channel.send(to_send)
+                await channel.send(to_send)
+                return 0
             if isinstance(to_send, discord.Embed):
                 if len(to_send) > 2048 or len(to_send.title) > 256:
                     return -1
-                return await channel.send(embed=to_send)
+                await channel.send(embed=to_send)
+                return 0
             return -2
         except discord.errors.Forbidden:
             return -3
         except discord.errors.HTTPException:
             return -4
 
-    async def send_all_subscribed(self, to_send, send_mentions=False):
+    async def send_all_subscribed(
+        self, to_send: Union[str, discord.Embed], send_mentions: bool = False
+    ) -> Set[int]:
         """Send all subscribed channels to_send
         If send_mentions is true, get mentions from redis and send as well
-        Returns a set of channels that are invalid -> should be removed
+        Returns a set of channels that are invalid -> should be unsubscribed
         """
         channel_ids = await redis.get_subbed_channels()
         invalid_ids = set()

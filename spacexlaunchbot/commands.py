@@ -1,3 +1,5 @@
+import discord
+
 import config
 import embedcreators
 import statics
@@ -5,13 +7,13 @@ import apis
 from redisclient import redis
 
 
-def _from_owner(message):
+def _from_owner(message: discord.Message) -> bool:
     """Returns True/False depending on the sender of the message
     """
     return message.author.id == int(config.BOT_OWNER_ID)
 
 
-def _from_admin(message):
+def _from_admin(message: discord.Message) -> bool:
     """Returns True/False depending on the sender of the message
     """
     try:
