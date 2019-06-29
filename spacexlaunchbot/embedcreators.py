@@ -167,7 +167,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     return notif_embed
 
 
-async def get_info_embed(client: discordclient.SpaceXLaunchBotClient) -> discord.Embed:
+async def get_info_embed(client) -> discord.Embed:
     """Creates an info embed
     """
 
@@ -188,7 +188,7 @@ async def get_info_embed(client: discordclient.SpaceXLaunchBotClient) -> discord
     info_embed.add_field(
         name="Links", value=f"[GitHub]({config.BOT_GITHUB}), [Bot Invite]({BOT_INVITE})"
     )
-    info_embed.add_field(name="Contact", value=f"{statics.OWNER_MENTION}")
+    info_embed.add_field(name="Contact", value=f"{config.BOT_OWNER}")
     info_embed.add_field(
         name="Help",
         value=f"Use {config.BOT_COMMAND_PREFIX}help to get a list of commands",

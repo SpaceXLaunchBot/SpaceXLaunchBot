@@ -4,11 +4,12 @@ import logging
 API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
 API_TOKEN_DBL = os.environ["SLB_API_TOKEN_DBL"]
 
-BOT_OWNER_ID = "263412940869206027"
+BOT_OWNER = "Dragon#0571"
+BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "!"
 BOT_GAME = "with rockets"
 BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
-BOT_CLIENT_ID = "411618411169447950"
+BOT_CLIENT_ID = 411618411169447950
 BOT_INVITE_PERMISSIONS = "19456"
 
 LOG_PATH = "/var/log/spacexlaunchbot/bot.log" if os.name != "nt" else "bot.log"

@@ -20,7 +20,6 @@ async def startup():
 
 def main():
     asyncio.get_event_loop().run_until_complete(startup())
-
     client = discordclient.SpaceXLaunchBotClient()
     client.run(config.API_TOKEN_DISCORD)
 

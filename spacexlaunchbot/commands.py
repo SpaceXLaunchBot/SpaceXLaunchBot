@@ -10,7 +10,7 @@ from redisclient import redis
 def _from_owner(message: discord.Message) -> bool:
     """Returns True/False depending on the sender of the message
     """
-    return message.author.id == int(config.BOT_OWNER_ID)
+    return message.author.id == config.BOT_OWNER_ID
 
 
 def _from_admin(message: discord.Message) -> bool:
@@ -35,7 +35,7 @@ async def _next_launch(**kwargs):
 
 
 async def _add_channel(**kwargs):
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_admin(message):
         return
 
@@ -49,7 +49,7 @@ async def _add_channel(**kwargs):
 
 
 async def _remove_channel(**kwargs):
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_admin(message):
         return
 
@@ -63,7 +63,7 @@ async def _remove_channel(**kwargs):
 
 
 async def _set_mentions(**kwargs):
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_admin(message):
         return
 
@@ -79,7 +79,7 @@ async def _set_mentions(**kwargs):
 
 
 async def _get_mentions(**kwargs):
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_admin(message):
         return
 
@@ -93,7 +93,7 @@ async def _get_mentions(**kwargs):
 
 
 async def _remove_mentions(**kwargs):
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_admin(message):
         return
 
@@ -107,7 +107,7 @@ async def _remove_mentions(**kwargs):
 
 
 async def _info(**kwargs):
-    client = kwargs["client"]
+    client = kwargs.get("client")
     info_embed = await embedcreators.get_info_embed(client)
     return info_embed
 
@@ -119,7 +119,7 @@ async def _help(**kwargs):
 async def _debug_launching_soon(**kwargs):
     """Send launching soon embed for the given launch
     """
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_owner(message):
         return
 
@@ -141,7 +141,7 @@ async def _debug_launching_soon(**kwargs):
 async def _debug_launch_information(**kwargs):
     """Send launch information embed for the given launch
     """
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_owner(message):
         return
 
@@ -164,7 +164,7 @@ async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications)
     prefix + resetnts
     """
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_owner(message):
         return
 
@@ -176,7 +176,7 @@ async def _log_dump(**kwargs):
     """Reply with latest lines from bot.log
     prefix + logdump
     """
-    message = kwargs["message"]
+    message = kwargs.get("message")
     if not _from_owner(message):
         return
 

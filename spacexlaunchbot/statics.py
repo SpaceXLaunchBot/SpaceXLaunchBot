@@ -16,8 +16,6 @@ ROCKET_ID_IMAGES = {
 ERROR_RED = Colour.from_rgb(*config.EMBED_COLOURS["error_red"])
 FALCON_RED = Colour.from_rgb(*config.EMBED_COLOURS["falcon_red"])
 
-OWNER_MENTION = f"<@{config.BOT_OWNER_ID}>"
-
 HELP_EMBED = Embed(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
@@ -67,21 +65,21 @@ HELP_EMBED.add_field(
 
 NEXT_LAUNCH_ERROR_EMBED = Embed(
     title="Error",
-    description=f"An launch_info_embed error occurred, contact {OWNER_MENTION}",
+    description=f"An launch_info_embed error occurred, contact {config.BOT_OWNER}",
     color=ERROR_RED,
 )
 API_ERROR_EMBED = Embed(
     title="Error",
-    description=f"An API error occurred, contact {OWNER_MENTION}",
+    description=f"An API error occurred, contact {config.BOT_OWNER}",
     color=ERROR_RED,
 )
 GENERAL_ERROR_EMBED = Embed(
     title="Error",
-    description=f"An error occurred, contact {OWNER_MENTION}",
+    description=f"An error occurred, contact {config.BOT_OWNER}",
     color=ERROR_RED,
 )
 DB_ERROR_EMBED = Embed(
     title="Error",
-    description=f"A database error occurred, contact {OWNER_MENTION}",
+    description=f"A database error occurred, contact {config.BOT_OWNER}",
     color=ERROR_RED,
 )

@@ -67,7 +67,7 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
             to_send = statics.DB_ERROR_EMBED
 
-        if to_send is None or to_send.strip() == "":
+        if to_send is None:
             return
 
         await self.send_s(message.channel, to_send)
