@@ -2,7 +2,6 @@ import discord
 import copy
 from typing import Dict
 
-import discordclient
 import config
 import structure
 import statics
@@ -167,11 +166,9 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     return notif_embed
 
 
-async def get_info_embed(client) -> discord.Embed:
+async def get_info_embed(guild_count: int) -> discord.Embed:
     """Creates an info embed
     """
-
-    guild_count = len(client.guilds)
     subbed_channel_count = await redis.subbed_channels_count()
 
     info_embed = discord.Embed(

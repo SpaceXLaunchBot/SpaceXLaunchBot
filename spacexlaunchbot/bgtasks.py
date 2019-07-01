@@ -14,7 +14,7 @@ ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
-async def _check_and_send_notifs(client):
+async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient"):
     """Checks what notification messages need to be sent, and send them
     Updates Redis values if necessary
     """
@@ -75,7 +75,7 @@ async def _check_and_send_notifs(client):
         await redis.remove_subbed_channel(channel_id)
 
 
-async def notification_task(client):
+async def notification_task(client: "discordclient.SpaceXLaunchBotClient"):
     """An async task to send out launching soon & launch info notifications
     """
     await client.wait_until_ready()

@@ -1,4 +1,5 @@
 import discord
+from typing import Callable
 
 import config
 import embedcreators
@@ -7,20 +8,33 @@ import apis
 from redisclient import redis
 
 
-def _from_owner(message: discord.Message) -> bool:
-    """Returns True/False depending on the sender of the message
+def req_id_owner(func: Callable) -> Callable:
+    """Runs command if message.author.id == BOT_OWNER_ID
+    Returns a blank string if user does not meet requirement
     """
-    return message.author.id == config.BOT_OWNER_ID
+
+    def wrapper(**kwargs):
+        message = kwargs.get("message")
+        if message.author.id == config.BOT_OWNER_ID:
+            return func(**kwargs)
+        return ""
+
+    return wrapper
 
 
-def _from_admin(message: discord.Message) -> bool:
-    """Returns True/False depending on the sender of the message
+def req_perm_admin(func: Callable) -> Callable:
+    """Runs command if message.author has the administrator permission
+    Returns a blank string if user does not meet requirement
     """
-    try:
-        is_admin = message.author.permissions_in(message.channel).administrator
-    except AttributeError:
-        is_admin = False
-    return is_admin
+
+    def wrapper(**kwargs):
+        message = kwargs.get("message")
+        perms = message.author.permissions_in(message.channel)
+        if getattr(perms, "administrator", False):
+            return func(**kwargs)
+        return ""
+
+    return wrapper
 
 
 async def _next_launch(**kwargs):
@@ -34,11 +48,9 @@ async def _next_launch(**kwargs):
     return launch_info_embed
 
 
+@req_perm_admin
 async def _add_channel(**kwargs):
     message = kwargs.get("message")
-    if not _from_admin(message):
-        return
-
     reply = "This channel has been added to the notification service"
 
     added = await redis.add_subbed_channel(message.channel.id)
@@ -48,11 +60,9 @@ async def _add_channel(**kwargs):
     return reply
 
 
+@req_perm_admin
 async def _remove_channel(**kwargs):
     message = kwargs.get("message")
-    if not _from_admin(message):
-        return
-
     reply = "This channel has been removed from the notification service"
 
     removed = await redis.remove_subbed_channel(message.channel.id)
@@ -62,12 +72,11 @@ async def _remove_channel(**kwargs):
     return reply
 
 
+@req_perm_admin
 async def _set_mentions(**kwargs):
     message = kwargs.get("message")
-    if not _from_admin(message):
-        return
-
     reply = "Invalid input for setmentions command"
+
     roles_to_mention = " ".join(message.content.split("setmentions")[1:])
     roles_to_mention = roles_to_mention.strip()
 
@@ -78,11 +87,9 @@ async def _set_mentions(**kwargs):
     return reply
 
 
+@req_perm_admin
 async def _get_mentions(**kwargs):
     message = kwargs.get("message")
-    if not _from_admin(message):
-        return
-
     reply = "This guild has no mentions set"
 
     mentions = await redis.get_guild_mentions(message.guild.id)
@@ -92,11 +99,9 @@ async def _get_mentions(**kwargs):
     return reply
 
 
+@req_perm_admin
 async def _remove_mentions(**kwargs):
     message = kwargs.get("message")
-    if not _from_admin(message):
-        return
-
     reply = "Removed mentions succesfully"
 
     deleted = await redis.delete_guild_mentions(message.guild.id)
@@ -108,7 +113,8 @@ async def _remove_mentions(**kwargs):
 
 async def _info(**kwargs):
     client = kwargs.get("client")
-    info_embed = await embedcreators.get_info_embed(client)
+    guild_count = len(client.guilds)
+    info_embed = await embedcreators.get_info_embed(guild_count)
     return info_embed
 
 
@@ -116,12 +122,11 @@ async def _help(**kwargs):
     return statics.HELP_EMBED
 
 
+@req_id_owner
 async def _debug_launching_soon(**kwargs):
     """Send launching soon embed for the given launch
     """
     message = kwargs.get("message")
-    if not _from_owner(message):
-        return
 
     try:
         launch_number = "".join(message.content.split(" ")[1:])
@@ -138,12 +143,11 @@ async def _debug_launching_soon(**kwargs):
     return lse
 
 
+@req_id_owner
 async def _debug_launch_information(**kwargs):
     """Send launch information embed for the given launch
     """
     message = kwargs.get("message")
-    if not _from_owner(message):
-        return
 
     try:
         launch_number = "".join(message.content.split(" ")[1:])
@@ -160,26 +164,20 @@ async def _debug_launch_information(**kwargs):
     return lie
 
 
+@req_id_owner
 async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications)
     prefix + resetnts
     """
-    message = kwargs.get("message")
-    if not _from_owner(message):
-        return
-
     await redis.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
     return "Reset notification_task_store"
 
 
+@req_id_owner
 async def _log_dump(**kwargs):
     """Reply with latest lines from bot.log
     prefix + logdump
     """
-    message = kwargs.get("message")
-    if not _from_owner(message):
-        return
-
     log_message = "```\n{}```"
 
     with open(config.LOG_PATH, "r") as config_file:
