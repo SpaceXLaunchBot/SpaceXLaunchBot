@@ -1,4 +1,3 @@
-import discord
 from typing import Callable
 
 import config

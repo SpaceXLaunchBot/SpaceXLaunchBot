@@ -4,7 +4,7 @@ import datetime
 import aredis
 from typing import Set
 
-import discordclient
+import discordclient  # pylint: disable=unused-import
 import config
 import embedcreators
 import apis
