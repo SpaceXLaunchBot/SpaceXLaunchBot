@@ -70,9 +70,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient"):
 
     # Save any changed data to redis
     await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
-    for channel_id in channels_to_remove:
-        logging.info(f"{channel_id} is an invalid channel ID, removing")
-        await redis.remove_subbed_channel(channel_id)
+    await redis.remove_subbed_channels(channels_to_remove)
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient"):

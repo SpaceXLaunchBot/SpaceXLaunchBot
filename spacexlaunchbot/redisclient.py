@@ -1,7 +1,7 @@
 import logging
 import pickle
 import aredis
-from typing import Tuple, Set
+from typing import Tuple, Set, List
 
 import statics
 import config
@@ -109,6 +109,18 @@ class RedisClient(aredis.StrictRedis):
         """
         channel_id_bytes = str(channel_id).encode("UTF-8")
         return await self.srem(self.KEY_SUBSCRIBED_CHANNELS, channel_id_bytes)
+
+    async def remove_subbed_channels(self, channels_to_remove: Set[int]) -> List[int]:
+        """Uses a pipeline to remove a group of channels from the subbed channels set
+        Returns a List of all the srem command returns, e.g. [1, 1, 1, 0]
+        """
+        pipe = await self.pipeline()
+
+        for channel_id in channels_to_remove:
+            channel_id_bytes = str(channel_id).encode("UTF-8")
+            await pipe.srem(self.KEY_SUBSCRIBED_CHANNELS, channel_id_bytes)
+
+        return await pipe.execute()
 
     async def subbed_channels_count(self) -> int:
         """Returns the number of subscribed channels
