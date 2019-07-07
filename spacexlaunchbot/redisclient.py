@@ -47,9 +47,12 @@ class RedisClient(aredis.StrictRedis):
         1: li_dict_hash
         """
         hash_key = self.KEY_NOTIFICATION_TASK_STORE
+        pipe = await self.pipeline()
 
-        ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
-        li_dict_hash = await self.hget(hash_key, "li_dict_hash")
+        await pipe.hget(hash_key, "ls_notif_sent")
+        await pipe.hget(hash_key, "li_dict_hash")
+
+        ls_notif_sent, li_dict_hash = await pipe.execute()
 
         return ls_notif_sent.decode("UTF-8"), li_dict_hash.decode("UTF-8")
 
@@ -62,8 +65,12 @@ class RedisClient(aredis.StrictRedis):
         ls_notif_sent_bytes = ls_notif_sent.encode("UTF-8")
         li_dict_hash_bytes = li_dict_hash.encode("UTF-8")
 
-        await self.hset(hash_key, "ls_notif_sent", ls_notif_sent_bytes)
-        await self.hset(hash_key, "li_dict_hash", li_dict_hash_bytes)
+        pipe = await self.pipeline()
+
+        await pipe.hset(hash_key, "ls_notif_sent", ls_notif_sent_bytes)
+        await pipe.hset(hash_key, "li_dict_hash", li_dict_hash_bytes)
+
+        await pipe.execute()
 
     async def set_guild_mentions(self, guild_id: int, to_mention: str):
         """Set mentions for a guild
