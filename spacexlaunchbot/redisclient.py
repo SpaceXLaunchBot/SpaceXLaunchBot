@@ -1,9 +1,7 @@
 import logging
-import pickle
 import aredis
 from typing import Tuple, Set, List
 
-import statics
 import config
 
 
@@ -23,8 +21,8 @@ class RedisClient(aredis.StrictRedis):
     notification_task_store   | A Redis hash containing variables that need to persist
                               | between runs of the notification task. This includes:
                               | "ls_notif_sent": "True" OR "False" (str not bool)
-                              | "li_embed_dict": pickled(embed_dict)
-                              | See bgtasks.notification_task to see usage
+                              | "li_dict_hash": SHA256 hash of li embed dict
+                              | Go to bgtasks to see usage
     """
 
     KEY_PREFIX = "slb:"
@@ -40,34 +38,32 @@ class RedisClient(aredis.StrictRedis):
         """
         if not await self.exists(self.KEY_NOTIFICATION_TASK_STORE):
             logging.info(f"{self.KEY_NOTIFICATION_TASK_STORE} does not exist, creating")
-            await self.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
+            await self.set_notification_task_store("False", "0")
 
-    async def get_notification_task_store(self) -> Tuple[str, dict]:
+    async def get_notification_task_store(self) -> Tuple[str, str]:
         """Gets and decodes / deserializes variables from notification_task_store
         Returns a list with these indexes:
         0: ls_notif_sent
-        1: li_embed_dict
+        1: li_dict_hash
         """
         hash_key = self.KEY_NOTIFICATION_TASK_STORE
 
         ls_notif_sent = await self.hget(hash_key, "ls_notif_sent")
-        li_embed_dict = await self.hget(hash_key, "li_embed_dict")
+        li_dict_hash = await self.hget(hash_key, "li_dict_hash")
 
-        return ls_notif_sent.decode("UTF-8"), pickle.loads(li_embed_dict)
+        return ls_notif_sent.decode("UTF-8"), li_dict_hash.decode("UTF-8")
 
-    async def set_notification_task_store(
-        self, ls_notif_sent: str, li_embed_dict: dict
-    ):
+    async def set_notification_task_store(self, ls_notif_sent: str, li_dict_hash: str):
         """Update / create the hash for notification_task_store
         Automatically encodes / serializes both arguments
         """
         hash_key = self.KEY_NOTIFICATION_TASK_STORE
 
         ls_notif_sent_bytes = ls_notif_sent.encode("UTF-8")
-        li_embed_dict_bytes = pickle.dumps(li_embed_dict)
+        li_dict_hash_bytes = li_dict_hash.encode("UTF-8")
 
         await self.hset(hash_key, "ls_notif_sent", ls_notif_sent_bytes)
-        await self.hset(hash_key, "li_embed_dict", li_embed_dict_bytes)
+        await self.hset(hash_key, "li_dict_hash", li_dict_hash_bytes)
 
     async def set_guild_mentions(self, guild_id: int, to_mention: str):
         """Set mentions for a guild

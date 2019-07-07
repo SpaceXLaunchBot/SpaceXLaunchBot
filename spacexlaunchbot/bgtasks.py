@@ -2,6 +2,9 @@ import logging
 import asyncio
 import datetime
 import aredis
+import hashlib
+import json
+import discord
 from typing import Set
 
 import discordclient  # pylint: disable=unused-import
@@ -14,31 +17,40 @@ ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
+async def hash_embed(embed: discord.Embed) -> str:
+    """Takes an Embed obj, converts to a sorted JSON string and returns the SHA256 hash
+    """
+    # sort_keys ensures consistency
+    sorted_embed_dict = json.dumps(embed.to_dict(), sort_keys=True)
+    sorted_embed_dict_bytes = sorted_embed_dict.encode("UTF-8")
+    return hashlib.sha256(sorted_embed_dict_bytes).hexdigest()
+
+
 async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient"):
     """Checks what notification messages need to be sent, and send them
     Updates Redis values if necessary
     """
     next_launch_dict = await apis.spacex.get_launch_dict()
 
-    # If the API is misbehaving, don't do anything, as we risk sending incorrect data
+    # If the API is misbehaving, don't do anything, don't risk sending incorrect data
     if next_launch_dict == {}:
         return
 
-    # At the end of this method, remove all channels that we can't access anymore
+    # At the end of this method, remove all channels that can't be access anymore
     channels_to_remove: Set[int] = set()
 
-    # Names shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, li_embed_dict = await redis.get_notification_task_store()
+    # Shortened to save space, ls = launching soon, li = launch information
+    ls_notif_sent, latest_li_embed_hash = await redis.get_notification_task_store()
 
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
-    new_li_embed_dict = new_li_embed.to_dict()
+    new_li_embed_hash = await hash_embed(new_li_embed)
 
     # Send out a launch information embed if it has changed from the previous one
-    if new_li_embed_dict != li_embed_dict:
+    if new_li_embed_hash != latest_li_embed_hash:
         logging.info("Launch info changed, sending notifications")
 
         ls_notif_sent = "False"
-        li_embed_dict = new_li_embed_dict
+        latest_li_embed_hash = new_li_embed_hash
 
         # New launch found, send all "subscribed" channels the embed
         invalid_channels = await client.send_all_subscribed(new_li_embed)
@@ -69,7 +81,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient"):
         ls_notif_sent = "True"
 
     # Save any changed data to redis
-    await redis.set_notification_task_store(ls_notif_sent, li_embed_dict)
+    await redis.set_notification_task_store(ls_notif_sent, latest_li_embed_hash)
     await redis.remove_subbed_channels(channels_to_remove)
 
 

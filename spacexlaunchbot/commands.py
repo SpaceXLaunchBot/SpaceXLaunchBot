@@ -9,21 +9,21 @@ from redisclient import redis
 
 def req_id_owner(func: Callable) -> Callable:
     """Runs command if message.author.id == BOT_OWNER_ID
-    Returns a blank string if user does not meet requirement
+    Returns None if message.author does not meet requirement
     """
 
     def wrapper(**kwargs):
         message = kwargs.get("message")
         if message.author.id == config.BOT_OWNER_ID:
             return func(**kwargs)
-        return ""
+        return None
 
     return wrapper
 
 
 def req_perm_admin(func: Callable) -> Callable:
     """Runs command if message.author has the administrator permission
-    Returns a blank string if user does not meet requirement
+    Returns None if message.author does not meet requirement
     """
 
     def wrapper(**kwargs):
@@ -31,7 +31,7 @@ def req_perm_admin(func: Callable) -> Callable:
         perms = message.author.permissions_in(message.channel)
         if getattr(perms, "administrator", False):
             return func(**kwargs)
-        return ""
+        return None
 
     return wrapper
 
@@ -168,7 +168,7 @@ async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications)
     prefix + resetnts
     """
-    await redis.set_notification_task_store("False", statics.GENERAL_ERROR_EMBED)
+    await redis.set_notification_task_store("False", "0")
     return "Reset notification_task_store"
 
 
