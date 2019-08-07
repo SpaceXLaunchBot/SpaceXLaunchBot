@@ -23,15 +23,21 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self):
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
-        await apis.dbl.update_guild_count(len(self.guilds))
+        guild_count = len(self.guilds)
+        await apis.dbl.update_guild_count(guild_count)
+        await apis.bod.update_guild_count(guild_count)
 
     async def on_guild_join(self, guild):
         logging.info(f"Joined guild, ID: {guild.id}")
-        await apis.dbl.update_guild_count(len(self.guilds))
+        guild_count = len(self.guilds)
+        await apis.dbl.update_guild_count(guild_count)
+        await apis.bod.update_guild_count(guild_count)
 
     async def on_guild_remove(self, guild):
         logging.info(f"Removed from guild, ID: {guild.id}")
-        await apis.dbl.update_guild_count(len(self.guilds))
+        guild_count = len(self.guilds)
+        await apis.dbl.update_guild_count(guild_count)
+        await apis.bod.update_guild_count(guild_count)
 
         deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
