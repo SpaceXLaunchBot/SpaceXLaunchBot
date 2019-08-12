@@ -6,7 +6,7 @@ import logging
 
 import config
 
-BOD_URL = f"https://bots.ondiscord.xyz/bot-api/bots/{config.BOT_CLIENT_ID}/guildss"
+BOD_URL = f"https://bots.ondiscord.xyz/bot-api/bots/{config.BOT_CLIENT_ID}/guilds"
 BOD_HEADERS = {
     "Authorization": config.API_TOKEN_BOD,
     "Content-Type": "application/json",
