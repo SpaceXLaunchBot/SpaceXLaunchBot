@@ -1,23 +1,23 @@
 import logging
 import logging.handlers
 import datetime
+from typing import Union
 
 import config
 
 
-async def utc_from_ts(timestamp: int) -> str:
+async def utc_from_ts(timestamp: Union[int, None]) -> str:
     """Get a UTC string from a unix timestamp
     Specifically, for getting the launch time, so if timestamp is not an int, returns
     "To Be Announced"
     """
-    try:
-        formatted_date = datetime.datetime.utcfromtimestamp(timestamp).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        return f"{formatted_date} UTC"
-    except TypeError:
-        # timestamp is not int
+    if timestamp is None:
         return "To Be Announced"
+
+    formatted_date = datetime.datetime.utcfromtimestamp(timestamp).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    return f"{formatted_date} UTC"
 
 
 async def setup_logging():

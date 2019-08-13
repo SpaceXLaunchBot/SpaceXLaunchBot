@@ -43,6 +43,9 @@ class SpaceXLaunchBotClient(discord.Client):
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
+    async def set_playing(self, title: str):
+        await self.change_presence(activity=discord.Game(name=title))
+
     async def on_message(self, message):
         if (
             not message.content.startswith(config.BOT_COMMAND_PREFIX)
@@ -77,9 +80,6 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         await self.send_s(message.channel, to_send)
-
-    async def set_playing(self, title: str):
-        await self.change_presence(activity=discord.Game(name=title))
 
     @staticmethod
     async def send_s(
