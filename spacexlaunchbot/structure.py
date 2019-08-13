@@ -7,9 +7,12 @@ import config
 
 
 async def utc_from_ts(timestamp: Union[int, None]) -> str:
-    """Get a UTC string from a unix timestamp
-    Specifically, for getting the launch time, so if timestamp is not an int, returns
-    "To Be Announced"
+    """
+    Convert a unix timestamp to a formatted date string
+
+    :param timestamp: A unix timestamp
+    :return: The timestamp formatted as a date, or "To Be Announced" if timestamp is
+        None
     """
     if timestamp is None:
         return "To Be Announced"
@@ -20,12 +23,15 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     return f"{formatted_date} UTC"
 
 
-async def setup_logging():
-    """Setup logging
+async def setup_logging() -> None:
+    """
+    Setup logging
     These settings will apply to any logging.info, error, debug, etc. call from now on
     This uses logging.basicConfig to setup the logging usage, which means this function
     has to be called before anything else even imports logging, otherwise the
     configuration set by this will not be used
+
+    :return: None
     """
     log_file_handler = logging.handlers.TimedRotatingFileHandler(
         filename=config.LOG_PATH, when="W0", backupCount=10, encoding="UTF-8"

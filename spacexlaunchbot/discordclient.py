@@ -12,7 +12,7 @@ from redisclient import redis
 
 
 class SpaceXLaunchBotClient(discord.Client):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         logging.info("Client initialised")
@@ -20,20 +20,20 @@ class SpaceXLaunchBotClient(discord.Client):
         # Create asyncio tasks now
         self.loop.create_task(bgtasks.notification_task(self))
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)
 
-    async def on_guild_join(self, guild):
+    async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)
 
-    async def on_guild_remove(self, guild):
+    async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
@@ -43,10 +43,16 @@ class SpaceXLaunchBotClient(discord.Client):
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
-    async def set_playing(self, title: str):
+    async def set_playing(self, title: str) -> None:
+        """
+        Set the bots current "Playing: " status
+
+        :param title: The title of the "game" the bot is playing
+        :return: None
+        """
         await self.change_presence(activity=discord.Game(name=title))
 
-    async def on_message(self, message):
+    async def on_message(self, message: discord.message) -> None:
         if (
             not message.content.startswith(config.BOT_COMMAND_PREFIX)
             or message.author.bot
@@ -85,14 +91,18 @@ class SpaceXLaunchBotClient(discord.Client):
     async def send_s(
         channel: discord.TextChannel, to_send: Union[str, discord.Embed]
     ) -> int:
-        """Sends a text / embed message to a channel safely
+        """
+        Sends a text / embed message to a channel safely
         If an error occurs, safely suppress it so the bot doesn't crash
-        Returns:
-          0 : Success
-         -1 : Message / embed / embed.title too long
-         -2 : Nothing to send (to_send is not a string or Embed)
-         -3 : Forbidden (No permission to message this channel)
-         -4 : HTTPException (API down, network issues, etc.)
+
+        :param channel: A discord.Channel object
+        :param to_send: A String or discord.Embed object
+        :return: An integer 0 to -4:
+            - 0 : Success
+            - -1 : Message / embed / embed.title too long
+            - -2 : Nothing to send (to_send is not a string or Embed)
+            - -3 : Forbidden (No permission to message this channel)
+            - -4 : HTTPException (API down, network issues, etc.)
         """
         try:
             if isinstance(to_send, str):
@@ -114,9 +124,12 @@ class SpaceXLaunchBotClient(discord.Client):
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False
     ) -> Set[int]:
-        """Send all subscribed channels to_send
-        If send_mentions is true, get mentions from redis and send as well
-        Returns a set of channels that are invalid -> should be unsubscribed
+        """
+        Send a message to all subscribed channels
+
+        :param to_send: A String or discord.Embed object
+        :param send_mentions: If True, get mentions from redis and send as well
+        :return: A set of channels that are invalid so should be unsubscribed
         """
         channel_ids = await redis.get_subbed_channels()
         invalid_ids = set()

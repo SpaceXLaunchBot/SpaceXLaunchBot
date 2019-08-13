@@ -1,4 +1,5 @@
-"""Handles interactions with the discordbots.org API
+"""
+Handles interactions with the discordbots.org API
 """
 
 import aiohttp
@@ -13,7 +14,13 @@ DBL_HEADERS = {
 }
 
 
-async def update_guild_count(guild_count: int):
+async def update_guild_count(guild_count: int) -> None:
+    """
+    Updates the live guild count for the bots discordbots.org page
+
+    :param guild_count: The number of guilds the bot is currently a member of
+    :return: None
+    """
     logging.info(f"Sending a guild_count of {guild_count} to DBL")
 
     async with aiohttp.ClientSession() as session:

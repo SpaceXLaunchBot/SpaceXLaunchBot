@@ -1,4 +1,5 @@
-"""Handles interactions with the SpaceX API
+"""
+Handles interactions with the SpaceX API
 As of 13/01/19, API rate limit is 50 req/sec per IP
 """
 
@@ -8,9 +9,12 @@ from typing import Dict
 
 
 async def get_launch_dict(launch_number: int = 0) -> Dict:
-    """Get a launch dict for the given launch
+    """
+    Get a launch information dictionary for the given launch
     If launch_number <= 0 (the default), get the "next" launch
-    Returns {} on failure
+
+    :param launch_number: The launch number to get information for
+    :return: A dictionary containing launch information, or {} if a request fails
     """
 
     route = str(launch_number) if launch_number > 0 else "next"

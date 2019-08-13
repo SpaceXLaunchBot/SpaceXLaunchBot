@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Dict
 
 import config
 import embedcreators
@@ -8,8 +8,12 @@ from redisclient import redis
 
 
 def req_id_owner(func: Callable) -> Callable:
-    """Runs command if message.author.id == BOT_OWNER_ID
-    Returns None if message.author does not meet requirement
+    """
+    Runs command if message.author.id == BOT_OWNER_ID
+    The wrapped function will return None if message.author does not meet requirements
+
+    :param func: The function to wrap
+    :return: The wrapped function
     """
 
     def wrapper(**kwargs):
@@ -22,8 +26,12 @@ def req_id_owner(func: Callable) -> Callable:
 
 
 def req_perm_admin(func: Callable) -> Callable:
-    """Runs command if message.author has the administrator permission
-    Returns None if message.author does not meet requirement
+    """
+    Runs command if message.author has the administrator permission
+    The wrapped function will return None if message.author does not meet requirements
+
+    :param func: The function to wrap
+    :return: The wrapped function
     """
 
     def wrapper(**kwargs):
@@ -123,7 +131,8 @@ async def _help(**kwargs):
 
 @req_id_owner
 async def _debug_launching_soon(**kwargs):
-    """Send launching soon embed for the given launch
+    """
+    Send launching soon embed for the given launch
     """
     message = kwargs.get("message")
 
@@ -144,7 +153,8 @@ async def _debug_launching_soon(**kwargs):
 
 @req_id_owner
 async def _debug_launch_information(**kwargs):
-    """Send launch information embed for the given launch
+    """
+    Send launch information embed for the given launch
     """
     message = kwargs.get("message")
 
@@ -165,8 +175,8 @@ async def _debug_launch_information(**kwargs):
 
 @req_id_owner
 async def _reset_notif_task_store(**kwargs):
-    """Reset notification_task_store to default values (triggers notifications)
-    prefix + resetnts
+    """
+    Reset notification_task_store to default values (triggers notifications)
     """
     await redis.set_notification_task_store("False", "0")
     return "Reset notification_task_store"
@@ -174,8 +184,8 @@ async def _reset_notif_task_store(**kwargs):
 
 @req_id_owner
 async def _log_dump(**kwargs):
-    """Reply with latest lines from bot.log
-    prefix + logdump
+    """
+    Tail bot.log and send it
     """
     log_message = "```\n{}```"
 
@@ -186,7 +196,7 @@ async def _log_dump(**kwargs):
     return log_message.format(log_content)
 
 
-CMD_FUNC_LOOKUP = {
+CMD_FUNC_LOOKUP: Dict[str, Callable] = {
     "nextlaunch": _next_launch,
     "addchannel": _add_channel,
     "removechannel": _remove_channel,

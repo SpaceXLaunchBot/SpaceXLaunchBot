@@ -9,7 +9,7 @@ import discordclient
 import redisclient
 
 
-async def startup():
+async def startup() -> None:
     await structure.setup_logging()
     try:
         await redisclient.redis.init_defaults()
@@ -18,7 +18,7 @@ async def startup():
         sys.exit(1)
 
 
-def main():
+def main() -> None:
     asyncio.get_event_loop().run_until_complete(startup())
     client = discordclient.SpaceXLaunchBotClient()
     client.run(config.API_TOKEN_DISCORD)
