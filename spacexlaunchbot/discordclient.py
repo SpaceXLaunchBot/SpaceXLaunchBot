@@ -44,11 +44,11 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.info(f"Removed guild settings for {guild.id}")
 
     async def set_playing(self, title: str) -> None:
-        """
-        Set the bots current "Playing: " status
+        """Set the bots current "Playing: " status.
 
-        :param title: The title of the "game" the bot is playing
-        :return: None
+        Args:
+            title: The title of the "game" the bot is playing.
+
         """
         await self.change_presence(activity=discord.Game(name=title))
 
@@ -91,18 +91,22 @@ class SpaceXLaunchBotClient(discord.Client):
     async def send_s(
         channel: discord.TextChannel, to_send: Union[str, discord.Embed]
     ) -> int:
-        """
-        Sends a text / embed message to a channel safely
-        If an error occurs, safely suppress it so the bot doesn't crash
+        """Sends a text / embed message to a channel safely.
 
-        :param channel: A discord.Channel object
-        :param to_send: A String or discord.Embed object
-        :return: An integer 0 to -4:
-            - 0 : Success
-            - -1 : Message / embed / embed.title too long
-            - -2 : Nothing to send (to_send is not a string or Embed)
-            - -3 : Forbidden (No permission to message this channel)
-            - -4 : HTTPException (API down, network issues, etc.)
+        If an error occurs, safely suppress it so the bot doesn't crash.
+
+        Args:
+            channel: A discord.Channel object.
+            to_send: A String or discord.Embed object.
+
+        Returns:
+            An integer 0 to -4:
+                 0 : Success
+                -1 : Message / embed / embed.title too long.
+                -2 : Nothing to send (to_send is not a string or Embed).
+                -3 : Forbidden (No permission to message this channel).
+                -4 : HTTPException (API down, network issues, etc.).
+
         """
         try:
             if isinstance(to_send, str):
@@ -124,12 +128,15 @@ class SpaceXLaunchBotClient(discord.Client):
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False
     ) -> Set[int]:
-        """
-        Send a message to all subscribed channels
+        """Send a message to all subscribed channels.
 
-        :param to_send: A String or discord.Embed object
-        :param send_mentions: If True, get mentions from redis and send as well
-        :return: A set of channels that are invalid so should be unsubscribed
+        Args:
+            to_send: A String or discord.Embed object.
+            send_mentions: If True, get mentions from redis and send as well.
+
+        Returns:
+            A set of channels that are invalid so should be unsubscribed.
+
         """
         channel_ids = await redis.get_subbed_channels()
         invalid_ids = set()

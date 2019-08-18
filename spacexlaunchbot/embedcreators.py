@@ -30,11 +30,14 @@ BOT_INVITE = (
 
 
 async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
-    """
-    Creates a "launch information" style embed from a dict of launch information
+    """Creates a "launch information" style embed from a dict of launch information.
 
-    :param launch_dict: A dictionary of launch information from apis.spacex
-    :return: A Discord.Embed object
+    Args:
+        launch_dict: A dictionary of launch information from apis.spacex.
+
+    Returns:
+        A Discord.Embed object.
+
     """
 
     # Having desc set to `None` breaks things
@@ -138,11 +141,14 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
 
 
 async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
-    """
-    Create a "launching soon" style embed from a dict of launch information
+    """Create a "launching soon" style embed from a dict of launch information.
 
-    :param launch_dict: A dictionary of launch information from apis.spacex
-    :return: A Discord.Embed object
+    Args:
+        launch_dict: A dictionary of launch information from apis.spacex.
+
+    Returns:
+        A Discord.Embed object.
+
     """
 
     embed_desc = ""
@@ -177,11 +183,14 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
 
 
 async def get_info_embed(guild_count: int) -> discord.Embed:
-    """
-    Creates an info embed
+    """Creates an info embed.
 
-    :param guild_count: The number of guilds the bot is currently a member of
-    :return: A discord.Embed object
+    Args:
+        guild_count: The number of guilds the bot is currently a member of.
+
+    Returns:
+        A discord.Embed object.
+
     """
     subbed_channel_count = await redis.subbed_channels_count()
 

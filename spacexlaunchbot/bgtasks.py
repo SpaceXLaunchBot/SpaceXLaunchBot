@@ -18,11 +18,8 @@ LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA
 
 
 async def hash_embed(embed: discord.Embed) -> str:
-    """
-    Takes an Embed obj, converts to a sorted JSON string and returns the SHA256 hash
-
-    :param embed: A discord.Embed object
-    :return: A string containing the hexadecimal digits of the hash
+    """Takes a discord.Embed object, converts it to a sorted JSON string and returns the
+    SHA256 hash as a string of hexadecimal characters.
     """
     # sort_keys ensures consistency
     sorted_embed_dict = json.dumps(embed.to_dict(), sort_keys=True)
@@ -31,12 +28,13 @@ async def hash_embed(embed: discord.Embed) -> str:
 
 
 async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") -> None:
-    """
-    Checks what notification messages need to be sent, and sends them
-    Updates Redis values if they need updating
+    """Checks what notification messages need to be sent, and sends them.
 
-    :param client: A discord.Client object
-    :return: None
+    Updates Redis values if they need updating.
+
+    Args:
+        client : The client to use to send messages.
+
     """
     next_launch_dict = await apis.spacex.get_launch_dict()
 
@@ -94,11 +92,11 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
-    """
-    An async task to send out launching soon & launch info notifications
+    """An async task to send out launching soon & launch info notifications.
 
-    :param client: A discord.Client object
-    :return: None
+    Args:
+        client: The client to use to send messages.
+
     """
     await client.wait_until_ready()
     logging.info("Starting")
