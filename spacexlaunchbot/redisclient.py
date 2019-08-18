@@ -6,11 +6,12 @@ import config
 
 
 class RedisClient(aredis.StrictRedis):
-    """Redis Structure.
+    """A subclass of aredis.StrictRedis to deal with my specific use case(s)
 
     All keys are prepended with "slb:".
-    Variables in the keys described below are enclosed in {braces}.
 
+    Database structure:
+    ------------------------|-----------------------------------------------------------
     Key                     | Value
     ------------------------|-----------------------------------------------------------
     subscribed_channels     | A Redis SET of channel IDs to be sent notifications.
