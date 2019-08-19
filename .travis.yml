@@ -13,3 +13,5 @@ script:
   - mypy spacexlaunchbot
   # Static security analysis
   - bandit -r spacexlaunchbot -c .bandit
+  # Tests
+  - pytest

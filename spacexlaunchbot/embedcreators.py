@@ -3,7 +3,7 @@ import copy
 from typing import Dict
 
 import config
-import structure
+import utils
 import statics
 from redisclient import redis
 
@@ -68,7 +68,7 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
     )
 
     # Add a field for the launch date
-    utc_launch_date = await structure.utc_from_ts(launch_dict["launch_date_unix"])
+    utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
     launch_info_embed.add_field(
         name="Launch date",
         value=LAUNCH_DATE_INFO.format(
@@ -176,7 +176,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
         embed_desc += f"[Press kit]({launch_dict['links']['presskit']})\n"
     notif_embed.description = embed_desc
 
-    utc_launch_date = await structure.utc_from_ts(launch_dict["launch_date_unix"])
+    utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
     notif_embed.add_field(name="Launch date", value=utc_launch_date)
 
     return notif_embed

@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
-# Run this from the projects root directory
-# Runs pylint for Travis CI
+# Runs pylint for Travis CI - run this from the projects root directory
 # Why: https://fullvalence.com/2016/11/22/travis-and-pylint/
 
 rc=$(pylint spacexlaunchbot --rcfile=.pylintrc)
 
-# Fail Travis build if Pylint returns fatal (1) | error (2)
+# Fail Travis build if Pylint returns fatal (1) or error (2)
 if [[ rc == 1 || rc == 2 ]]; then
-    echo "pylint failed"
-    exit 1
+    echo "pylint failed" && exit 1
 else
-    echo "pylint passed"
-    exit 0
+    echo "pylint passed" && exit 0
 fi

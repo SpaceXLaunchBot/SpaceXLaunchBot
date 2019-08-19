@@ -24,6 +24,7 @@ class RedisClient(aredis.StrictRedis):
                             | "ls_notif_sent": "True" OR "False" (str not bool).
                             | "li_dict_hash": SHA256 hash of li embed dict.
                             | Go to bgtasks to see usage.
+
     """
 
     KEY_PREFIX = "slb:"

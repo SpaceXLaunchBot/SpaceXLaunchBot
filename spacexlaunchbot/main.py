@@ -3,14 +3,14 @@ import logging
 import aredis
 import sys
 
-import structure
+import utils
 import config
 import discordclient
 import redisclient
 
 
 async def startup() -> None:
-    await structure.setup_logging()
+    await utils.setup_logging()
     try:
         await redisclient.redis.init_defaults()
     except aredis.exceptions.ConnectionError:
