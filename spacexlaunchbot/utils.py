@@ -10,7 +10,7 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     """Convert a unix timestamp to a formatted date string.
 
     Args:
-        timestamp: A unix timestamp.
+        timestamp: A unix timestamp. Can be None.
 
     Returns:
         The timestamp formatted as a date, or "To Be Announced" if timestamp is None.
@@ -19,10 +19,9 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     if timestamp is None:
         return "To Be Announced"
 
-    formatted_date = datetime.datetime.utcfromtimestamp(timestamp).strftime(
-        "%Y-%m-%d %H:%M:%S"
+    return datetime.datetime.utcfromtimestamp(timestamp).strftime(
+        "%Y-%m-%d %H:%M:%S UTC"
     )
-    return f"{formatted_date} UTC"
 
 
 async def setup_logging() -> None:
