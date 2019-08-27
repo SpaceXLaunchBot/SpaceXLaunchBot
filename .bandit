@@ -1,2 +1,0 @@
-# Ignore pickle warnings
-skips: ['B403', 'B301']

@@ -12,6 +12,6 @@ script:
   # Static analysis of type hints
   - mypy spacexlaunchbot
   # Static security analysis
-  - bandit -r spacexlaunchbot -c .bandit
+  - bandit -r spacexlaunchbot
   # Tests
   - pytest
