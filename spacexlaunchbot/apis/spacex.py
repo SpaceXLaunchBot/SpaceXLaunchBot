@@ -3,9 +3,10 @@
 As of 13/01/19, API rate limit is 50 req/sec per IP.
 """
 
-import aiohttp
 import logging
 from typing import Dict
+
+import aiohttp
 
 
 async def get_launch_dict(launch_number: int = 0) -> Dict:

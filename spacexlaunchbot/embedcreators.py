@@ -1,10 +1,11 @@
-import discord
 import copy
 from typing import Dict
 
+import discord
+
 import config
-import utils
 import statics
+import utils
 from redisclient import redis
 
 PAYLOAD_INFO = """Type: {}

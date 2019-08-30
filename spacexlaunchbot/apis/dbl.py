@@ -1,8 +1,9 @@
 """Handles interactions with the discordbots.org API.
 """
 
-import aiohttp
 import logging
+
+import aiohttp
 
 import config
 

@@ -1,6 +1,7 @@
 import logging
-import aredis
 from typing import Tuple, Set, List
+
+import aredis
 
 import config
 

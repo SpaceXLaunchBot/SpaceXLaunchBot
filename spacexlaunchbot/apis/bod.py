@@ -1,8 +1,9 @@
 """Handles interactions with the bots.ondiscord.xyz API.
 """
 
-import aiohttp
 import logging
+
+import aiohttp
 
 import config
 

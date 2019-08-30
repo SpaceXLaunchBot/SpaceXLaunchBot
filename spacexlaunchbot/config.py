@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
 API_TOKEN_DBL = os.environ["SLB_API_TOKEN_DBL"]

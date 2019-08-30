@@ -1,13 +1,14 @@
-import discord
-import aredis
 import logging
 from typing import Union, Set
 
-import commands
-import statics
-import bgtasks
+import aredis
+import discord
+
 import apis
+import bgtasks
+import commands
 import config
+import statics
 from redisclient import redis
 
 

@@ -1,16 +1,17 @@
-import logging
 import asyncio
 import datetime
-import aredis
 import hashlib
 import json
-import discord
+import logging
 from typing import Set
 
-import discordclient  # pylint: disable=unused-import
-import config
-import embedcreators
+import aredis
+import discord
+
 import apis
+import config
+import discordclient  # pylint: disable=unused-import
+import embedcreators
 from redisclient import redis
 
 ONE_MINUTE = 60

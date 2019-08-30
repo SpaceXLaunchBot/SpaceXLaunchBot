@@ -1,9 +1,9 @@
 from typing import Callable, Dict
 
+import apis
 import config
 import embedcreators
 import statics
-import apis
 from redisclient import redis
 
 

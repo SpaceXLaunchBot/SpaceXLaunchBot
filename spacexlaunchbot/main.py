@@ -1,12 +1,13 @@
 import asyncio
 import logging
-import aredis
 import sys
 
-import utils
+import aredis
+
 import config
 import discordclient
 import redisclient
+import utils
 
 
 async def startup() -> None:

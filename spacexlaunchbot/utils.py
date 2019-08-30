@@ -1,6 +1,6 @@
+import datetime
 import logging
 import logging.handlers
-import datetime
 from typing import Union
 
 import config
