@@ -93,6 +93,7 @@ fi
 
 # Setup slb-venv & install requirements inside slb-venv
 run sudo python3 -m venv slb-venv
+run sudo slb-venv/bin/pip3 install wheel  # Requirement for installing many pypi packages
 run sudo slb-venv/bin/pip3 install -r requirements.txt
 
 # Set up spacexlaunchbot user and fs permissions
