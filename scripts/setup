@@ -1,4 +1,39 @@
 #!/usr/bin/env bash
+# git clone https://github.com/r-spacex/SpaceXLaunchBot.git /opt && sudo bash /opt/SpaceXLaunchBot/scripts/setup
+
+# -----------------------------------------------------------------------------
+# Inspired by netdata installer: /master/packaging/installer/functions.sh#L188
+TPUT_RESET="$(tput sgr 0)"
+TPUT_YELLOW="$(tput setaf 3)"
+TPUT_WHITE="$(tput setaf 7)"
+TPUT_BGRED="$(tput setab 1)"
+TPUT_BGGREEN="$(tput setab 2)"
+TPUT_BOLD="$(tput bold)"
+TPUT_DIM="$(tput dim)"
+
+run() {
+    location="[${TPUT_DIM}${PWD}${TPUT_RESET}]$ "
+    printf "${location}${TPUT_BOLD}${TPUT_YELLOW}"
+    printf "$*"
+    printf "${TPUT_RESET}\n"
+
+    # Run all arguments - * puts all arguments to this function into a single string
+    # Note: only call run on one command, piping and redirection kinda doesn't work
+    $*
+
+    # The ? gets the exit status of the command
+    ret=$?
+
+	if [ ${ret} -ne 0 ]; then
+		# FAILED
+        printf "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} \n\n"
+	else
+        # OK
+		printf "${TPUT_BGGREEN}${TPUT_WHITE}${TPUT_BOLD} OK ${TPUT_RESET} \n\n"
+	fi
+
+	return $ret
+}
 
 askyn() {
     while true; do
@@ -15,6 +50,11 @@ askyn() {
 exists() {
   command -v "$1" >/dev/null 2>&1
 }
+# -----------------------------------------------------------------------------
+
+if ! [ -f /etc/debian_version ]; then
+    askyn "This script is designed to run on Debian, are you sure you want to continue?" || exit
+fi
 
 cat << EndOfMsg
 
@@ -37,45 +77,39 @@ askyn "Is this correct?" || exit
 
 exists python3 || (echo "python3 does not exist, cannot continue" && exit)
 
-cd /opt/SpaceXLaunchBot || (echo "/opt/SpaceXLaunchBot does not exist, cannot continue" && exit)
+run cd /opt/SpaceXLaunchBot || (echo "/opt/SpaceXLaunchBot does not exist, cannot continue" && exit)
 
-echo "Installing apt dependencies"
-sudo apt install python3-venv redis-server -y
+run sudo apt install python3-venv redis-server -y
 
 # pip is not actually required to make the venv, but installing this means that:
 # - There is no confusion between system-wide pip and the pip that's copied to the venv
 # - The default packages (setuptools, wheel) are installed correctly
 if ! exists pip3; then
     echo "Installing the latest version of pip for python3"
-    curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+    run curl https://bootstrap.pypa.io/get-pip.py | sudo python3
 fi
 
-echo "Setting up slb-venv"
-sudo python3 -m venv slb-venv
-echo "Installing requirements inside slb-venv"
-sudo slb-venv/bin/pip3 install -r requirements.txt
+# Setup slb-venv & install requirements inside slb-venv
+run sudo python3 -m venv slb-venv
+run sudo slb-venv/bin/pip3 install -r requirements.txt
 
-echo "Setting up spacexlaunchbot user and fs permissions"
-sudo adduser --system --group --no-create-home spacexlaunchbot
-sudo chown -R spacexlaunchbot:spacexlaunchbot /opt/SpaceXLaunchBot
+# Set up spacexlaunchbot user and fs permissions
+run sudo adduser --system --group --no-create-home spacexlaunchbot
+run sudo chown -R spacexlaunchbot:spacexlaunchbot /opt/SpaceXLaunchBot
 # Permissions Explanation
 # Capital X --> https://www.g-loaded.eu/2005/11/08/the-use-of-the-uppercase-x-in-chmod/
 # Give owner of the file (spacexlaunchbot) the ability to r, w, and X all files
 # Allow everyone else to r and X, don't allow anyone else to w
-sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceXLaunchBot
+run sudo chmod -R u+rwX,go+rX,go-w /opt/SpaceXLaunchBot
 
-echo "Setting up /var/log/spacexlaunchbot"
-sudo mkdir /var/log/spacexlaunchbot
-sudo chown spacexlaunchbot:spacexlaunchbot /var/log/spacexlaunchbot
+run sudo mkdir /var/log/spacexlaunchbot
+run sudo chown spacexlaunchbot:spacexlaunchbot /var/log/spacexlaunchbot
 
-echo "Copying over systemd file(s)"
-sudo cp -R -p services/systemd/. /etc/systemd/system
+run sudo cp -R -p services/systemd/. /etc/systemd/system
 
-echo "Copying redis config to /etc/redis"
 # The apt installed version of redis-server looks for a config file here by default
-sudo cp -R services/redis/. /etc/redis
-echo "Restarting Redis"
-sudo systemctl restart redis
+run sudo cp -R services/redis/. /etc/redis
+run sudo systemctl restart redis
 
 if askyn "Edit spacexlaunchbot.service now? This will have to be done before running it";
 then sudo nano /etc/systemd/system/spacexlaunchbot.service; fi
