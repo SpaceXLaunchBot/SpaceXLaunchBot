@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# git clone https://github.com/r-spacex/SpaceXLaunchBot.git /opt && sudo bash /opt/SpaceXLaunchBot/scripts/setup
+# sudo git clone https://github.com/r-spacex/SpaceXLaunchBot.git /opt/SpaceXLaunchBot && sudo bash /opt/SpaceXLaunchBot/scripts/setup
 
 # -----------------------------------------------------------------------------
 # Inspired by netdata installer: /master/packaging/installer/functions.sh#L188
@@ -86,7 +86,9 @@ run sudo apt install python3-venv redis-server -y
 # - The default packages (setuptools, wheel) are installed correctly
 if ! exists pip3; then
     echo "Installing the latest version of pip for python3"
-    run curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+    run sudo wget https://bootstrap.pypa.io/get-pip.py -O gp.py
+    run sudo python3 gp.py
+    run sudo rm gp.py
 fi
 
 # Setup slb-venv & install requirements inside slb-venv
