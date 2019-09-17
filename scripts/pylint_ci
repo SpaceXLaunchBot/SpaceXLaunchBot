@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Runs pylint for Travis CI - run this from the projects root directory
 # Why: https://fullvalence.com/2016/11/22/travis-and-pylint/
 

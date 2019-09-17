@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+
 # sudo git clone https://github.com/r-spacex/SpaceXLaunchBot.git /opt/SpaceXLaunchBot && sudo bash /opt/SpaceXLaunchBot/scripts/setup
 
 # -----------------------------------------------------------------------------
-# Inspired by netdata installer: /master/packaging/installer/functions.sh#L188
+# Inspired by Netdata installer: /master/packaging/installer/functions.sh#L188
 TPUT_RESET="$(tput sgr 0)"
 TPUT_YELLOW="$(tput setaf 3)"
 TPUT_WHITE="$(tput setaf 7)"
@@ -24,7 +25,7 @@ run() {
     # The ? gets the exit status of the command
     ret=$?
 
-	if [ ${ret} -ne 0 ]; then
+	if [[ ${ret} -ne 0 ]]; then
 		# FAILED
         printf "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} \n\n"
 	else
@@ -38,7 +39,7 @@ run() {
 askyn() {
     while true; do
         read -p "$1 [Yy/Nn]" yn
-        case $yn in
+        case ${yn} in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
             * ) echo "Please answer y or n";;
@@ -52,7 +53,7 @@ exists() {
 }
 # -----------------------------------------------------------------------------
 
-if ! [ -f /etc/debian_version ]; then
+if ! [[ -f /etc/debian_version ]]; then
     askyn "This script is designed to run on Debian, are you sure you want to continue?" || exit
 fi
 
