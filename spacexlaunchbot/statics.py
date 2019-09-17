@@ -23,8 +23,7 @@ HELP_EMBED = Embed(
 )
 HELP_EMBED.add_field(
     name="nextlaunch",
-    value="Send the latest launch information message to the current channel\n"
-    "*Any user can use this command*",
+    value="Send the latest launch information message to the current channel",
 )
 HELP_EMBED.add_field(
     name="addchannel",
@@ -51,17 +50,13 @@ HELP_EMBED.add_field(
 )
 HELP_EMBED.add_field(
     name="getmentions",
-    value="Send the mentions set for the current guild to the current channel\n"
+    value='Show the mentions you have set for "launching soon" notifications\n'
     "*Only admins can use this command*",
 )
 HELP_EMBED.add_field(
-    name="info",
-    value="Send information about the bot to the current channel\n"
-    "*Any user can use this command*",
+    name="info", value="Send information about the bot to the current channel"
 )
-HELP_EMBED.add_field(
-    name="help", value="List these commands\n*Any user can use this command*"
-)
+HELP_EMBED.add_field(name="help", value="List these commands")
 
 NEXT_LAUNCH_ERROR_EMBED = Embed(
     title="Error",
