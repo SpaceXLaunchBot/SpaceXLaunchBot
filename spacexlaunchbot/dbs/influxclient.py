@@ -15,7 +15,7 @@ class InfluxClient(InfluxDBClient):
         await self.query(f'CREATE DATABASE "{self.db}"')
 
     @staticmethod
-    def create_point(measurement: str, value: int, tags: Dict = dict()) -> Dict:
+    def create_point(measurement: str, value: int, tags: Dict = {}) -> Dict:
         """Create a data point to write to the database
 
         Args:
