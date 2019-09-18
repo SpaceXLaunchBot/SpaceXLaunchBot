@@ -78,6 +78,7 @@ class SpaceXLaunchBotClient(discord.Client):
             run_command = commands.CMD_FUNC_LOOKUP[command_used]
             # All commands are passed the client and the message objects
             to_send = await run_command(client=self, message=message)
+            await influx.update_command_usage(command_used)
 
         except KeyError:
             to_send = None
