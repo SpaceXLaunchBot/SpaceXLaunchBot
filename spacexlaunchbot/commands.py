@@ -62,7 +62,7 @@ async def _add_channel(**kwargs):
         reply = "This channel is already subscribed to the notification service"
     else:
         subbed_channels_count = await redis.subbed_channels_count()
-        await influx.update_subscribed_channels_count(subbed_channels_count)
+        await influx.send_subscribed_channels_count(subbed_channels_count)
 
     return reply
 
@@ -77,7 +77,7 @@ async def _remove_channel(**kwargs):
         reply = "This channel was not previously subscribed to the notification service"
     else:
         subbed_channels_count = await redis.subbed_channels_count()
-        await influx.update_subscribed_channels_count(subbed_channels_count)
+        await influx.send_subscribed_channels_count(subbed_channels_count)
 
     return reply
 

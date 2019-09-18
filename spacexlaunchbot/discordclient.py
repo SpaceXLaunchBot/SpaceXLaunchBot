@@ -33,7 +33,7 @@ class SpaceXLaunchBotClient(discord.Client):
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)
-        await influx.update_guild_count(guild_count)
+        await influx.send_guild_count(guild_count)
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
@@ -78,7 +78,7 @@ class SpaceXLaunchBotClient(discord.Client):
             run_command = commands.CMD_FUNC_LOOKUP[command_used]
             # All commands are passed the client and the message objects
             to_send = await run_command(client=self, message=message)
-            await influx.update_command_usage(command_used)
+            await influx.send_command_used(command_used)
 
         except KeyError:
             to_send = None

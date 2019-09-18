@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict
+from typing import Union, Dict
 
 from aioinflux import InfluxDBClient
 
@@ -7,6 +7,11 @@ import config
 
 
 class InfluxClient(InfluxDBClient):
+
+    KEY_GUILD_COUNT = "guild_count"
+    KEY_SUBSCRIBED_CHANNELS_COUNT = "subscribed_channels_count"
+    KEY_COMMAND_USAGE = "command_usage"
+
     def __init__(self, db: str) -> None:
         super().__init__(db=db)
 
@@ -15,7 +20,9 @@ class InfluxClient(InfluxDBClient):
         await self.query(f'CREATE DATABASE "{self.db}"')
 
     @staticmethod
-    def create_point(measurement: str, value: int, tags: Dict = {}) -> Dict:
+    def create_point(
+        measurement: str, value: int, tags: Union[Dict, None] = None
+    ) -> Dict:
         """Create a data point to write to the database
 
         Args:
@@ -24,6 +31,8 @@ class InfluxClient(InfluxDBClient):
             tags: A dictionary of tags, e.g. {"host": "server01", "region": "us-west"}
 
         """
+        if tags is None:
+            tags = {}
         return {
             "time": datetime.datetime.now().isoformat(),
             "measurement": measurement,
@@ -31,18 +40,18 @@ class InfluxClient(InfluxDBClient):
             "fields": {"value": value},
         }
 
-    async def update_guild_count(self, guild_count: int) -> None:
-        point = self.create_point("guild_count", guild_count)
+    async def send_guild_count(self, guild_count: int) -> None:
+        point = self.create_point(self.KEY_GUILD_COUNT, guild_count)
         await self.write(point)
 
-    async def update_subscribed_channels_count(
-        self, subbed_channels_count: int
-    ) -> None:
-        point = self.create_point("subbed_channels_count", subbed_channels_count)
+    async def send_subscribed_channels_count(self, channel_count: int) -> None:
+        point = self.create_point(self.KEY_SUBSCRIBED_CHANNELS_COUNT, channel_count)
         await self.write(point)
 
-    async def update_command_usage(self, command_name: str) -> None:
-        point = self.create_point("command_usage", 1, {"command_name": command_name})
+    async def send_command_used(self, command_name: str) -> None:
+        point = self.create_point(
+            self.KEY_COMMAND_USAGE, 1, {"command_name": command_name}
+        )
         await self.write(point)
 
 
