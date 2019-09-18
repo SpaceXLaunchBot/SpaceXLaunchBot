@@ -6,14 +6,16 @@ import aredis
 
 import config
 import discordclient
-import redisclient
+from dbs.redisclient import redis
+from dbs.influxclient import influx
 import utils
 
 
 async def startup() -> None:
     await utils.setup_logging()
     try:
-        await redisclient.redis.init_defaults()
+        await redis.init_defaults()
+        await influx.init_defaults()
     except aredis.exceptions.ConnectionError:
         logging.error("Cannot connect to Redis, exiting")
         sys.exit(1)

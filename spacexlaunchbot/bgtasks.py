@@ -12,7 +12,7 @@ import apis
 import config
 import discordclient  # pylint: disable=unused-import
 import embedcreators
-from redisclient import redis
+from dbs.redisclient import redis
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)

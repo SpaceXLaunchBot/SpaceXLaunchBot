@@ -6,7 +6,7 @@ import discord
 import config
 import statics
 import utils
-from redisclient import redis
+from dbs.redisclient import redis
 
 PAYLOAD_INFO = """Type: {}
 Orbit: {}

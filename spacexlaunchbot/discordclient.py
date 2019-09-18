@@ -9,7 +9,8 @@ import bgtasks
 import commands
 import config
 import statics
-from redisclient import redis
+from dbs.influxclient import influx
+from dbs.redisclient import redis
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -24,21 +25,23 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
+        await self.guild_count_update()
+
+    async def guild_count_update(self) -> None:
+        """Call when the bots guild count changes, updates relevent statistics
+        """
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)
+        await influx.update_guild_count(guild_count)
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
-        guild_count = len(self.guilds)
-        await apis.dbl.update_guild_count(guild_count)
-        await apis.bod.update_guild_count(guild_count)
+        await self.guild_count_update()
 
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
-        guild_count = len(self.guilds)
-        await apis.dbl.update_guild_count(guild_count)
-        await apis.bod.update_guild_count(guild_count)
+        await self.guild_count_update()
 
         deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:

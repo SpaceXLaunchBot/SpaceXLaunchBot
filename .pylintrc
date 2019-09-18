@@ -7,7 +7,7 @@ jobs=0
 [BASIC]
 
 # Even though the redis instance variable is at module level it is not a constant
-good-names=redis,ex
+good-names=ex,redis,influx
 
 
 [MESSAGES CONTROL]

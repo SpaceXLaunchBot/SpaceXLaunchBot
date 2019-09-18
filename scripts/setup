@@ -66,8 +66,10 @@ Dependencies to be installed:
 - python3-venv from apt
 - redis-server from apt
 - pip3 from pypa (if not installed already)
+- gcc to build ciso8601 python package which is a dependency of the aioinflux python package
 
 Required:
+- An installed & running InfluxDB node (see config.py)
 - Discord bot API token
 - Discord Bot List API token
 - Bots on Discord API token
@@ -76,11 +78,13 @@ EndOfMsg
 
 askyn "Is this correct?" || exit
 
+exists influxd || (echo "InfluxDB does not seem to be installed, cannot continue" && exit)
+
 exists python3 || (echo "python3 does not exist, cannot continue" && exit)
 
 run cd /opt/SpaceXLaunchBot || (echo "/opt/SpaceXLaunchBot does not exist, cannot continue" && exit)
 
-run sudo apt install python3-venv redis-server -y
+run sudo apt install python3-venv redis-server gcc -y
 
 # pip is not actually required to make the venv, but installing this means that:
 # - There is no confusion between system-wide pip and the pip that's copied to the venv

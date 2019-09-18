@@ -21,6 +21,9 @@ REDIS_HOST = "127.0.0.1"
 REDIS_PORT = 6379
 REDIS_DB = 0
 
+# Other Influx stuff is default
+INFLUX_DB = "spacexlaunchbot"
+
 # error_red --> used for error embeds
 # falcon_red --> used for launch embeds
 EMBED_COLOURS = {"error_red": (255, 0, 0), "falcon_red": (238, 15, 70)}
