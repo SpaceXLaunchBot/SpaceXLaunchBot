@@ -24,14 +24,17 @@ REDIS_DB = 0
 # Other Influx stuff is default
 INFLUX_DB = "spacexlaunchbot"
 
-# error_red --> used for error embeds
-# falcon_red --> used for launch embeds
-EMBED_COLOURS = {"error_red": (255, 0, 0), "falcon_red": (238, 15, 70)}
+# How many minutes to wait in-between updating InfluxDB
+UPDATE_INFLUXDB_METRICS_TASK_INTERVAL = 1
 
-# The interval time, in minutes, between checking the SpaceX API for updates
+# How many minutes to wait in-between checking the SpaceX API for updates
 # This does not take into account time taken to process the data and to send out notifs
 NOTIF_TASK_API_INTERVAL = 1
 
 # How many minutes to look into the future for an upcoming launch time
 # Must be > NOTIF_TASK_API_INTERVAL else you risk skipping a launch
 NOTIF_TASK_LAUNCH_DELTA = 30
+
+# error_red --> used for error embeds
+# falcon_red --> used for launch embeds
+EMBED_COLOURS = {"error_red": (255, 0, 0), "falcon_red": (238, 15, 70)}

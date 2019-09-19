@@ -4,7 +4,6 @@ import apis
 import config
 import embedcreators
 import statics
-from dbs.influxclient import influx
 from dbs.redisclient import redis
 
 
@@ -60,9 +59,6 @@ async def _add_channel(**kwargs):
     added = await redis.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
-    else:
-        subbed_channels_count = await redis.subbed_channels_count()
-        await influx.send_subscribed_channels_count(subbed_channels_count)
 
     return reply
 
@@ -75,9 +71,6 @@ async def _remove_channel(**kwargs):
     removed = await redis.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
-    else:
-        subbed_channels_count = await redis.subbed_channels_count()
-        await influx.send_subscribed_channels_count(subbed_channels_count)
 
     return reply
 

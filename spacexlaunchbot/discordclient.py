@@ -9,7 +9,7 @@ import bgtasks
 import commands
 import config
 import statics
-from dbs.influxclient import influx
+from dbs.influxdbclient import influxdb
 from dbs.redisclient import redis
 
 
@@ -21,26 +21,33 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Create asyncio tasks now
         self.loop.create_task(bgtasks.notification_task(self))
+        self.loop.create_task(bgtasks.update_influxdb_metrics_task(self))
 
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
-        await self.guild_count_update()
+        await self.update_website_metrics()
 
-    async def guild_count_update(self) -> None:
-        """Call when the bots guild count changes, updates relevant statistics"""
+    async def update_influxdb_metrics(self) -> None:
+        """Update InfluxDB with metrics"""
+        guild_count = len(self.guilds)
+        subbed_channels_count = await redis.subbed_channels_count()
+        await influxdb.send_guild_count(guild_count)
+        await influxdb.send_subscribed_channels_count(subbed_channels_count)
+
+    async def update_website_metrics(self) -> None:
+        """Update Discord bot websites with guild count"""
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)
-        await influx.send_guild_count(guild_count)
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
-        await self.guild_count_update()
+        await self.update_website_metrics()
 
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
-        await self.guild_count_update()
+        await self.update_website_metrics()
 
         deleted = await redis.delete_guild_mentions(guild.id)
         if deleted != 0:
@@ -77,7 +84,7 @@ class SpaceXLaunchBotClient(discord.Client):
             run_command = commands.CMD_FUNC_LOOKUP[command_used]
             # All commands are passed the client and the message objects
             to_send = await run_command(client=self, message=message)
-            await influx.send_command_used(command_used)
+            await influxdb.send_command_used(command_used)
 
         except KeyError:
             to_send = None

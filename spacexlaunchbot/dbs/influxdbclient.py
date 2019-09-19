@@ -1,12 +1,12 @@
 import datetime
 from typing import Union, Dict
 
-from aioinflux import InfluxDBClient
+from aioinflux import InfluxDBClient as OriginalInfluxDBClient
 
 import config
 
 
-class InfluxClient(InfluxDBClient):
+class InfluxDBClient(OriginalInfluxDBClient):
 
     KEY_GUILD_COUNT = "guild_count"
     KEY_SUBSCRIBED_CHANNELS_COUNT = "subscribed_channels_count"
@@ -58,4 +58,4 @@ class InfluxClient(InfluxDBClient):
         await self.write(point)
 
 
-influx = InfluxClient(config.INFLUX_DB)
+influxdb = InfluxDBClient(config.INFLUX_DB)

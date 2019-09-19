@@ -19,7 +19,6 @@ class RedisClient(aredis.StrictRedis):
     guild:{guild_id}        | A hash containing options for that guild. This includes:
                             | "mentions": String of channels, users, etc. to ping for a
                             | "launching soon" message.
-    metric:{metric_name}    | Currently not used. Example use: slb:metric:commands_used
     notification_task_store | A Redis hash containing variables that need to persist
                             | between runs of the notification task. This includes:
                             | "ls_notif_sent": "True" OR "False" (str not bool).

@@ -8,7 +8,7 @@ from aiohttp import client_exceptions as aiohttp_exceptions
 import config
 import discordclient
 import utils
-from dbs.influxclient import influx
+from dbs.influxdbclient import influxdb
 from dbs.redisclient import redis
 
 
@@ -16,7 +16,7 @@ async def startup() -> None:
     await utils.setup_logging()
     try:
         await redis.init_defaults()
-        await influx.init_defaults()
+        await influxdb.init_defaults()
     except aredis.exceptions.ConnectionError:
         logging.error("Cannot connect to Redis, exiting")
         sys.exit(1)

@@ -7,6 +7,7 @@ from typing import Set
 
 import aredis
 import discord
+from aiohttp import client_exceptions as aiohttp_exceptions
 
 import apis
 import config
@@ -93,12 +94,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
-    """An async task to send out launching soon & launch info notifications.
-
-    Args:
-        client: The client to use to send messages.
-
-    """
+    """An async task to send out launching soon & launch info notifications."""
     await client.wait_until_ready()
     logging.info("Starting")
 
@@ -110,3 +106,22 @@ async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> No
             logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
 
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+
+
+async def update_influxdb_metrics_task(
+    client: "discordclient.SpaceXLaunchBotClient"
+) -> None:
+    """An async task to periodically call the client.update_influxdb_metrics method"""
+    await client.wait_until_ready()
+    logging.info("Starting")
+
+    while not client.is_closed():
+        try:
+            await client.update_influxdb_metrics()
+
+        except aiohttp_exceptions.ClientConnectorError as ex:
+            logging.error(
+                f"InfluxDB connection error occurred: {type(ex).__name__}: {ex}"
+            )
+
+        await asyncio.sleep(ONE_MINUTE * config.UPDATE_INFLUXDB_METRICS_TASK_INTERVAL)
