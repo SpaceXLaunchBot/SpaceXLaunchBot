@@ -3,6 +3,7 @@ import logging
 import sys
 
 import aredis
+from aiohttp import client_exceptions as aiohttp_exceptions
 
 import config
 import discordclient
@@ -18,6 +19,9 @@ async def startup() -> None:
         await influx.init_defaults()
     except aredis.exceptions.ConnectionError:
         logging.error("Cannot connect to Redis, exiting")
+        sys.exit(1)
+    except aiohttp_exceptions.ClientConnectorError:
+        logging.error("Cannot connect to InfluxDB, exiting")
         sys.exit(1)
 
 
