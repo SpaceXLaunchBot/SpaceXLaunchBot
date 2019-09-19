@@ -7,9 +7,9 @@ from aiohttp import client_exceptions as aiohttp_exceptions
 
 import config
 import discordclient
-from dbs.redisclient import redis
-from dbs.influxclient import influx
 import utils
+from dbs.influxclient import influx
+from dbs.redisclient import redis
 
 
 async def startup() -> None:
