@@ -28,8 +28,7 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.guild_count_update()
 
     async def guild_count_update(self) -> None:
-        """Call when the bots guild count changes, updates relevent statistics
-        """
+        """Call when the bots guild count changes, updates relevant statistics"""
         guild_count = len(self.guilds)
         await apis.dbl.update_guild_count(guild_count)
         await apis.bod.update_guild_count(guild_count)

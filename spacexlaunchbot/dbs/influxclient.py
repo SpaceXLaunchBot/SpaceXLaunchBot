@@ -30,6 +30,9 @@ class InfluxClient(InfluxDBClient):
             value: The value, e.g. 100
             tags: A dictionary of tags, e.g. {"host": "server01", "region": "us-west"}
 
+        Returns:
+            A dictionary to be written to the database
+
         """
         if tags is None:
             tags = {}
