@@ -51,9 +51,11 @@ class InfluxDBClient(OriginalInfluxDBClient):
         point = self.create_point(self.KEY_SUBSCRIBED_CHANNELS_COUNT, channel_count)
         await self.write(point)
 
-    async def send_command_used(self, command_name: str) -> None:
+    async def send_command_used(self, command_name: str, guild_id: int) -> None:
         point = self.create_point(
-            self.KEY_COMMAND_USAGE, 1, {"command_name": command_name}
+            self.KEY_COMMAND_USAGE,
+            1,
+            {"command_name": command_name, "guild_id": guild_id},
         )
         await self.write(point)
 
