@@ -41,16 +41,16 @@ Command|Description|Permissions needed
 
 The `!addchannel` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
 
-- A **launch information message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every 15 minutes.
+- A **launch information message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every minute.
 
 ![launch_info](images/screenshots/launch_info.png)
 
-- A **launching soon message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent roughly 15 minutes (not exact due to technical reasons) before a launch actually happens.
+- A **launching soon message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent 30 minutes before a launch.
 
 ![launch_soon](images/screenshots/launch_soon.png)
 
 ## New Features
 
-I am currently using a Trello board to keep track of new features, todos, etc.
+See the Github [project page](https://github.com/r-spacex/SpaceXLaunchBot/projects/1) for planned updates
 
-You can see it [here](https://trello.com/b/5zLV8wR3/spacexlaunchbot)
+If you want to request a feature, [open an issue](https://github.com/r-spacex/SpaceXLaunchBot/issues/new)
