@@ -7,7 +7,7 @@ import config
 
 
 class RedisClient(aredis.StrictRedis):
-    """A subclass of aredis.StrictRedis to deal with my specific use case(s)
+    """A subclass of aredis.StrictRedis that implements some useful methods
 
     All keys are prepended with "slb:".
 

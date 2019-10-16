@@ -10,6 +10,7 @@ import config
 
 
 class InfluxDBClient(OriginalInfluxDBClient):
+    """A subclass of aioinflux.InfluxDBClient that implements some useful methods"""
 
     KEY_GUILD_COUNT = "guild_count"
     KEY_SUBSCRIBED_CHANNELS_COUNT = "subscribed_channels_count"
