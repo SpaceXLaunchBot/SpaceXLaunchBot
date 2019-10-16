@@ -37,9 +37,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
-        guild_count = len(self.guilds)
-        await apis.dbl.update_guild_count(guild_count)
-        await apis.bod.update_guild_count(guild_count)
+        await apis.bot_lists.post_all_bot_lists(len(self.guilds))
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")

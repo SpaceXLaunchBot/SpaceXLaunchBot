@@ -6,8 +6,10 @@ After=network-online.target
 
 [Service]
 Environment=SLB_API_TOKEN_DISCORD=
-Environment=SLB_API_TOKEN_DBL=
-Environment=SLB_API_TOKEN_BOD=
+Environment=SLB_API_TOKEN_BOT_LIST_DBL=
+Environment=SLB_API_TOKEN_BOT_LIST_BOD=
+Environment=SLB_API_TOKEN_BOT_LIST_DBG=
+Environment=SLB_API_TOKEN_BOT_LIST_BFD=
 User=spacexlaunchbot
 WorkingDirectory=/opt/SpaceXLaunchBot/spacexlaunchbot
 Type=idle
