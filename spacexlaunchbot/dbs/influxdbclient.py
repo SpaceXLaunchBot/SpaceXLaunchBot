@@ -5,9 +5,6 @@ from aioinflux import InfluxDBClient as OriginalInfluxDBClient
 
 import config
 
-# TODO: Reconnect to Influx on error? Maybe a safe "write" function?
-#  Error example: https://gist.github.com/psidex/6c10dbceac9f4c416833f40f590a2a5a
-
 
 class InfluxDBClient(OriginalInfluxDBClient):
     """A subclass of aioinflux.InfluxDBClient that implements some useful methods."""

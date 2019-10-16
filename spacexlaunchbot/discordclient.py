@@ -3,6 +3,7 @@ from typing import Union, Set
 
 import aredis
 import discord
+from aiohttp import client_exceptions as aiohttp_exceptions
 
 import apis
 import bgtasks
@@ -89,6 +90,12 @@ class SpaceXLaunchBotClient(discord.Client):
 
         except aredis.RedisError as ex:
             logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
+            to_send = statics.DB_ERROR_EMBED
+
+        except aiohttp_exceptions.ClientConnectorError as ex:
+            logging.error(
+                f"InfluxDB connection error occurred: {type(ex).__name__}: {ex}"
+            )
             to_send = statics.DB_ERROR_EMBED
 
         if to_send is None:
