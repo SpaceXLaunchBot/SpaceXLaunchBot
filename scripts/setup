@@ -71,8 +71,7 @@ Dependencies to be installed:
 Required:
 - An installed & running InfluxDB node (see config.py)
 - Discord bot API token
-- Discord Bot List API token
-- Bots on Discord API token
+- API tokens for all discord bot lists supported (see config.py)
 
 EndOfMsg
 
