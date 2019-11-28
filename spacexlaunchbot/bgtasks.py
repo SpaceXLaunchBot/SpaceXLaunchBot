@@ -111,7 +111,7 @@ async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> No
 async def update_influxdb_metrics_task(
     client: "discordclient.SpaceXLaunchBotClient"
 ) -> None:
-    """An async task to periodically call the client.update_influxdb_metrics method"""
+    """An async task to periodically call the client.update_influxdb_metrics method."""
     await client.wait_until_ready()
     logging.info("Starting")
 
@@ -125,3 +125,6 @@ async def update_influxdb_metrics_task(
             )
 
         await asyncio.sleep(ONE_MINUTE * config.UPDATE_INFLUXDB_METRICS_TASK_INTERVAL)
+
+    # TODO: Find out why this stops sometimes (or at least stops sending data).
+    logging.info("Stopped")

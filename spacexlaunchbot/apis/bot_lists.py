@@ -4,7 +4,7 @@ import aiohttp
 
 import config
 
-bot_lists = {
+BOT_LISTS = {
     "bod": {
         "url": f"https://bots.ondiscord.xyz/bot-api/bots/{config.BOT_CLIENT_ID}/guilds",
         "token": config.API_TOKEN_BOT_LIST_BOD,
@@ -42,11 +42,11 @@ async def post_count_to_bot_list(
 
 
 async def post_all_bot_lists(guild_count: int) -> None:
-    for bot_list in bot_lists:
+    for bot_list in BOT_LISTS:
         await post_count_to_bot_list(
             bot_list,
             guild_count,
-            bot_lists[bot_list]["url"],
-            bot_lists[bot_list]["token"],
-            bot_lists[bot_list]["guild_count_parameter"],
+            BOT_LISTS[bot_list]["url"],
+            BOT_LISTS[bot_list]["token"],
+            BOT_LISTS[bot_list]["guild_count_parameter"],
         )

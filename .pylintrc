@@ -6,8 +6,8 @@ jobs=0
 
 [BASIC]
 
-# Even though the redis instance variable is at module level it is not a constant
-good-names=ex,redis,influx
+# Even though the database instance variables are at module level they aren't constants (?)
+good-names=ex,redis,influxdb
 
 
 [MESSAGES CONTROL]
@@ -17,6 +17,7 @@ disable=bad-continuation,               # Black formatter does not agree
         missing-docstring,              # Not everything needs a docstring
         wrong-import-order,             # "import commands" should not be before "import discord"
         logging-fstring-interpolation,  # f-strings in log calls are fine
+        logging-format-interpolation,   # ^
         too-many-return-statements,     # This doesn't matter
 
 
