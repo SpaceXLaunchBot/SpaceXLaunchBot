@@ -34,10 +34,14 @@ class RedisClient(aredis.StrictRedis):
 
     def __init__(self, host: str, port: int, db_num: int) -> None:
         super().__init__(host=host, port=port, db=db_num)
-        logging.info(f"Connected to {db_num} @ {host}:{port}")
+        self.host = host
+        self.port = port
+        self.db_num = db_num
 
     async def init_defaults(self) -> None:
         """If the database is new, create default values for needed keys"""
+        logging.info(f"Connected to Redis db {self.db_num} @ {self.host}:{self.port}")
+
         if not await self.exists(self.KEY_NOTIFICATION_TASK_STORE):
             logging.info(f"{self.KEY_NOTIFICATION_TASK_STORE} does not exist, creating")
             await self.set_notification_task_store("False", "0")

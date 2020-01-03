@@ -1,6 +1,6 @@
 import datetime
-from typing import Union, Dict
 import logging
+from typing import Union, Dict
 
 from aioinflux import InfluxDBClient as OriginalInfluxDBClient
 from aioinflux import client as aioinfluxclient
@@ -17,9 +17,10 @@ class InfluxDBClient(OriginalInfluxDBClient):
 
     def __init__(self, db: str) -> None:
         super().__init__(db=db)
-        logging.info(f"Connected to {db}")
 
     async def init_defaults(self):
+        logging.info(f"Connected to InfluxDB node: {self.db}")
+
         # This will not erase if already created
         await self.query(f'CREATE DATABASE "{self.db}"')
 
