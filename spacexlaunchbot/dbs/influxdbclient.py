@@ -3,7 +3,7 @@ from typing import Union, Dict
 import logging
 
 from aioinflux import InfluxDBClient as OriginalInfluxDBClient
-from aioinflux.client import InfluxDBWriteError
+from aioinflux import client as aioinfluxclient
 
 import config
 
@@ -56,7 +56,7 @@ class InfluxDBClient(OriginalInfluxDBClient):
         """
         try:
             await self.write(point)
-        except InfluxDBWriteError as ex:
+        except aioinfluxclient.InfluxDBWriteError as ex:
             logging.error(f"InfluxDBWriteError occurred: {type(ex).__name__}: {ex}")
 
     async def send_guild_count(self, guild_count: int) -> None:
