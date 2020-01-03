@@ -34,6 +34,7 @@ class RedisClient(aredis.StrictRedis):
 
     def __init__(self, host: str, port: int, db_num: int) -> None:
         super().__init__(host=host, port=port, db=db_num)
+        logging.info(f"Connected to {db_num} @ {host}:{port}")
 
     async def init_defaults(self) -> None:
         """If the database is new, create default values for needed keys"""
