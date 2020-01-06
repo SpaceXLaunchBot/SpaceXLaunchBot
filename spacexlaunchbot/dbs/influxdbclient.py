@@ -49,7 +49,7 @@ class InfluxDBClient(OriginalInfluxDBClient):
         }
 
     async def write_s(self, point):
-        """Writes data point to the database. Catches potential breaking error(s).
+        """Write a data point to the db. Catches and logs potential InfluxDBWriteError.
 
         Args:
             point: A dictionary to be written to the database

@@ -13,7 +13,7 @@ from dbs.redisclient import redis
 
 
 async def startup() -> None:
-    await utils.setup_logging()
+    utils.setup_logging()
     try:
         await redis.init_defaults()
         await influxdb.init_defaults()

@@ -24,7 +24,7 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     )
 
 
-async def setup_logging() -> None:
+def setup_logging() -> None:
     """Setup logging.
 
     These settings will apply to any logging.info, error, debug, etc. call from now on

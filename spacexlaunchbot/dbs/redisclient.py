@@ -22,7 +22,7 @@ class RedisClient(aredis.StrictRedis):
     notification_task_store | A Redis hash containing variables that need to persist
                             | between runs of the notification task. This includes:
                             | "ls_notif_sent": "True" OR "False" (str not bool).
-                            | "li_dict_hash": SHA256 hash of li embed dict.
+                            | "li_dict_hash": SHA256 hash of the latest li embed dict.
                             | Go to bgtasks to see usage.
 
     """
