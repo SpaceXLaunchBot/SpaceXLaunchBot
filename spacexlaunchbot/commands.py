@@ -4,7 +4,7 @@ import apis
 import config
 import embedcreators
 import statics
-from dbs.redisclient import redis
+from sqlitedb import sqlitedb
 
 
 def req_id_owner(func: Callable) -> Callable:
@@ -56,7 +56,7 @@ async def _add_channel(**kwargs):
     message = kwargs.get("message")
     reply = "This channel has been added to the notification service"
 
-    added = await redis.add_subbed_channel(message.channel.id)
+    added = sqlitedb.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
 
@@ -68,7 +68,7 @@ async def _remove_channel(**kwargs):
     message = kwargs.get("message")
     reply = "This channel has been removed from the notification service"
 
-    removed = await redis.remove_subbed_channel(message.channel.id)
+    removed = sqlitedb.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
 
@@ -85,7 +85,7 @@ async def _set_mentions(**kwargs):
 
     if roles_to_mention != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
-        await redis.set_guild_mentions(message.guild.id, roles_to_mention)
+        sqlitedb.set_guild_mentions(message.guild.id, roles_to_mention)
 
     return reply
 
@@ -95,7 +95,7 @@ async def _get_mentions(**kwargs):
     message = kwargs.get("message")
     reply = "This guild has no mentions set"
 
-    mentions = await redis.get_guild_mentions(message.guild.id)
+    mentions = sqlitedb.get_guild_mentions(message.guild.id)
     if mentions:
         reply = f"Mentions for this guild: {mentions}"
 
@@ -107,7 +107,7 @@ async def _remove_mentions(**kwargs):
     message = kwargs.get("message")
     reply = "Removed mentions succesfully"
 
-    deleted = await redis.delete_guild_mentions(message.guild.id)
+    deleted = sqlitedb.delete_guild_mentions(message.guild.id)
     if deleted == 0:
         reply = "This guild has no mentions to be removed"
 
@@ -171,7 +171,7 @@ async def _debug_launch_information(**kwargs):
 async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications).
     """
-    await redis.set_notification_task_store("False", "0")
+    sqlitedb.set_notification_task_store(False, "")
     return "Reset notification_task_store"
 
 
@@ -188,6 +188,13 @@ async def _log_dump(**kwargs):
     return log_message.format(log_content)
 
 
+@req_id_owner
+async def _shutdown(**kwargs):
+    sqlitedb.stop()
+    client = kwargs.get("client")
+    await client.logout()
+
+
 CMD_FUNC_LOOKUP: Dict[str, Callable] = {
     "nextlaunch": _next_launch,
     "addchannel": _add_channel,
@@ -201,4 +208,5 @@ CMD_FUNC_LOOKUP: Dict[str, Callable] = {
     "dbgli": _debug_launch_information,
     "resetnts": _reset_notif_task_store,
     "logdump": _log_dump,
+    "shutdown": _shutdown,
 }

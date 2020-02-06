@@ -6,8 +6,8 @@ jobs=0
 
 [BASIC]
 
-# Even though the database instance variables are at module level they aren't constants (?)
-good-names=ex,redis,influxdb
+# Ignore variable naming scheme for these.
+good-names=ex,sqlitedb
 
 
 [MESSAGES CONTROL]

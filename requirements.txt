@@ -1,4 +1,3 @@
 discord.py
-aredis
+sqlitedict
 aiohttp<3.6.0,>=3.3.0
-aioinflux

@@ -1,28 +1,14 @@
 import asyncio
-import logging
-import sys
-
-import aredis
-from aiohttp import client_exceptions as aiohttp_exceptions
 
 import config
 import discordclient
 import utils
-from dbs.influxdbclient import influxdb
-from dbs.redisclient import redis
+from sqlitedb import sqlitedb
 
 
 async def startup() -> None:
     utils.setup_logging()
-    try:
-        await redis.init_defaults()
-        await influxdb.init_defaults()
-    except aredis.exceptions.ConnectionError:
-        logging.error("Cannot connect to Redis, exiting")
-        sys.exit(1)
-    except aiohttp_exceptions.ClientConnectorError:
-        logging.error("Cannot connect to InfluxDB, exiting")
-        sys.exit(1)
+    sqlitedb.init_defaults()
 
 
 def main() -> None:

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: Update this to not install/setup Redis or Influx.
 
 # sudo git clone https://github.com/r-spacex/SpaceXLaunchBot.git /opt/SpaceXLaunchBot && sudo bash /opt/SpaceXLaunchBot/scripts/setup
 

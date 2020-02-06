@@ -1,17 +1,13 @@
 import logging
 from typing import Union, Set
 
-import aredis
 import discord
-from aiohttp import client_exceptions as aiohttp_exceptions
 
 import apis
 import bgtasks
 import commands
 import config
-import statics
-from dbs.influxdbclient import influxdb
-from dbs.redisclient import redis
+from sqlitedb import sqlitedb
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -22,19 +18,11 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Create asyncio tasks now
         self.loop.create_task(bgtasks.notification_task(self))
-        self.loop.create_task(bgtasks.update_influxdb_metrics_task(self))
 
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
-
-    async def update_influxdb_metrics(self) -> None:
-        """Update InfluxDB with metrics"""
-        guild_count = len(self.guilds)
-        subbed_channels_count = await redis.subbed_channels_count()
-        await influxdb.send_guild_count(guild_count)
-        await influxdb.send_subscribed_channels_count(subbed_channels_count)
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
@@ -48,7 +36,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
 
-        deleted = await redis.delete_guild_mentions(guild.id)
+        deleted = sqlitedb.delete_guild_mentions(guild.id)
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
@@ -83,20 +71,9 @@ class SpaceXLaunchBotClient(discord.Client):
             run_command = commands.CMD_FUNC_LOOKUP[command_used]
             # All commands are passed the client and the message objects
             to_send = await run_command(client=self, message=message)
-            await influxdb.send_command_used(command_used, message.guild.id)
 
         except KeyError:
             to_send = None
-
-        except aredis.RedisError as ex:
-            logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
-            to_send = statics.DB_ERROR_EMBED
-
-        except aiohttp_exceptions.ClientConnectorError as ex:
-            logging.error(
-                f"InfluxDB connection error occurred: {type(ex).__name__}: {ex}"
-            )
-            to_send = statics.DB_ERROR_EMBED
 
         if to_send is None:
             return
@@ -148,13 +125,13 @@ class SpaceXLaunchBotClient(discord.Client):
 
         Args:
             to_send: A String or discord.Embed object.
-            send_mentions: If True, get mentions from redis and send as well.
+            send_mentions: If True, get mentions from db and send as well.
 
         Returns:
             A set of channels that are invalid so should be unsubscribed.
 
         """
-        channel_ids = await redis.get_subbed_channels()
+        channel_ids = sqlitedb.get_subbed_channels()
         invalid_ids = set()
 
         for channel_id in channel_ids:
@@ -167,7 +144,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 await self.send_s(channel, to_send)
 
                 if send_mentions:
-                    mentions = await redis.get_guild_mentions(channel.guild.id)
+                    mentions = sqlitedb.get_guild_mentions(channel.guild.id)
                     if mentions != "":
                         await self.send_s(channel, mentions)
 

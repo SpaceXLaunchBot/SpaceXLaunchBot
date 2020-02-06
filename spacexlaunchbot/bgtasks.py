@@ -5,15 +5,13 @@ import json
 import logging
 from typing import Set
 
-import aredis
 import discord
-from aiohttp import client_exceptions as aiohttp_exceptions
 
 import apis
 import config
 import discordclient  # pylint: disable=unused-import
 import embedcreators
-from dbs.redisclient import redis
+from sqlitedb import sqlitedb
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
@@ -32,7 +30,7 @@ async def hash_embed(embed: discord.Embed) -> str:
 async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") -> None:
     """Checks what notification messages need to be sent, and sends them.
 
-    Updates Redis values if they need updating.
+    Updates database values if they need updating.
 
     Args:
         client : The client to use to send messages.
@@ -48,7 +46,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     channels_to_remove: Set[int] = set()
 
     # Shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, latest_li_embed_hash = await redis.get_notification_task_store()
+    ls_notif_sent, latest_li_embed_hash = sqlitedb.get_notification_task_store()
 
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
     new_li_embed_hash = await hash_embed(new_li_embed)
@@ -57,7 +55,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     if new_li_embed_hash != latest_li_embed_hash:
         logging.info("Launch info changed, sending notifications")
 
-        ls_notif_sent = "False"
+        ls_notif_sent = False
         latest_li_embed_hash = new_li_embed_hash
 
         # New launch found, send all "subscribed" channels the embed
@@ -78,7 +76,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     # launch_timestamp is not in the past, and we haven't already sent the notif
     if (
         curr_time_plus_delta >= launch_timestamp >= current_time.timestamp()
-        and ls_notif_sent == "False"
+        and ls_notif_sent is False
     ):
         logging.info("Launch is soon, sending out notifications")
         launching_soon_embed = await embedcreators.get_launching_soon_embed(
@@ -86,11 +84,11 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
         )
         invalid_channels = await client.send_all_subscribed(launching_soon_embed, True)
         channels_to_remove |= invalid_channels
-        ls_notif_sent = "True"
+        ls_notif_sent = True
 
-    # Save any changed data to redis
-    await redis.set_notification_task_store(ls_notif_sent, latest_li_embed_hash)
-    await redis.remove_subbed_channels(channels_to_remove)
+    # Save any changed data to db
+    sqlitedb.set_notification_task_store(ls_notif_sent, latest_li_embed_hash)
+    sqlitedb.remove_subbed_channels(channels_to_remove)
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
@@ -99,32 +97,5 @@ async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> No
     logging.info("Starting")
 
     while not client.is_closed():
-        try:
-            await _check_and_send_notifs(client)
-
-        except aredis.RedisError as ex:
-            logging.error(f"RedisError occurred: {type(ex).__name__}: {ex}")
-
+        await _check_and_send_notifs(client)
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
-
-
-async def update_influxdb_metrics_task(
-    client: "discordclient.SpaceXLaunchBotClient"
-) -> None:
-    """An async task to periodically call the client.update_influxdb_metrics method."""
-    await client.wait_until_ready()
-    logging.info("Starting")
-
-    while not client.is_closed():
-        try:
-            await client.update_influxdb_metrics()
-
-        except aiohttp_exceptions.ClientConnectorError as ex:
-            logging.error(
-                f"InfluxDB connection error occurred: {type(ex).__name__}: {ex}"
-            )
-
-        await asyncio.sleep(ONE_MINUTE * config.UPDATE_INFLUXDB_METRICS_TASK_INTERVAL)
-
-    # TODO: Find out why this stops sometimes (or at least stops sending data).
-    logging.info("Stopped")

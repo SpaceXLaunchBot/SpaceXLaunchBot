@@ -20,15 +20,7 @@ LOG_PATH = "/var/log/spacexlaunchbot/bot.log" if os.name != "nt" else "bot.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
 LOG_LEVEL = logging.INFO
 
-REDIS_HOST = "127.0.0.1"
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-# Other Influx stuff is default
-INFLUX_DB = "spacexlaunchbot"
-
-# How many minutes to wait in-between updating InfluxDB
-UPDATE_INFLUXDB_METRICS_TASK_INTERVAL = 1
+SQLITE_LOCATION = "slb_data.sqlite"
 
 # How many minutes to wait in-between checking the SpaceX API for updates
 # This does not take into account time taken to process the data and to send out notifs
