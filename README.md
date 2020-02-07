@@ -72,9 +72,9 @@ sudo docker build -t spacexlaunchbot-image .
 
 ```bash
 sudo docker volume create slb-storage
-sudo docker run \
+sudo docker run -d \
     --name spacexlaunchbot-container \
-    -v spacexlaunchbot-storage:/docker-storage \
+    -v slb-storage:/docker-storage \
     --env-file ./variables.env \
     spacexlaunchbot-image
 ```
