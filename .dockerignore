@@ -1,0 +1,12 @@
+# Everything that isn't actually relevant to running the bot.
+
+images
+scripts
+
+.gitignore
+.pylintrc
+.travis.yml
+LICENSE
+mypy.ini
+README.md
+requirements-dev.txt

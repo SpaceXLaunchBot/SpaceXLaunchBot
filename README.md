@@ -54,3 +54,27 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 See the Github [project page](https://github.com/r-spacex/SpaceXLaunchBot/projects/1) for planned updates
 
 If you want to request a feature, [open an issue](https://github.com/r-spacex/SpaceXLaunchBot/issues/new)
+
+## Deployment
+
+These instructions are mainly reminders for me, but feel free to deploy this yourself.
+
+### Build image
+
+```bash
+cd /opt
+sudo git clone https://github.com/r-spacex/SpaceXLaunchBot
+cd SpaceXLaunchBot
+sudo docker build -t spacexlaunchbot-image .
+```
+
+### Create volume and deploy container
+
+```bash
+sudo docker volume create slb-storage
+sudo docker run \
+    --name spacexlaunchbot-container \
+    -v spacexlaunchbot-storage:/docker-storage \
+    --env-file ./variables.env \
+    spacexlaunchbot-image
+```
