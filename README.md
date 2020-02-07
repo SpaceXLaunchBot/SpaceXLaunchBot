@@ -59,6 +59,8 @@ If you want to request a feature, [open an issue](https://github.com/r-spacex/Sp
 
 These instructions are mainly reminders for me, but feel free to deploy this yourself.
 
+TODO: Output log to Docker log instead of log file?
+
 ### Build image
 
 ```bash
