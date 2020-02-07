@@ -64,11 +64,12 @@ These instructions are mainly reminders for me, but feel free to deploy this you
 ```bash
 cd /opt
 sudo git clone https://github.com/r-spacex/SpaceXLaunchBot
-cd SpaceXLaunchBot
-sudo docker build -t spacexlaunchbot-image .
+sudo docker build -t spacexlaunchbot-image SpaceXLaunchBot
 ```
 
 ### Create volume and deploy container
+
+Make sure `variables.env` contains the correct variables and is in the current directory.
 
 ```bash
 sudo docker volume create slb-storage
