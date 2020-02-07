@@ -113,5 +113,5 @@ dmypy.json
 .idea
 
 # Local bot data.
-*.sqlite
-bot.log
+slb.sqlite
+slb.log
