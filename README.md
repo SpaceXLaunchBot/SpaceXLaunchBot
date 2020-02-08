@@ -57,23 +57,26 @@ If you want to request a feature, [open an issue](https://github.com/r-spacex/Sp
 
 ## Deployment
 
-These instructions are mainly reminders for me, but feel free to deploy this yourself.
+These instructions are mainly reminders for me, but feel free to use this yourself.
 
 ### Build image
 
+Login using `docker login` first.
+
 ```bash
 git clone https://github.com/r-spacex/SpaceXLaunchBot
-sudo docker build -t spacexlaunchbot-image SpaceXLaunchBot
+docker build -t spacexlaunchbot SpaceXLaunchBot
+docker push psidex/spacexlaunchbot
 ```
 
 ### Create volume and deploy container
 
 Make sure `variables.env` contains the correct variables and is in the current directory.
 
-The `-v` command means the sqlite file will be written to `/var/lib/spacexlaunchbot` in the host fs.
+The `-v` command means the sqlite db will be written to `/var/lib/spacexlaunchbot/` in the host fs.
 
 ```bash
-sudo docker run -d --name spacexlaunchbot \
+docker run -d --name spacexlaunchbot \
     -v /var/lib/spacexlaunchbot:/docker-volume \
     --env-file ./variables.env \
     psidex/spacexlaunchbot
