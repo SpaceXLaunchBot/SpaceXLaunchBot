@@ -10,15 +10,26 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: "3.8"
+          
       - name: Install dependencies
         # The normal requirements.txt is installed as it provides stub files for mypy to use.
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          
       - name: Lint
-        run: bash ./scripts/pylint_ci
+        run: bash ./scripts/
+        
       - name: MyPy
         run: mypy --config-file ./mypy.ini ./spacexlaunchbot
+        
       - name: Bandit
         run: bandit -r ./spacexlaunchbot
+        
+      - name: Publish to Docker Hub
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: psidex/spacexlaunchbot
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
