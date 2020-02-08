@@ -6,10 +6,8 @@ import config
 
 
 class SqliteDb:
-    """Database structure:
-    ------------------------|-----------------------------------------------------------
-    Key                     | Value
-    ------------------------|-----------------------------------------------------------
+    """Database key/value structure (all keys are prepended with KEY_PREFIX):
+    ------------------------|-------------------------------------------------
     subscribed_channels     | A set of channel IDs to be sent notifications.
     guild:{guild_id}        | A string of channels, users, etc. to ping for a
                             | "launching soon" message.

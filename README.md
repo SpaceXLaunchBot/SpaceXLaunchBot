@@ -73,9 +73,8 @@ Make sure `variables.env` contains the correct variables and is in the current d
 The `-v` command means the sqlite file will be written to `/var/lib/spacexlaunchbot` in the host fs.
 
 ```bash
-sudo docker run -d \
-    --name spacexlaunchbot-container \
+sudo docker run -d --name spacexlaunchbot \
     -v /var/lib/spacexlaunchbot:/docker-volume \
-    --env-file ./SpaceXLaunchBot/variables.env \
-    spacexlaunchbot-image
+    --env-file ./variables.env \
+    psidex/spacexlaunchbot
 ```

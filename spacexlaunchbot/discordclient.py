@@ -4,9 +4,9 @@ from typing import Union, Set
 import discord
 
 import apis
-import bgtasks
 import commands
 import config
+import notifications
 from sqlitedb import sqlitedb
 
 
@@ -17,7 +17,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info("Client initialised")
 
         # Create asyncio tasks now
-        self.loop.create_task(bgtasks.notification_task(self))
+        self.loop.create_task(notifications.notification_task(self))
 
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")

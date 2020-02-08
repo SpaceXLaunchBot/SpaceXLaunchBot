@@ -1,12 +1,16 @@
 # Everything that isn't actually relevant to running the bot.
 
+.git
 images
 scripts
 
+.dockerignore
 .gitignore
 .pylintrc
 .travis.yml
+Dockerfile
 LICENSE
 mypy.ini
 README.md
 requirements-dev.txt
+variables.env
