@@ -59,13 +59,10 @@ If you want to request a feature, [open an issue](https://github.com/r-spacex/Sp
 
 These instructions are mainly reminders for me, but feel free to deploy this yourself.
 
-TODO: Output log to Docker log instead of log file?
-
 ### Build image
 
 ```bash
-cd /opt
-sudo git clone https://github.com/r-spacex/SpaceXLaunchBot
+git clone https://github.com/r-spacex/SpaceXLaunchBot
 sudo docker build -t spacexlaunchbot-image SpaceXLaunchBot
 ```
 
@@ -74,10 +71,9 @@ sudo docker build -t spacexlaunchbot-image SpaceXLaunchBot
 Make sure `variables.env` contains the correct variables and is in the current directory.
 
 ```bash
-sudo docker volume create slb-storage
 sudo docker run -d \
     --name spacexlaunchbot-container \
-    -v slb-storage:/docker-volume \
-    --env-file ./variables.env \
+    -v /var/lib/spacexlaunchbot:/docker-volume \
+    --env-file ./SpaceXLaunchBot/variables.env \
     spacexlaunchbot-image
 ```
