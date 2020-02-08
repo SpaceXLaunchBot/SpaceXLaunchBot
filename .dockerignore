@@ -3,11 +3,11 @@
 .git
 images
 scripts
+.mypy_cache
 
 .dockerignore
 .gitignore
 .pylintrc
-.travis.yml
 Dockerfile
 LICENSE
 mypy.ini

@@ -11,9 +11,6 @@
         <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
-    <a href="https://travis-ci.com/r-spacex/SpaceXLaunchBot/">
-        <img src="https://img.shields.io/travis/com/r-spacex/SpaceXLaunchBot.svg?style=flat&colorA=35383d" alt="Travis CI build status" />
-    </a>
     <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
     </a>
@@ -51,25 +48,13 @@ The `!addchannel` command allows admins to "subscribe" text channels to the bots
 
 ## New Features
 
-See the Github [project page](https://github.com/r-spacex/SpaceXLaunchBot/projects/1) for planned updates
+See the Github [project page](https://github.com/r-spacex/SpaceXLaunchBot/projects/1) for planned updates.
 
-If you want to request a feature, [open an issue](https://github.com/r-spacex/SpaceXLaunchBot/issues/new)
+If you want to request a feature, [open an issue](https://github.com/r-spacex/SpaceXLaunchBot/issues/new).
 
 ## Deployment
 
-These instructions are mainly reminders for me, but feel free to use this yourself.
-
-### Build image
-
-Login using `docker login` first.
-
-```bash
-git clone https://github.com/r-spacex/SpaceXLaunchBot
-docker build -t spacexlaunchbot SpaceXLaunchBot
-docker push psidex/spacexlaunchbot
-```
-
-### Create volume and deploy container
+This is mainly reminders for me, but feel free to use this yourself.
 
 Make sure `variables.env` contains the correct variables and is in the current directory.
 
