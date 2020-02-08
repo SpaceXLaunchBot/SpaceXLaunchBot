@@ -20,7 +20,6 @@ BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 411618411169447950
 BOT_INVITE_PERMISSIONS = "19456"
 
-LOG_PATH = DOCKER_VOLUME_NAME + "slb.log" if INSIDE_DOCKER else "./slb.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
 LOG_LEVEL = logging.INFO
 

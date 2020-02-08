@@ -175,20 +175,6 @@ async def _reset_notif_task_store(**kwargs):
     sqlitedb.set_notification_task_store(False, "")
     return "Reset notification_task_store"
 
-
-@req_id_owner
-async def _log_dump(**kwargs):
-    """Tail bot.log and send it.
-    """
-    log_message = "```\n{}```"
-
-    with open(config.LOG_PATH, "r") as config_file:
-        # Code block markdown in log_message takes up 7 of the 2000 allowed chars
-        log_content = config_file.read()[-1993:]
-
-    return log_message.format(log_content)
-
-
 @req_id_owner
 async def _shutdown(**kwargs):
     logging.info("Shutting down")
@@ -209,6 +195,5 @@ CMD_FUNC_LOOKUP: Dict[str, Callable] = {
     "dbgls": _debug_launching_soon,
     "dbgli": _debug_launch_information,
     "resetnts": _reset_notif_task_store,
-    "logdump": _log_dump,
     "shutdown": _shutdown,
 }
