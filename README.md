@@ -70,6 +70,8 @@ sudo docker build -t spacexlaunchbot-image SpaceXLaunchBot
 
 Make sure `variables.env` contains the correct variables and is in the current directory.
 
+The `-v` command means the sqlite file will be written to `/var/lib/spacexlaunchbot` in the host fs.
+
 ```bash
 sudo docker run -d \
     --name spacexlaunchbot-container \
