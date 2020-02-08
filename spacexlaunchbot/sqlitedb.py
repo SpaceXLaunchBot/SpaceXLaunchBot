@@ -47,7 +47,7 @@ class SqliteDb:
                 1: li_dict_hash: A string of the latest launch info dict hash.
 
         """
-        return self.sqlite.get(self.KEY_NOTIFICATION_TASK_STORE)
+        return self.sqlite[self.KEY_NOTIFICATION_TASK_STORE]
 
     def set_notification_task_store(
         self, ls_notif_sent: bool, li_dict_hash: str

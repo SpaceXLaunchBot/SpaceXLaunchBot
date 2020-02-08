@@ -1,3 +1,4 @@
+import logging
 from typing import Callable, Dict
 
 import apis
@@ -190,6 +191,7 @@ async def _log_dump(**kwargs):
 
 @req_id_owner
 async def _shutdown(**kwargs):
+    logging.info("Shutting down")
     sqlitedb.stop()
     client = kwargs.get("client")
     await client.logout()

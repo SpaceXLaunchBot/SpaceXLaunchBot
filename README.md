@@ -77,7 +77,7 @@ Make sure `variables.env` contains the correct variables and is in the current d
 sudo docker volume create slb-storage
 sudo docker run -d \
     --name spacexlaunchbot-container \
-    -v slb-storage:/docker-storage \
+    -v slb-storage:/docker-volume \
     --env-file ./variables.env \
     spacexlaunchbot-image
 ```

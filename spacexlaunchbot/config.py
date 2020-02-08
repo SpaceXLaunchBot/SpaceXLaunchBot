@@ -2,13 +2,15 @@ import logging
 import os
 
 INSIDE_DOCKER = os.environ.get("INSIDE_DOCKER", False)
+DOCKER_VOLUME_NAME = "/docker-volume/"
 
 API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
 
-API_TOKEN_BOT_LIST_DBL = os.environ["SLB_API_TOKEN_BOT_LIST_DBL"]
-API_TOKEN_BOT_LIST_BOD = os.environ["SLB_API_TOKEN_BOT_LIST_BOD"]
-API_TOKEN_BOT_LIST_DBG = os.environ["SLB_API_TOKEN_BOT_LIST_DBG"]
-API_TOKEN_BOT_LIST_BFD = os.environ["SLB_API_TOKEN_BOT_LIST_BFD"]
+DEFAULT_BL_TOKEN = "test-token-pls-ignore"
+API_TOKEN_BOT_LIST_DBL = os.environ.get("SLB_API_TOKEN_BOT_LIST_DBL", DEFAULT_BL_TOKEN)
+API_TOKEN_BOT_LIST_BOD = os.environ.get("SLB_API_TOKEN_BOT_LIST_BOD", DEFAULT_BL_TOKEN)
+API_TOKEN_BOT_LIST_DBG = os.environ.get("SLB_API_TOKEN_BOT_LIST_DBG", DEFAULT_BL_TOKEN)
+API_TOKEN_BOT_LIST_BFD = os.environ.get("SLB_API_TOKEN_BOT_LIST_BFD", DEFAULT_BL_TOKEN)
 
 BOT_OWNER = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
@@ -18,11 +20,11 @@ BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 411618411169447950
 BOT_INVITE_PERMISSIONS = "19456"
 
-LOG_PATH = "/docker-storage/slb.log" if INSIDE_DOCKER else "./slb.log"
+LOG_PATH = DOCKER_VOLUME_NAME + "slb.log" if INSIDE_DOCKER else "./slb.log"
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
 LOG_LEVEL = logging.INFO
 
-SQLITE_LOCATION = "/docker-storage/slb.sqlite" if INSIDE_DOCKER else "slb.sqlite"
+SQLITE_LOCATION = DOCKER_VOLUME_NAME + "slb.sqlite" if INSIDE_DOCKER else "./slb.sqlite"
 
 # How many minutes to wait in-between checking the SpaceX API for updates
 # This does not take into account time taken to process the data and to send out notifs
