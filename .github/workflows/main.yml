@@ -17,6 +17,6 @@ jobs:
       - name: Lint
         run: bash scripts/pylint_ci
       - name: MyPy
-        run: mypy
+        run: mypy spacexlaunchbot
       - name: Bandit
-        run: bandit
+        run: bandit -r spacexlaunchbot
