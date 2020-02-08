@@ -15,8 +15,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: Lint
-        run: bash scripts/pylint_ci
+        run: bash ./scripts/pylint_ci
       - name: MyPy
-        run: mypy spacexlaunchbot
+        run: mypy --config-file ./mypy.ini ./spacexlaunchbot
       - name: Bandit
-        run: bandit -r spacexlaunchbot
+        run: bandit -r ./spacexlaunchbot
