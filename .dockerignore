@@ -1,6 +1,7 @@
 # Everything that isn't actually relevant to running the bot.
 
 .git
+.github
 images
 scripts
 .mypy_cache
