@@ -24,6 +24,11 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
 
+    async def shutdown(self):
+        logging.info("Shutting down")
+        sqlitedb.stop()
+        await self.logout()
+
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
         await apis.bot_lists.post_all_bot_lists(len(self.guilds))
@@ -68,7 +73,7 @@ class SpaceXLaunchBotClient(discord.Client):
         command_used = first_word.replace(config.BOT_COMMAND_PREFIX, "")
 
         try:
-            run_command = commands.CMD_FUNC_LOOKUP[command_used]
+            run_command = commands.CMD_LOOKUP[command_used]
             # All commands are passed the client and the message objects
             to_send = await run_command(client=self, message=message)
 

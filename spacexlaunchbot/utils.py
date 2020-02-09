@@ -26,7 +26,7 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
 
 def setup_logging() -> None:
     """Setup logging."""
-    logging.basicConfig(level=config.LOG_LEVEL)
+    logging.basicConfig(level=config.LOG_LEVEL, format=config.LOG_FORMAT)
 
     # Change discord to only log ERROR level and above
     logging.getLogger("discord").setLevel(logging.ERROR)

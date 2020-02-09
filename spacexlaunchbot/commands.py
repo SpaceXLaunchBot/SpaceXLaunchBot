@@ -1,4 +1,3 @@
-import logging
 from typing import Callable, Dict
 
 import apis
@@ -175,15 +174,14 @@ async def _reset_notif_task_store(**kwargs):
     sqlitedb.set_notification_task_store(False, "")
     return "Reset notification_task_store"
 
+
 @req_id_owner
 async def _shutdown(**kwargs):
-    logging.info("Shutting down")
-    sqlitedb.stop()
     client = kwargs.get("client")
-    await client.logout()
+    await client.shutdown()
 
 
-CMD_FUNC_LOOKUP: Dict[str, Callable] = {
+CMD_LOOKUP: Dict[str, Callable] = {
     "nextlaunch": _next_launch,
     "addchannel": _add_channel,
     "removechannel": _remove_channel,
