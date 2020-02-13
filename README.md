@@ -69,3 +69,10 @@ docker run -d --name spacexlaunchbot \
     --env-file ./variables.env \
     psidex/spacexlaunchbot
 ```
+
+To use previous data:
+
+```bash
+sudo mkdir /var/lib/spacexlaunchbot
+sudo cp ./slb.sqlite /var/lib/spacexlaunchbot
+```
