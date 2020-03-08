@@ -19,17 +19,23 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
     spacex_api_url = f"https://api.spacexdata.com/v3/launches/{route}"
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(spacex_api_url) as response:
 
-            if response.status != 200:
-                logging.error(f"Response status: {response.status}")
-                return {}
+        try:
+            async with session.get(spacex_api_url) as response:
 
-            try:
-                launch_dict = await response.json()
+                if response.status != 200:
+                    logging.error(f"Response status: {response.status}")
+                    return {}
 
-            except aiohttp.ContentTypeError:
-                logging.error("JSON decode failed")
-                return {}
+                try:
+                    launch_dict = await response.json()
 
-            return launch_dict
+                except aiohttp.ContentTypeError:
+                    logging.error("JSON decode failed")
+                    return {}
+
+                return launch_dict
+
+        except aiohttp.client_exceptions.ClientConnectorError:
+            # Cannot connect to website :[
+            return {}
