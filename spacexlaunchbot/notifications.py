@@ -74,6 +74,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
 
         # Get changes between old and new launch information embeds
         changes = get_embed_dict_differences(new_li_embed_dict, old_li_embed_dict)
+        logging.info(f"Found changes: {changes}")
 
         # Deal with changes
         if len(changes) > 1:
