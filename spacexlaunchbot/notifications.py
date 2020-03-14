@@ -1,9 +1,7 @@
 import asyncio
 import datetime
 import logging
-from typing import Set
 
-import discord
 from dictdiffer import diff
 
 import apis
