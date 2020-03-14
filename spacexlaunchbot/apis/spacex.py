@@ -28,14 +28,12 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
                     return {}
 
                 try:
-                    launch_dict = await response.json()
+                    return await response.json()
 
                 except aiohttp.ContentTypeError:
                     logging.error("JSON decode failed")
                     return {}
 
-                return launch_dict
-
         except aiohttp.client_exceptions.ClientConnectorError:
-            # Cannot connect to website :[
+            logging.error("Cannot connect to api.spacexdata.com")
             return {}

@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Set
+from typing import Union
 
 import discord
 
@@ -125,15 +125,12 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False
-    ) -> Set[int]:
+    ) -> None:
         """Send a message to all subscribed channels.
 
         Args:
             to_send: A String or discord.Embed object.
             send_mentions: If True, get mentions from db and send as well.
-
-        Returns:
-            A set of channels that are invalid so should be unsubscribed.
 
         """
         channel_ids = sqlitedb.get_subbed_channels()
@@ -146,6 +143,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 invalid_ids.add(channel_id)
 
             else:
+                # TODO: If send_s returns -1, log? Send smaller?
                 await self.send_s(channel, to_send)
 
                 if send_mentions:
@@ -153,4 +151,5 @@ class SpaceXLaunchBotClient(discord.Client):
                     if mentions != "":
                         await self.send_s(channel, mentions)
 
-        return invalid_ids
+        # Remove any channels from db that are picked up as invalid
+        sqlitedb.remove_subbed_channels(invalid_ids)

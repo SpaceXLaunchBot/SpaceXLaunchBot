@@ -1,4 +1,4 @@
-from typing import Tuple, Set
+from typing import Tuple, Set, Dict
 
 from sqlitedict import SqliteDict
 
@@ -36,28 +36,28 @@ class SqliteDb:
 
         self.sqlite.commit()
 
-    def get_notification_task_store(self) -> Tuple[bool, str]:
+    def get_notification_task_store(self) -> Tuple[bool, Dict]:
         """Gets and decodes / deserializes variables from notification_task_store.
 
         Returns:
             A list with these indexes:
                 0: ls_notif_sent: True/False if the launching soon msg has been sent.
-                1: li_dict_hash: A string of the latest launch info dict hash.
+                1: li_embed_dict: The latest launch info embed as a dictionary.
 
         """
         return self.sqlite[self.KEY_NOTIFICATION_TASK_STORE]
 
     def set_notification_task_store(
-        self, ls_notif_sent: bool, li_dict_hash: str
+        self, ls_notif_sent: bool, li_embed_dict: Dict
     ) -> None:
         """Update / create the hash for notification_task_store.
 
         Args:
             ls_notif_sent: True/False if the launching soon msg has been sent.
-            li_dict_hash: A string of the latest launch info dict hash.
+            li_embed_dict: The latest launch info embed as a dictionary.
 
         """
-        self.sqlite[self.KEY_NOTIFICATION_TASK_STORE] = [ls_notif_sent, li_dict_hash]
+        self.sqlite[self.KEY_NOTIFICATION_TASK_STORE] = [ls_notif_sent, li_embed_dict]
         self.sqlite.commit()
 
     def set_guild_mentions(self, guild_id: int, to_mention: str) -> None:

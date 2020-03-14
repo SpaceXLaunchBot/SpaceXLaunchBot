@@ -171,7 +171,7 @@ async def _debug_launch_information(**kwargs):
 async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications).
     """
-    sqlitedb.set_notification_task_store(False, "")
+    sqlitedb.set_notification_task_store(False, {})
     return "Reset notification_task_store"
 
 

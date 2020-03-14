@@ -1,11 +1,10 @@
 import asyncio
 import datetime
-import hashlib
-import json
 import logging
 from typing import Set
 
 import discord
+from dictdiffer import diff
 
 import apis
 import config
@@ -17,14 +16,35 @@ ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
-async def hash_embed(embed: discord.Embed) -> str:
-    """Takes a discord.Embed object, converts it to a sorted JSON string and returns the
-    SHA256 hash as a string of hexadecimal characters.
+def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
+    """Finds any differences between 2 embed dicts, returning the names of the keys /
+    fields that are different. Does not find additions or deletions, just changes.
+
+    Args:
+        embed1: A dict of a discord Embed object.
+        embed2: A dict of a discord Embed object.
+
+    Returns:
+        A List of strings that are the names of the changed keys / fields.
+
     """
-    # sort_keys ensures consistency
-    sorted_embed_dict = json.dumps(embed.to_dict(), sort_keys=True)
-    sorted_embed_dict_bytes = sorted_embed_dict.encode("UTF-8")
-    return hashlib.sha256(sorted_embed_dict_bytes).hexdigest()
+    changes = []
+
+    for difference in list(diff(embed1, embed2)):
+
+        # The first index is the type of diff. We are looking for changes.
+        if difference[0] == "change":
+
+            # The second index is the key, or in the case of fields, it is a list like
+            # ['fields', 0, 'value'], where the 2nd index is the index of the field.
+            if type(difference[1]) == list and difference[1][0] == "fields":
+                # diff[1][1] is the fields index in the embed dict.
+                changes.append(embed1["fields"][difference[1][1]]["name"])
+
+            else:
+                changes.append(difference[1])
+
+    return changes
 
 
 async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") -> None:
@@ -33,7 +53,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     Updates database values if they need updating.
 
     Args:
-        client : The client to use to send messages.
+        client : The Discord client to use to send messages.
 
     """
     next_launch_dict = await apis.spacex.get_launch_dict()
@@ -42,26 +62,36 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     if next_launch_dict == {}:
         return
 
-    # At the end of this method, remove all channels that can't be access anymore
-    channels_to_remove: Set[int] = set()
-
     # Shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, latest_li_embed_hash = sqlitedb.get_notification_task_store()
-
+    ls_notif_sent, old_li_embed_dict = sqlitedb.get_notification_task_store()
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
-    new_li_embed_hash = await hash_embed(new_li_embed)
+    new_li_embed_dict = new_li_embed.to_dict()
+
+    # This is the embed that will be saved to the notification task store
+    embed_dict_to_save = old_li_embed_dict
 
     # Send out a launch information embed if it has changed from the previous one
-    if new_li_embed_hash != latest_li_embed_hash:
+    if new_li_embed_dict != old_li_embed_dict:
         logging.info("Launch info changed, sending notifications")
 
+        # Get changes between old and new launch information embeds
+        changes = get_embed_dict_differences(new_li_embed_dict, old_li_embed_dict)
+
+        # Deal with changes
+        if len(changes) > 1:
+            changed_text = f"Changed: {changes[0]} + {len(changes) - 1} more"
+        elif len(changes) == 0:
+            # It can be 0 if we use reset nts and the li embed dict is set to {}
+            # The changes will be listed as "add" instead of "change" by dictdiffer
+            changed_text = "Changed: New Embed"
+        else:
+            changed_text = f"Changed: {changes[0]}"
+
+        new_li_embed.set_footer(text=changed_text)
+        await client.send_all_subscribed(new_li_embed)
+
         ls_notif_sent = False
-        latest_li_embed_hash = new_li_embed_hash
-
-        # New launch found, send all "subscribed" channels the embed
-        invalid_channels = await client.send_all_subscribed(new_li_embed)
-        channels_to_remove |= invalid_channels
-
+        embed_dict_to_save = new_li_embed_dict
     try:
         launch_timestamp = int(next_launch_dict["launch_date_unix"])
     except ValueError:
@@ -82,13 +112,11 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
         launching_soon_embed = await embedcreators.get_launching_soon_embed(
             next_launch_dict
         )
-        invalid_channels = await client.send_all_subscribed(launching_soon_embed, True)
-        channels_to_remove |= invalid_channels
+        await client.send_all_subscribed(launching_soon_embed, True)
         ls_notif_sent = True
 
     # Save any changed data to db
-    sqlitedb.set_notification_task_store(ls_notif_sent, latest_li_embed_hash)
-    sqlitedb.remove_subbed_channels(channels_to_remove)
+    sqlitedb.set_notification_task_store(ls_notif_sent, embed_dict_to_save)
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
