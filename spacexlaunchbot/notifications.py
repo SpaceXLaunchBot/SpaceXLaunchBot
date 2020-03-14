@@ -33,9 +33,14 @@ def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
         # The first index is the type of diff. We are looking for changes.
         if difference[0] == "change":
 
-            # The second index is the key, or in the case of fields, it is a list like
-            # ['fields', 0, 'value'], where the 2nd index is the index of the field.
-            if type(difference[1]) == list and difference[1][0] == "fields":
+            # The second index ([1]) is the key, or in the case of fields, it is a list
+            # like: ['fields', 0, 'value'].
+            # Here we check it is a fields value that has changed, otherwise ignore it.
+            if (
+                type(difference[1]) == list
+                and difference[1][0] == "fields"
+                and difference[1][2] == "value"
+            ):
                 # diff[1][1] is the fields index in the embed dict.
                 changes.append(embed1["fields"][difference[1][1]]["name"])
 
