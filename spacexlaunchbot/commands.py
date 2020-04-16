@@ -15,7 +15,7 @@ def req_id_owner(func: Callable) -> Callable:
     """
 
     def wrapper(**kwargs):
-        message = kwargs.get("message")
+        message = kwargs["message"]
         if message.author.id == config.BOT_OWNER_ID:
             return func(**kwargs)
         return None
@@ -31,7 +31,7 @@ def req_perm_admin(func: Callable) -> Callable:
     """
 
     def wrapper(**kwargs):
-        message = kwargs.get("message")
+        message = kwargs["message"]
         perms = message.author.permissions_in(message.channel)
         if getattr(perms, "administrator", False):
             return func(**kwargs)
@@ -53,7 +53,7 @@ async def _next_launch(**kwargs):
 
 @req_perm_admin
 async def _add_channel(**kwargs):
-    message = kwargs.get("message")
+    message = kwargs["message"]
     reply = "This channel has been added to the notification service"
 
     added = sqlitedb.add_subbed_channel(message.channel.id)
@@ -65,7 +65,7 @@ async def _add_channel(**kwargs):
 
 @req_perm_admin
 async def _remove_channel(**kwargs):
-    message = kwargs.get("message")
+    message = kwargs["message"]
     reply = "This channel has been removed from the notification service"
 
     removed = sqlitedb.remove_subbed_channel(message.channel.id)
@@ -77,7 +77,7 @@ async def _remove_channel(**kwargs):
 
 @req_perm_admin
 async def _set_mentions(**kwargs):
-    message = kwargs.get("message")
+    message = kwargs["message"]
     reply = "Invalid input for setmentions command"
 
     roles_to_mention = " ".join(message.content.split("setmentions")[1:])
@@ -92,7 +92,7 @@ async def _set_mentions(**kwargs):
 
 @req_perm_admin
 async def _get_mentions(**kwargs):
-    message = kwargs.get("message")
+    message = kwargs["message"]
     reply = "This guild has no mentions set"
 
     mentions = sqlitedb.get_guild_mentions(message.guild.id)
@@ -104,7 +104,7 @@ async def _get_mentions(**kwargs):
 
 @req_perm_admin
 async def _remove_mentions(**kwargs):
-    message = kwargs.get("message")
+    message = kwargs["message"]
     reply = "Removed mentions succesfully"
 
     deleted = sqlitedb.delete_guild_mentions(message.guild.id)
@@ -115,7 +115,7 @@ async def _remove_mentions(**kwargs):
 
 
 async def _info(**kwargs):
-    client = kwargs.get("client")
+    client = kwargs["client"]
     guild_count = len(client.guilds)
     info_embed = await embedcreators.get_info_embed(guild_count)
     return info_embed
@@ -129,7 +129,7 @@ async def _help(**kwargs):
 async def _debug_launching_soon(**kwargs):
     """Send launching soon embed for the given launch.
     """
-    message = kwargs.get("message")
+    message = kwargs["message"]
 
     try:
         launch_number = "".join(message.content.split(" ")[1:])
@@ -150,7 +150,7 @@ async def _debug_launching_soon(**kwargs):
 async def _debug_launch_information(**kwargs):
     """Send launch information embed for the given launch.
     """
-    message = kwargs.get("message")
+    message = kwargs["message"]
 
     try:
         launch_number = "".join(message.content.split(" ")[1:])
@@ -177,7 +177,7 @@ async def _reset_notif_task_store(**kwargs):
 
 @req_id_owner
 async def _shutdown(**kwargs):
-    client = kwargs.get("client")
+    client = kwargs["client"]
     await client.shutdown()
 
 
