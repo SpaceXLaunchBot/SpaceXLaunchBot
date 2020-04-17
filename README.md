@@ -57,22 +57,9 @@ If you want to request a feature, [open an issue](https://github.com/r-spacex/Sp
 
 ## Deployment
 
-This is mainly reminders for me, but feel free to use this yourself.
-
-Make sure `variables.env` contains the correct variables and is in the current directory.
-
-The `-v` command means the sqlite db will be written to `/var/lib/spacexlaunchbot/` in the host fs.
-
 ```bash
 docker run -d --name spacexlaunchbot \
     -v /var/lib/spacexlaunchbot:/docker-volume \
-    --env-file ./variables.env \
+    --env-file /path/to/variables.env \
     psidex/spacexlaunchbot
-```
-
-To use previous data:
-
-```bash
-sudo mkdir /var/lib/spacexlaunchbot
-sudo cp ./slb.sqlite /var/lib/spacexlaunchbot
 ```
