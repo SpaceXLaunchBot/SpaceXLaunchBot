@@ -18,7 +18,7 @@
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
-        <img src="https://img.shields.io/badge/Ko--fi-Donate-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
+        <img src="https://img.shields.io/badge/Support%20Me-Ko--fi-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
     </a>    
 </p>
 
