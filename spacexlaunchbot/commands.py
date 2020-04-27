@@ -105,7 +105,7 @@ async def _get_mentions(**kwargs):
 @req_perm_admin
 async def _remove_mentions(**kwargs):
     message = kwargs["message"]
-    reply = "Removed mentions succesfully"
+    reply = "Removed mentions successfully"
 
     deleted = sqlitedb.delete_guild_mentions(message.guild.id)
     if deleted == 0:
