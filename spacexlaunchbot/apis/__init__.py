@@ -1,4 +1,4 @@
-"""So apis.dbl or apis.spacex can be used instead of having to "import ... from apis"
+"""So "import apis; apis.file" can be used instead of having to "import file from apis"
 """
 from . import bot_lists
 from . import spacex

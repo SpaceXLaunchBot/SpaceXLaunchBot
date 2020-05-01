@@ -46,7 +46,7 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
         launch_dict["details"] = ""
 
     launch_info_embed = discord.Embed(
-        color=statics.FALCON_RED,
+        color=config.EmbedColours.FALCON_RED,
         description=launch_dict["details"],
         title="Launch #{} - {}".format(
             launch_dict["flight_number"], launch_dict["mission_name"]
@@ -155,7 +155,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     embed_desc = ""
 
     notif_embed = discord.Embed(
-        color=statics.FALCON_RED,
+        color=config.EmbedColours.FALCON_RED,
         title="{} is launching soon!".format(launch_dict["mission_name"]),
     )
 
@@ -197,7 +197,7 @@ async def get_info_embed(guild_count: int) -> discord.Embed:
 
     info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",
-        color=statics.FALCON_RED,
+        color=config.EmbedColours.FALCON_RED,
         description="A Discord bot for getting news, information, and notifications "
         "about upcoming SpaceX launches",
     )
@@ -212,7 +212,7 @@ async def get_info_embed(guild_count: int) -> discord.Embed:
     info_embed.add_field(name="Contact", value=f"{config.BOT_OWNER}")
     info_embed.add_field(
         name="Help",
-        value=f"Use {config.BOT_COMMAND_PREFIX}help to get a list of commands",
+        value=f"Use `{config.BOT_COMMAND_PREFIX} help` to get a list of commands",
     )
 
     return info_embed

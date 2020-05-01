@@ -7,6 +7,7 @@ import apis
 import commands
 import config
 import notifications
+import statics
 from sqlitedb import sqlitedb
 
 
@@ -31,7 +32,9 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
-        await apis.bot_lists.post_all_bot_lists(len(self.guilds))
+        gc = len(self.guilds)
+        logging.info(f"Updating bot lists with a guild_count of {gc}")
+        await apis.bot_lists.post_all_bot_lists(gc)
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
@@ -55,22 +58,21 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.change_presence(activity=discord.Game(name=title))
 
     async def on_message(self, message: discord.message) -> None:
-        if (
-            not message.content.startswith(config.BOT_COMMAND_PREFIX)
-            or message.author.bot
-            or not message.guild
-        ):
-            # Not possibly a command (doesn't start with prefix)
-            # Don't reply to bots (includes self)
-            # Only reply to messages from guilds
+        if message.author.bot or not message.guild:
             return
 
-        # Commands can be in any case
-        message_lower = message.content.lower()
-        # Grab first word in the message (the command)
-        first_word = message_lower.split(" ")[0]
-        # Remove the command prefix so we can lookup the command
-        command_used = first_word.replace(config.BOT_COMMAND_PREFIX, "")
+        message_parts = message.content.lower().split(" ")
+
+        # ToDo: Temporary, remove after n months
+        if message_parts[0].startswith(config.BOT_COMMAND_PREFIX_LEGACY):
+            if message_parts[0][1:] in commands.CMD_LOOKUP:
+                await self.send_s(message.channel, statics.LEGACY_PREFIX_WARNING_EMBED)
+            return
+
+        if message_parts[0] != config.BOT_COMMAND_PREFIX:
+            return
+
+        command_used = message_parts[1]
 
         try:
             run_command = commands.CMD_LOOKUP[command_used]
@@ -106,6 +108,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 -4 : HTTPException (API down, network issues, etc.).
 
         """
+        # ToDo: These return codes aren't actually used for anything yet
         try:
             if isinstance(to_send, str):
                 if len(to_send) > 2000:
@@ -141,15 +144,14 @@ class SpaceXLaunchBotClient(discord.Client):
 
             if channel is None:
                 invalid_ids.add(channel_id)
+                continue
 
-            else:
-                # TODO: If send_s returns -1, log? Send smaller?
-                await self.send_s(channel, to_send)
+            await self.send_s(channel, to_send)
 
-                if send_mentions:
-                    mentions = sqlitedb.get_guild_mentions(channel.guild.id)
-                    if mentions != "":
-                        await self.send_s(channel, mentions)
+            if send_mentions:
+                mentions = sqlitedb.get_guild_mentions(channel.guild.id)
+                if mentions != "":
+                    await self.send_s(channel, mentions)
 
         # Remove any channels from db that are picked up as invalid
         sqlitedb.remove_subbed_channels(invalid_ids)
