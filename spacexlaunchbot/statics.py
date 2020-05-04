@@ -15,7 +15,7 @@ ROCKET_ID_IMAGES = {
 HELP_EMBED = Embed(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
-    color=config.Colours.FALCON_RED,
+    color=config.COLOUR_FALCON_RED,
 )
 HELP_EMBED.add_field(
     name="nextlaunch",
