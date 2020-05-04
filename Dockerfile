@@ -6,5 +6,7 @@ COPY . .
 RUN pip install -r requirements.txt
 ENV INSIDE_DOCKER "True"
 
+HEALTHCHECK CMD discordhealthcheck || exit 1
+
 # -u so stdout shows up in Docker log.
 CMD ["python","-u","./spacexlaunchbot/main.py"]

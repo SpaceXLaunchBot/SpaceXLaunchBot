@@ -2,6 +2,7 @@ import logging
 from typing import Union
 
 import discord
+import discordhealthcheck
 
 import apis
 import commands
@@ -19,6 +20,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Create asyncio tasks now
         self.loop.create_task(notifications.notification_task(self))
+        discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")

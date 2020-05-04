@@ -76,11 +76,13 @@ NOTIF_TASK_API_INTERVAL = 1
 NOTIF_TASK_LAUNCH_DELTA = 30
 
 #
-# Embeds
+# Misc
 #
 
 
-class EmbedColours:
+class Colours:
+    """discord.Color objects for embeds"""
+
     ERROR_RED = Colour.from_rgb(255, 0, 0)
     FALCON_RED = Colour.from_rgb(238, 15, 70)
     INFO_ORANGE = Colour.from_rgb(200, 74, 0)

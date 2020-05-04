@@ -15,7 +15,7 @@ ROCKET_ID_IMAGES = {
 HELP_EMBED = Embed(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
-    color=config.EmbedColours.FALCON_RED,
+    color=config.Colours.FALCON_RED,
 )
 HELP_EMBED.add_field(
     name="nextlaunch",
@@ -57,22 +57,22 @@ HELP_EMBED.add_field(name="help", value="List these commands")
 NEXT_LAUNCH_ERROR_EMBED = Embed(
     title="Error",
     description=f"An launch_info_embed error occurred, contact {config.BOT_OWNER}",
-    color=config.EmbedColours.ERROR_RED,
+    color=config.Colours.ERROR_RED,
 )
 API_ERROR_EMBED = Embed(
     title="Error",
     description=f"An API error occurred, contact {config.BOT_OWNER}",
-    color=config.EmbedColours.ERROR_RED,
+    color=config.Colours.ERROR_RED,
 )
 GENERAL_ERROR_EMBED = Embed(
     title="Error",
     description=f"An error occurred, contact {config.BOT_OWNER}",
-    color=config.EmbedColours.ERROR_RED,
+    color=config.Colours.ERROR_RED,
 )
 DB_ERROR_EMBED = Embed(
     title="Error",
     description=f"A database error occurred, contact {config.BOT_OWNER}",
-    color=config.EmbedColours.ERROR_RED,
+    color=config.Colours.ERROR_RED,
 )
 
 LEGACY_PREFIX_WARNING_EMBED = Embed(
@@ -80,5 +80,5 @@ LEGACY_PREFIX_WARNING_EMBED = Embed(
     description="You used a command with the old prefix (!), SpaceXLaunchBot has "
     'moved to using "slb" as a prefix, e.g. `slb help`. This warning will be removed '
     "soon.",
-    color=config.EmbedColours.INFO_ORANGE,
+    color=config.Colours.INFO_ORANGE,
 )
