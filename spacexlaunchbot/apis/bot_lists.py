@@ -18,5 +18,5 @@ async def _post_count_to_bot_list(bl_data: Dict[str, str], guild_count: int) -> 
 
 
 async def post_all_bot_lists(guild_count: int) -> None:
-    for d in config.BOT_LIST_DATA:
-        await _post_count_to_bot_list(d, guild_count)
+    for data in config.BOT_LIST_DATA:
+        await _post_count_to_bot_list(data, guild_count)

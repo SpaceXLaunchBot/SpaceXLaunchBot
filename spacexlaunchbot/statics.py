@@ -1,4 +1,4 @@
-from discord import Embed, Colour
+from discord import Embed
 
 import config
 

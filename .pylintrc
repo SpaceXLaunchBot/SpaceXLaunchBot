@@ -19,6 +19,7 @@ disable=bad-continuation,               # Black formatter does not agree
         logging-fstring-interpolation,  # f-strings in log calls are fine
         logging-format-interpolation,   # ^
         too-many-return-statements,     # This doesn't matter
+        too-few-public-methods          # ^
 
 
 [VARIABLES]

@@ -37,7 +37,7 @@ def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
             # like: ['fields', 0, 'value'].
             # Here we check it is a fields value that has changed, otherwise ignore it.
             if (
-                type(difference[1]) == list
+                isinstance(difference[1], list)
                 and difference[1][0] == "fields"
                 and difference[1][2] == "value"
             ):
