@@ -15,25 +15,21 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
     If launch_number <= 0 (the default), get the "next" launch.
     """
 
-    route = str(launch_number) if launch_number > 0 else "next"
+    route = launch_number if launch_number > 0 else "next"
     spacex_api_url = f"https://api.spacexdata.com/v3/launches/{route}"
 
-    async with aiohttp.ClientSession() as session:
-
-        try:
+    try:
+        async with aiohttp.ClientSession() as session:
             async with session.get(spacex_api_url) as response:
-
                 if response.status != 200:
                     logging.error(f"Response status: {response.status}")
                     return {}
+                return await response.json()
 
-                try:
-                    return await response.json()
+    except aiohttp.client_exceptions.ClientConnectorError:
+        logging.error("Cannot connect to api.spacexdata.com")
+        return {}
 
-                except aiohttp.ContentTypeError:
-                    logging.error("JSON decode failed")
-                    return {}
-
-        except aiohttp.client_exceptions.ClientConnectorError:
-            logging.error("Cannot connect to api.spacexdata.com")
-            return {}
+    except aiohttp.ContentTypeError:
+        logging.error("JSON decode failed")
+        return {}
