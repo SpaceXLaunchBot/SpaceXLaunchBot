@@ -1,4 +1,5 @@
 import logging
+import sys
 from typing import Union
 
 import discord
@@ -9,7 +10,7 @@ import commands
 import config
 import notifications
 import statics
-from sqlitedb import sqlitedb
+from sqlitedb import db
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -29,7 +30,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def shutdown(self):
         logging.info("Shutting down")
-        sqlitedb.stop()
+        db.stop()
         await self.logout()
 
     async def update_website_metrics(self) -> None:
@@ -46,7 +47,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
 
-        deleted = sqlitedb.delete_guild_mentions(guild.id)
+        deleted = db.delete_guild_mentions(guild.id)
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
@@ -68,7 +69,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # ToDo: Temporary, remove after n months
         if message_parts[0].startswith(config.BOT_COMMAND_PREFIX_LEGACY):
             if message_parts[0][1:] in commands.CMD_LOOKUP:
-                await self.send_s(message.channel, statics.LEGACY_PREFIX_WARNING_EMBED)
+                await self._send_s(message.channel, statics.LEGACY_PREFIX_WARNING_EMBED)
             return
 
         if message_parts[0] != config.BOT_COMMAND_PREFIX:
@@ -87,46 +88,35 @@ class SpaceXLaunchBotClient(discord.Client):
         if to_send is None:
             return
 
-        await self.send_s(message.channel, to_send)
+        await self._send_s(message.channel, to_send)
 
     @staticmethod
-    async def send_s(
+    async def _send_s(
         channel: discord.TextChannel, to_send: Union[str, discord.Embed]
-    ) -> int:
-        """Sends a text / embed message to a channel safely.
-
-        If an error occurs, safely suppress it so the bot doesn't crash.
+    ) -> None:
+        """Safely send a text / embed message to a channel. Logs any errors that occur.
 
         Args:
             channel: A discord.Channel object.
             to_send: A String or discord.Embed object.
 
-        Returns:
-            An integer 0 to -4:
-                 0 : Success
-                -1 : Message / embed / embed.title too long.
-                -2 : Nothing to send (to_send is not a string or Embed).
-                -3 : Forbidden (No permission to message this channel).
-                -4 : HTTPException (API down, network issues, etc.).
-
         """
-        # ToDo: These return codes aren't actually used for anything yet
         try:
             if isinstance(to_send, str):
                 if len(to_send) > 2000:
-                    return -1
-                await channel.send(to_send)
-                return 0
-            if isinstance(to_send, discord.Embed):
+                    logging.warning("Failed to send message: len of to_send > 2000")
+                else:
+                    await channel.send(to_send)
+
+            elif isinstance(to_send, discord.Embed):
                 if len(to_send) > 2048 or len(to_send.title) > 256:
-                    return -1
-                await channel.send(embed=to_send)
-                return 0
-            return -2
-        except discord.errors.Forbidden:
-            return -3
-        except discord.errors.HTTPException:
-            return -4
+                    logging.warning("Failed to send message: len of embed too long")
+                else:
+                    await channel.send(embed=to_send)
+
+        except (discord.errors.Forbidden, discord.errors.HTTPException):
+            ex, val, _ = sys.exc_info()
+            logging.warning(f"Failed to send message: {ex.__name__}: {val}")
 
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False
@@ -138,7 +128,7 @@ class SpaceXLaunchBotClient(discord.Client):
             send_mentions: If True, get mentions from db and send as well.
 
         """
-        channel_ids = sqlitedb.get_subbed_channels()
+        channel_ids = db.get_subbed_channels()
         invalid_ids = set()
 
         for channel_id in channel_ids:
@@ -148,12 +138,13 @@ class SpaceXLaunchBotClient(discord.Client):
                 invalid_ids.add(channel_id)
                 continue
 
-            await self.send_s(channel, to_send)
+            await self._send_s(channel, to_send)
 
-            if send_mentions:
-                mentions = sqlitedb.get_guild_mentions(channel.guild.id)
-                if mentions != "":
-                    await self.send_s(channel, mentions)
+            if (
+                send_mentions
+                and (mentions := db.get_guild_mentions(channel.guild.id)) != ""
+            ):
+                await self._send_s(channel, mentions)
 
         # Remove any channels from db that are picked up as invalid
-        sqlitedb.remove_subbed_channels(invalid_ids)
+        db.remove_subbed_channels(invalid_ids)

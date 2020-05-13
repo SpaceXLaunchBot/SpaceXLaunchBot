@@ -4,7 +4,7 @@ import apis
 import config
 import embedcreators
 import statics
-from sqlitedb import sqlitedb
+from sqlitedb import db
 
 
 def req_id_owner(func: Callable) -> Callable:
@@ -56,7 +56,7 @@ async def _add_channel(**kwargs):
     message = kwargs["message"]
     reply = "This channel has been added to the notification service"
 
-    added = sqlitedb.add_subbed_channel(message.channel.id)
+    added = db.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
 
@@ -68,7 +68,7 @@ async def _remove_channel(**kwargs):
     message = kwargs["message"]
     reply = "This channel has been removed from the notification service"
 
-    removed = sqlitedb.remove_subbed_channel(message.channel.id)
+    removed = db.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
 
@@ -85,7 +85,7 @@ async def _set_mentions(**kwargs):
 
     if roles_to_mention != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
-        sqlitedb.set_guild_mentions(message.guild.id, roles_to_mention)
+        db.set_guild_mentions(message.guild.id, roles_to_mention)
 
     return reply
 
@@ -95,7 +95,7 @@ async def _get_mentions(**kwargs):
     message = kwargs["message"]
     reply = "This guild has no mentions set"
 
-    mentions = sqlitedb.get_guild_mentions(message.guild.id)
+    mentions = db.get_guild_mentions(message.guild.id)
     if mentions:
         reply = f"Mentions for this guild: {mentions}"
 
@@ -107,7 +107,7 @@ async def _remove_mentions(**kwargs):
     message = kwargs["message"]
     reply = "Removed mentions successfully"
 
-    deleted = sqlitedb.delete_guild_mentions(message.guild.id)
+    deleted = db.delete_guild_mentions(message.guild.id)
     if deleted == 0:
         reply = "This guild has no mentions to be removed"
 
@@ -171,7 +171,7 @@ async def _debug_launch_information(**kwargs):
 async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications).
     """
-    sqlitedb.set_notification_task_store(False, {})
+    db.set_notification_task_store(False, {})
     return "Reset notification_task_store"
 
 

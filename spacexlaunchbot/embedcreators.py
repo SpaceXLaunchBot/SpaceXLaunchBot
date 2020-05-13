@@ -6,7 +6,7 @@ import discord
 import config
 import statics
 import utils
-from sqlitedb import sqlitedb
+from sqlitedb import db
 
 PAYLOAD_INFO = """Type: {}
 Orbit: {}
@@ -193,7 +193,7 @@ async def get_info_embed(guild_count: int) -> discord.Embed:
         A discord.Embed object.
 
     """
-    subbed_channel_count = sqlitedb.subbed_channels_count()
+    subbed_channel_count = db.subbed_channels_count()
 
     info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",

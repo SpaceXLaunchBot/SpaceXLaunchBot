@@ -169,4 +169,4 @@ class SqliteDb:
 
 
 # This is the instance that will be imported and used by all other files
-sqlitedb = SqliteDb(config.SQLITE_LOCATION)
+db = SqliteDb(config.SQLITE_LOCATION)
