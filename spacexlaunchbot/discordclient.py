@@ -116,7 +116,8 @@ class SpaceXLaunchBotClient(discord.Client):
 
         except (discord.errors.Forbidden, discord.errors.HTTPException):
             ex, val, _ = sys.exc_info()
-            logging.warning(f"Failed to send message: {ex.__name__}: {val}")
+            if ex is not None:  # MyPy must be pleased.
+                logging.warning(f"Failed to send message: {ex.__name__}: {val}")
 
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False
