@@ -1,4 +1,4 @@
-import pickle
+import pickle  # nosec
 from typing import Tuple, Set, Dict
 
 from sqlitedict import SqliteDict
@@ -180,7 +180,7 @@ class DataStore:
 
     def _load(self):
         with open(config.PICKLE_DUMP_LOCATION, "rb") as f:
-            tmp = pickle.load(f)
+            tmp = pickle.load(f)  # nosec
         self.__dict__.update(tmp)
 
     def _save(self):
