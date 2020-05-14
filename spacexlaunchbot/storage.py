@@ -1,3 +1,4 @@
+import pickle
 from typing import Tuple, Set, Dict
 
 from sqlitedict import SqliteDict
@@ -23,7 +24,7 @@ class SqliteDb:
     KEY_NOTIFICATION_TASK_STORE = KEY_PREFIX + "notification_task_store"
     KEY_GUILD = KEY_PREFIX + "guild:{}"
 
-    def __init__(self, sqlite_location: str) -> None:
+    def __init__(self, sqlite_location: str):
         self.sqlite = SqliteDict(sqlite_location, autocommit=False)
 
     def init_defaults(self) -> None:
@@ -166,6 +167,26 @@ class SqliteDb:
         """Closes the database"""
         self.sqlite.commit()
         self.sqlite.close()
+
+
+class DataStore:
+    def __init__(self):
+        self.subscribed_channels = []
+        self.launching_soon_notif_sent = False
+        self.launch_information = {}
+        self.guild_options = {}
+
+        self._load()
+
+    def _load(self):
+        with open(config.PICKLE_DUMP_LOCATION, "rb") as f:
+            tmp = pickle.load(f)
+        self.__dict__.update(tmp)
+
+    def _save(self):
+        # Idea from https://stackoverflow.com/a/2842727/6396652.
+        with open(config.PICKLE_DUMP_LOCATION, "wb") as f:
+            pickle.dump(self.__dict__, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 # This is the instance that will be imported and used by all other files

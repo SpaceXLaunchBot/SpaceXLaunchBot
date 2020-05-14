@@ -4,7 +4,7 @@ import apis
 import config
 import embedcreators
 import statics
-from sqlitedb import db
+from storage import db
 
 
 def req_id_owner(func: Callable) -> Callable:

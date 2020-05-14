@@ -10,7 +10,7 @@ import commands
 import config
 import notifications
 import statics
-from sqlitedb import db
+from storage import db
 
 
 class SpaceXLaunchBotClient(discord.Client):

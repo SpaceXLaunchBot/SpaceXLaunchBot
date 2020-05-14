@@ -1,7 +1,7 @@
 import config
 import discordclient
 import utils
-from sqlitedb import db
+from storage import db
 
 
 def main() -> None:

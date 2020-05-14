@@ -6,7 +6,7 @@ import discord
 import config
 import statics
 import utils
-from sqlitedb import db
+from storage import db
 
 PAYLOAD_INFO = """Type: {}
 Orbit: {}
