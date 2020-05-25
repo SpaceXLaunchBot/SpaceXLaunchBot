@@ -1,3 +1,4 @@
+import asyncio
 import pickle  # nosec
 from typing import Tuple, Set, Dict
 
@@ -176,17 +177,28 @@ class DataStore:
         self.launch_information = {}
         self.guild_options = {}
 
+        self.lock = asyncio.Lock()
         self._load()
 
     def _load(self):
-        with open(config.PICKLE_DUMP_LOCATION, "rb") as f:
-            tmp = pickle.load(f)  # nosec
-        self.__dict__.update(tmp)
+        try:
+            with open(config.PICKLE_DUMP_LOCATION, "rb") as f:
+                tmp = pickle.load(f)  # nosec
+            self.__dict__.update(tmp)
+        except FileNotFoundError:
+            pass
 
-    def _save(self):
-        # Idea from https://stackoverflow.com/a/2842727/6396652.
-        with open(config.PICKLE_DUMP_LOCATION, "wb") as f:
-            pickle.dump(self.__dict__, f, protocol=pickle.HIGHEST_PROTOCOL)
+    async def save(self):
+        async with self.lock:
+            to_dump = {
+                "subscribed_channels": self.subscribed_channels,
+                "launching_soon_notif_sent": self.launching_soon_notif_sent,
+                "launch_information": self.launch_information,
+                "guild_options": self.guild_options,
+            }
+            # Idea from https://stackoverflow.com/a/2842727/6396652.
+            with open(config.PICKLE_DUMP_LOCATION, "wb") as f:
+                pickle.dump(to_dump, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 # This is the instance that will be imported and used by all other files

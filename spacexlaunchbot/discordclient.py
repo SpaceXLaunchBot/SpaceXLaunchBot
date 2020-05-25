@@ -80,7 +80,10 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             run_command = commands.CMD_LOOKUP[command_used]
             # All commands are passed the client and the message objects
-            to_send = await run_command(client=self, message=message)
+            try:
+                to_send = await run_command(client=self, message=message)
+            except TypeError:
+                logging.error(f"to_send type error: {run_command=} {message=}")
 
         except KeyError:
             to_send = None
