@@ -83,7 +83,7 @@ class SpaceXLaunchBotClient(discord.Client):
             try:
                 to_send = await run_command(client=self, message=message)
             except TypeError:
-                logging.error(f"to_send type error: {run_command=} {message=}")
+                logging.error(f"to_send type error: {run_command=} {message.content=}")
 
         except KeyError:
             to_send = None
