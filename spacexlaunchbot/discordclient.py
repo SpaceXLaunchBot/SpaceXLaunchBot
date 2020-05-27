@@ -22,13 +22,19 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Create asyncio tasks now
         self.loop.create_task(notifications.notification_task(self))
-        self.loop.add_signal_handler(signal.SIGTERM, self.shutdown)
+        self.loop.add_signal_handler(signal.SIGTERM, self.shutdown_sigterm)
         discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
         logging.info("Successfully connected to Discord API")
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
+
+    @staticmethod
+    def shutdown_sigterm() -> None:
+        # Can't use async code in signal handler so just abandon discord connection.
+        logging.info("Received SIGTERM, shutting down")
+        db.stop()
 
     async def shutdown(self) -> None:
         logging.info("Shutting down")
