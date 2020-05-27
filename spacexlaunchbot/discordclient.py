@@ -1,4 +1,5 @@
 import logging
+import signal
 import sys
 from typing import Union
 
@@ -21,6 +22,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         # Create asyncio tasks now
         self.loop.create_task(notifications.notification_task(self))
+        self.loop.add_signal_handler(signal.SIGTERM, self.shutdown)
         discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
@@ -28,7 +30,7 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
 
-    async def shutdown(self):
+    async def shutdown(self) -> None:
         logging.info("Shutting down")
         db.stop()
         await self.logout()
