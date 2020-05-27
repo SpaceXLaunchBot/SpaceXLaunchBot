@@ -1,4 +1,5 @@
 import logging
+import os
 import signal
 import sys
 from typing import Union
@@ -11,18 +12,25 @@ import commands
 import config
 import notifications
 import statics
-from storage import db
+from storage import SqliteDb
 
 
 class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
         logging.info("Client initialised")
 
+        self.db = SqliteDb(config.SQLITE_LOCATION)
+        self.db.init_defaults()
+        logging.info("Database initialised")
+
         # Create asyncio tasks now
+
+        if os.name != "nt":
+            # Windows doesn't like loop.add_signal_handler
+            self.loop.add_signal_handler(signal.SIGTERM, self.shutdown_sigterm)
+
         self.loop.create_task(notifications.notification_task(self))
-        self.loop.add_signal_handler(signal.SIGTERM, self.shutdown_sigterm)
         discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
@@ -30,15 +38,14 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
 
-    @staticmethod
-    def shutdown_sigterm() -> None:
-        # Can't use async code in signal handler so just abandon discord connection.
+    def shutdown_sigterm(self) -> None:
+        # Can't use async code in signal handler so just abandon discord connection
         logging.info("Received SIGTERM, shutting down")
-        db.stop()
+        self.db.stop()
 
     async def shutdown(self) -> None:
         logging.info("Shutting down")
-        db.stop()
+        self.db.stop()
         await self.logout()
 
     async def update_website_metrics(self) -> None:
@@ -55,7 +62,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
 
-        deleted = db.delete_guild_mentions(guild.id)
+        deleted = self.db.delete_guild_mentions(guild.id)
         if deleted != 0:
             logging.info(f"Removed guild settings for {guild.id}")
 
@@ -142,7 +149,7 @@ class SpaceXLaunchBotClient(discord.Client):
             send_mentions: If True, get mentions from db and send as well.
 
         """
-        channel_ids = db.get_subbed_channels()
+        channel_ids = self.db.get_subbed_channels()
         invalid_ids = set()
 
         for channel_id in channel_ids:
@@ -156,9 +163,9 @@ class SpaceXLaunchBotClient(discord.Client):
 
             if (
                 send_mentions
-                and (mentions := db.get_guild_mentions(channel.guild.id)) != ""
+                and (mentions := self.db.get_guild_mentions(channel.guild.id)) != ""
             ):
                 await self._send_s(channel, mentions)
 
         # Remove any channels from db that are picked up as invalid
-        db.remove_subbed_channels(invalid_ids)
+        self.db.remove_subbed_channels(invalid_ids)

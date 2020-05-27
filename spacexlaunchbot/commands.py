@@ -4,7 +4,6 @@ import apis
 import config
 import embedcreators
 import statics
-from storage import db
 
 
 def req_id_owner(func: Callable) -> Callable:
@@ -53,10 +52,11 @@ async def _next_launch(**kwargs):
 
 @req_perm_admin
 async def _add_channel(**kwargs):
+    client = kwargs["client"]
     message = kwargs["message"]
     reply = "This channel has been added to the notification service"
 
-    added = db.add_subbed_channel(message.channel.id)
+    added = client.db.add_subbed_channel(message.channel.id)
     if added == 0:
         reply = "This channel is already subscribed to the notification service"
 
@@ -65,10 +65,11 @@ async def _add_channel(**kwargs):
 
 @req_perm_admin
 async def _remove_channel(**kwargs):
+    client = kwargs["client"]
     message = kwargs["message"]
     reply = "This channel has been removed from the notification service"
 
-    removed = db.remove_subbed_channel(message.channel.id)
+    removed = client.db.remove_subbed_channel(message.channel.id)
     if removed == 0:
         reply = "This channel was not previously subscribed to the notification service"
 
@@ -77,6 +78,7 @@ async def _remove_channel(**kwargs):
 
 @req_perm_admin
 async def _set_mentions(**kwargs):
+    client = kwargs["client"]
     message = kwargs["message"]
     reply = "Invalid input for setmentions command"
 
@@ -85,17 +87,18 @@ async def _set_mentions(**kwargs):
 
     if roles_to_mention != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
-        db.set_guild_mentions(message.guild.id, roles_to_mention)
+        client.db.set_guild_mentions(message.guild.id, roles_to_mention)
 
     return reply
 
 
 @req_perm_admin
 async def _get_mentions(**kwargs):
+    client = kwargs["client"]
     message = kwargs["message"]
     reply = "This guild has no mentions set"
 
-    mentions = db.get_guild_mentions(message.guild.id)
+    mentions = client.db.get_guild_mentions(message.guild.id)
     if mentions:
         reply = f"Mentions for this guild: {mentions}"
 
@@ -104,10 +107,11 @@ async def _get_mentions(**kwargs):
 
 @req_perm_admin
 async def _remove_mentions(**kwargs):
+    client = kwargs["client"]
     message = kwargs["message"]
     reply = "Removed mentions successfully"
 
-    deleted = db.delete_guild_mentions(message.guild.id)
+    deleted = client.db.delete_guild_mentions(message.guild.id)
     if deleted == 0:
         reply = "This guild has no mentions to be removed"
 
@@ -117,7 +121,8 @@ async def _remove_mentions(**kwargs):
 async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
-    info_embed = await embedcreators.get_info_embed(guild_count)
+    sub_count = client.db.subbed_channels_count()
+    info_embed = await embedcreators.get_info_embed(guild_count, sub_count)
     return info_embed
 
 
@@ -171,7 +176,8 @@ async def _debug_launch_information(**kwargs):
 async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications).
     """
-    db.set_notification_task_store(False, {})
+    client = kwargs["client"]
+    client.db.set_notification_task_store(False, {})
     return "Reset notification_task_store"
 
 

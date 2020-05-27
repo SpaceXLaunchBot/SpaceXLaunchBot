@@ -182,8 +182,8 @@ class DataStore:
 
     def _load(self):
         try:
-            with open(config.PICKLE_DUMP_LOCATION, "rb") as f:
-                tmp = pickle.load(f)  # nosec
+            with open(config.PICKLE_DUMP_LOCATION, "rb") as f_in:
+                tmp = pickle.load(f_in)  # nosec
             self.__dict__.update(tmp)
         except FileNotFoundError:
             pass
@@ -197,9 +197,5 @@ class DataStore:
                 "guild_options": self.guild_options,
             }
             # Idea from https://stackoverflow.com/a/2842727/6396652.
-            with open(config.PICKLE_DUMP_LOCATION, "wb") as f:
-                pickle.dump(to_dump, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-# This is the instance that will be imported and used by all other files
-db = SqliteDb(config.SQLITE_LOCATION)
+            with open(config.PICKLE_DUMP_LOCATION, "wb") as f_out:
+                pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)

@@ -6,7 +6,6 @@ import discord
 import config
 import statics
 import utils
-from storage import db
 
 PAYLOAD_INFO = """Type: {}
 Orbit: {}
@@ -183,7 +182,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     return notif_embed
 
 
-async def get_info_embed(guild_count: int) -> discord.Embed:
+async def get_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
     """Creates an info embed.
 
     Args:
@@ -193,7 +192,6 @@ async def get_info_embed(guild_count: int) -> discord.Embed:
         A discord.Embed object.
 
     """
-    subbed_channel_count = db.subbed_channels_count()
 
     info_embed = discord.Embed(
         title="SpaceXLaunchBot Information",
