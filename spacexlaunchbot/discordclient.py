@@ -1,5 +1,5 @@
 import logging
-import os
+import platform
 import signal
 import sys
 from typing import Union
@@ -24,29 +24,26 @@ class SpaceXLaunchBotClient(discord.Client):
         self.db.init_defaults()
         logging.info("Database initialised")
 
+        if platform.system() == "Linux":
+            self.loop.add_signal_handler(
+                signal.SIGTERM, lambda: self.loop.create_task(self.shutdown())
+            )
+            logging.info("Signal handler for SIGTERM registered")
+
         # Create asyncio tasks now
-
-        if os.name != "nt":
-            # Windows doesn't like loop.add_signal_handler
-            self.loop.add_signal_handler(signal.SIGTERM, self.shutdown_sigterm)
-
         self.loop.create_task(notifications.notification_task(self))
         discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
-        logging.info("Successfully connected to Discord API")
+        logging.info("Connected to Discord API")
         await self.set_playing(config.BOT_GAME)
         await self.update_website_metrics()
 
-    def shutdown_sigterm(self) -> None:
-        # Can't use async code in signal handler so just abandon discord connection
-        logging.info("Received SIGTERM, shutting down")
-        self.db.stop()
-
     async def shutdown(self) -> None:
+        # ToDo: Shutdown all tasks
         logging.info("Shutting down")
         self.db.stop()
-        await self.logout()
+        await self.close()
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
