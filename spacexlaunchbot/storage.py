@@ -1,6 +1,6 @@
 import pickle  # nosec
 from copy import deepcopy
-from typing import Tuple, Set, Dict
+from typing import Tuple, Set, Dict, Any
 
 from sqlitedict import SqliteDict
 
@@ -185,7 +185,7 @@ class DataStore:
         self.subscribed_channels: Set[int] = set()
         self.launching_soon_notif_sent = False
         self.launch_information_embed_dict: Dict = {}
-        self.guild_options: Dict[int, Dict] = {}
+        self.guild_options: Dict[int, Dict[str, Any]] = {}
 
         try:
             with open(self.dump_loc, "rb") as f_in:
@@ -217,16 +217,16 @@ class DataStore:
         self.launching_soon_notif_sent = ls_notif_sent
         self.launch_information_embed_dict = deepcopy(li_embed_dict)
 
-    def set_guild_mention(self, guild_id: int, to_mention: str) -> None:
+    def set_guild_option(self, guild_id: int, option: str, value: Any) -> None:
         if guild_id in self.guild_options:
-            self.guild_options[guild_id]["mentions"] = to_mention
+            self.guild_options[guild_id][option] = value
         else:
-            self.guild_options[guild_id] = {"mentions": to_mention}
+            self.guild_options[guild_id] = {option: value}
 
-    def get_guild_mentions(self) -> Dict:
+    def get_all_guild_options(self) -> Dict[int, Dict[str, Any]]:
         return deepcopy(self.guild_options)
 
-    def remove_guild_mention(self, guild_id: int) -> bool:
+    def remove_guild_options(self, guild_id: int) -> bool:
         if self.guild_options.get(guild_id) is not None:
             del self.guild_options[guild_id]
             return True
