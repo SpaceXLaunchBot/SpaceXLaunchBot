@@ -172,11 +172,10 @@ class SqliteDb:
 class DataStore:
     """A simple class to store data. Dynamically loads from pickled file if possible.
     
-    All methods use a single Lock so only 1 thing can be accessed / changed at a time,
-        and all methods that either return or take mutable objects as parameters make a
-        deep copy of said object(s) so that changes cannot be made outside the internal
-        lock.
-    This means it is safe to use from multiple asyncio Tasks.
+    All methods that either return or take mutable objects as parameters make a deep
+        copy of said object(s) so that changes cannot be made outside the instance.
+
+    This is safe to use from multiple asyncio Tasks.
 
     Immutable object reference(s):
      - https://stackoverflow.com/a/23715872/6396652
@@ -185,11 +184,10 @@ class DataStore:
 
     def __init__(self, save_file_location: str):
         self.dump_loc = save_file_location
-        self.lock = asyncio.Lock()
 
         self.subscribed_channels = set()
         self.launching_soon_notif_sent = False
-        self.launch_information = {}
+        self.launch_information_embed_dict = {}
         self.guild_options = {}
 
         try:
@@ -201,72 +199,59 @@ class DataStore:
 
     async def save(self) -> None:
         # Idea from https://stackoverflow.com/a/2842727/6396652.
-        async with self.lock:
-            to_dump = {
-                "subscribed_channels": self.subscribed_channels,
-                "launching_soon_notif_sent": self.launching_soon_notif_sent,
-                "launch_information": self.launch_information,
-                "guild_options": self.guild_options,
-            }
-            with open(self.dump_loc, "wb") as f_out:
-                pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)
+        to_dump = {
+            "subscribed_channels": self.subscribed_channels,
+            "launching_soon_notif_sent": self.launching_soon_notif_sent,
+            "launch_information": self.launch_information_embed_dict,
+            "guild_options": self.guild_options,
+        }
+        with open(self.dump_loc, "wb") as f_out:
+            pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)
 
     async def get_notification_task_vars(self) -> Tuple[bool, Dict]:
-        async with self.lock:
-            return (
-                self.launching_soon_notif_sent,
-                deepcopy(self.launch_information),
-            )
+        return (
+            self.launching_soon_notif_sent,
+            deepcopy(self.launch_information_embed_dict),
+        )
 
     async def set_notification_task_vars(
         self, ls_notif_sent: bool, li_embed_dict: Dict
     ) -> None:
-        async with self.lock:
-            self.launching_soon_notif_sent = ls_notif_sent
-            self.launch_information = deepcopy(li_embed_dict)
+        self.launching_soon_notif_sent = ls_notif_sent
+        self.launch_information_embed_dict = deepcopy(li_embed_dict)
 
-    async def set_guild_mentions(self, guild_id: int, to_mention: str) -> None:
-        async with self.lock:
-            if guild_id in self.guild_options:
-                self.guild_options[guild_id]["mentions"] = to_mention
-            else:
-                self.guild_options[guild_id] = {"mentions": to_mention}
+    async def set_guild_mention(self, guild_id: int, to_mention: str) -> None:
+        if guild_id in self.guild_options:
+            self.guild_options[guild_id]["mentions"] = to_mention
+        else:
+            self.guild_options[guild_id] = {"mentions": to_mention}
 
-    async def get_guild_mentions(self, guild_id: int) -> str:
-        async with self.lock:
-            if opts := self.guild_options.get(guild_id) is not None:
-                return opts["mentions"]
-        return ""
+    async def get_guild_mentions(self) -> Dict:
+        return deepcopy(self.guild_options)
 
-    async def remove_guild_mentions(self, guild_id: int) -> bool:
-        async with self.lock:
-            if self.guild_options.get(guild_id) is not None:
-                del self.guild_options[guild_id]
-                return True
+    async def remove_guild_mention(self, guild_id: int) -> bool:
+        if self.guild_options.get(guild_id) is not None:
+            del self.guild_options[guild_id]
+            return True
         return False
 
     async def add_subbed_channel(self, channel_id: int) -> bool:
-        async with self.lock:
-            if channel_id not in self.subscribed_channels:
-                self.subscribed_channels.add(channel_id)
-                return True
+        if channel_id not in self.subscribed_channels:
+            self.subscribed_channels.add(channel_id)
+            return True
         return False
 
     async def get_subbed_channels(self) -> Set[int]:
-        async with self.lock:
-            return deepcopy(self.subscribed_channels)
+        return deepcopy(self.subscribed_channels)
 
     async def remove_subbed_channel(self, channel_id: int) -> bool:
-        async with self.lock:
-            if channel_id in self.subscribed_channels:
-                self.subscribed_channels.remove(channel_id)
-                return True
+        if channel_id in self.subscribed_channels:
+            self.subscribed_channels.remove(channel_id)
+            return True
         return False
 
     async def remove_subbed_channels(self, channels_to_remove: Set[int]) -> None:
-        async with self.lock:
-            self.subscribed_channels = self.subscribed_channels - channels_to_remove
+        self.subscribed_channels = self.subscribed_channels - channels_to_remove
 
     async def subbed_channels_count(self) -> int:
-        async with self.lock:
-            return len(self.subscribed_channels)
+        return len(self.subscribed_channels)
