@@ -174,8 +174,6 @@ class DataStore:
     All methods that either return or take mutable objects as parameters make a deep
         copy of said object(s) so that changes cannot be made outside the instance.
 
-    This is safe to use from multiple asyncio Tasks.
-
     Immutable object reference(s):
      - https://stackoverflow.com/a/23715872/6396652
      - https://stackoverflow.com/a/986145/6396652
