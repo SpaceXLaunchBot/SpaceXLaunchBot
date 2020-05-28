@@ -1,4 +1,3 @@
-import asyncio
 import pickle  # nosec
 from copy import deepcopy
 from typing import Tuple, Set, Dict
@@ -171,7 +170,7 @@ class SqliteDb:
 
 class DataStore:
     """A simple class to store data. Dynamically loads from pickled file if possible.
-    
+
     All methods that either return or take mutable objects as parameters make a deep
         copy of said object(s) so that changes cannot be made outside the instance.
 
@@ -185,10 +184,10 @@ class DataStore:
     def __init__(self, save_file_location: str):
         self.dump_loc = save_file_location
 
-        self.subscribed_channels = set()
+        self.subscribed_channels: Set[int] = set()
         self.launching_soon_notif_sent = False
-        self.launch_information_embed_dict = {}
-        self.guild_options = {}
+        self.launch_information_embed_dict: Dict = {}
+        self.guild_options: Dict[int, Dict] = {}
 
         try:
             with open(self.dump_loc, "rb") as f_in:
@@ -197,7 +196,7 @@ class DataStore:
         except FileNotFoundError:
             pass
 
-    async def save(self) -> None:
+    def save(self) -> None:
         # Idea from https://stackoverflow.com/a/2842727/6396652.
         to_dump = {
             "subscribed_channels": self.subscribed_channels,
@@ -208,50 +207,50 @@ class DataStore:
         with open(self.dump_loc, "wb") as f_out:
             pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)
 
-    async def get_notification_task_vars(self) -> Tuple[bool, Dict]:
+    def get_notification_task_vars(self) -> Tuple[bool, Dict]:
         return (
             self.launching_soon_notif_sent,
             deepcopy(self.launch_information_embed_dict),
         )
 
-    async def set_notification_task_vars(
+    def set_notification_task_vars(
         self, ls_notif_sent: bool, li_embed_dict: Dict
     ) -> None:
         self.launching_soon_notif_sent = ls_notif_sent
         self.launch_information_embed_dict = deepcopy(li_embed_dict)
 
-    async def set_guild_mention(self, guild_id: int, to_mention: str) -> None:
+    def set_guild_mention(self, guild_id: int, to_mention: str) -> None:
         if guild_id in self.guild_options:
             self.guild_options[guild_id]["mentions"] = to_mention
         else:
             self.guild_options[guild_id] = {"mentions": to_mention}
 
-    async def get_guild_mentions(self) -> Dict:
+    def get_guild_mentions(self) -> Dict:
         return deepcopy(self.guild_options)
 
-    async def remove_guild_mention(self, guild_id: int) -> bool:
+    def remove_guild_mention(self, guild_id: int) -> bool:
         if self.guild_options.get(guild_id) is not None:
             del self.guild_options[guild_id]
             return True
         return False
 
-    async def add_subbed_channel(self, channel_id: int) -> bool:
+    def add_subbed_channel(self, channel_id: int) -> bool:
         if channel_id not in self.subscribed_channels:
             self.subscribed_channels.add(channel_id)
             return True
         return False
 
-    async def get_subbed_channels(self) -> Set[int]:
+    def get_subbed_channels(self) -> Set[int]:
         return deepcopy(self.subscribed_channels)
 
-    async def remove_subbed_channel(self, channel_id: int) -> bool:
+    def remove_subbed_channel(self, channel_id: int) -> bool:
         if channel_id in self.subscribed_channels:
             self.subscribed_channels.remove(channel_id)
             return True
         return False
 
-    async def remove_subbed_channels(self, channels_to_remove: Set[int]) -> None:
+    def remove_subbed_channels(self, channels_to_remove: Set[int]) -> None:
         self.subscribed_channels = self.subscribed_channels - channels_to_remove
 
-    async def subbed_channels_count(self) -> int:
+    def subbed_channels_count(self) -> int:
         return len(self.subscribed_channels)
