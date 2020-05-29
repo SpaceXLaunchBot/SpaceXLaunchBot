@@ -97,7 +97,7 @@ class SpaceXLaunchBotClient(discord.Client):
             pass
 
         except TypeError:
-            logging.exception(f"to_send failed, {message.content=}")
+            logging.exception(f"run_command TypeError: {message.content=}")
 
         if to_send is None:
             return
