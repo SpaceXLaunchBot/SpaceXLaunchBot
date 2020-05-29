@@ -61,7 +61,6 @@ BOT_LIST_DATA = [
 LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
 LOG_LEVEL = logging.INFO
 
-SQLITE_LOCATION = DOCKER_VOLUME_NAME + "slb.sqlite" if INSIDE_DOCKER else "./slb.sqlite"
 PICKLE_DUMP_LOCATION = DOCKER_VOLUME_NAME + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
 
 #

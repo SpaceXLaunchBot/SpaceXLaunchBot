@@ -56,8 +56,7 @@ async def _add_channel(**kwargs):
     message = kwargs["message"]
     reply = "This channel has been added to the notification service"
 
-    added = client.db.add_subbed_channel(message.channel.id)
-    if added == 0:
+    if client.ds.add_subbed_channel(message.channel.id) is False:
         reply = "This channel is already subscribed to the notification service"
 
     return reply
@@ -69,8 +68,7 @@ async def _remove_channel(**kwargs):
     message = kwargs["message"]
     reply = "This channel has been removed from the notification service"
 
-    removed = client.db.remove_subbed_channel(message.channel.id)
-    if removed == 0:
+    if client.ds.remove_subbed_channel(message.channel.id) is False:
         reply = "This channel was not previously subscribed to the notification service"
 
     return reply
@@ -87,7 +85,7 @@ async def _set_mentions(**kwargs):
 
     if roles_to_mention != "":
         reply = f"Added notification ping for mentions(s): {roles_to_mention}"
-        client.db.set_guild_mentions(message.guild.id, roles_to_mention)
+        client.ds.set_guild_option(message.guild.id, "mentions", roles_to_mention)
 
     return reply
 
@@ -98,9 +96,9 @@ async def _get_mentions(**kwargs):
     message = kwargs["message"]
     reply = "This guild has no mentions set"
 
-    mentions = client.db.get_guild_mentions(message.guild.id)
-    if mentions:
-        reply = f"Mentions for this guild: {mentions}"
+    if (opts := client.ds.get_guild_options(message.guild.id)) is not None:
+        if (mentions := opts.get("mentions")) is not None:
+            reply = f"Mentions for this guild: {mentions}"
 
     return reply
 
@@ -111,8 +109,7 @@ async def _remove_mentions(**kwargs):
     message = kwargs["message"]
     reply = "Removed mentions successfully"
 
-    deleted = client.db.delete_guild_mentions(message.guild.id)
-    if deleted == 0:
+    if client.ds.remove_guild_options(message.guild.id) is False:
         reply = "This guild has no mentions to be removed"
 
     return reply
@@ -121,7 +118,7 @@ async def _remove_mentions(**kwargs):
 async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
-    sub_count = client.db.subbed_channels_count()
+    sub_count = client.ds.subbed_channels_count()
     info_embed = await embedcreators.get_info_embed(guild_count, sub_count)
     return info_embed
 
@@ -177,7 +174,7 @@ async def _reset_notif_task_store(**kwargs):
     """Reset notification_task_store to default values (triggers notifications).
     """
     client = kwargs["client"]
-    client.db.set_notification_task_store(False, {})
+    client.ds.set_notification_task_vars(False, {})
     return "Reset notification_task_store"
 
 

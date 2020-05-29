@@ -12,7 +12,7 @@ import commands
 import config
 import notifications
 import statics
-from storage import SqliteDb
+import storage
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -20,9 +20,8 @@ class SpaceXLaunchBotClient(discord.Client):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
 
-        self.db = SqliteDb(config.SQLITE_LOCATION)
-        self.db.init_defaults()
-        logging.info("Database initialised")
+        self.ds = storage.DataStore(config.PICKLE_DUMP_LOCATION)
+        logging.info("Data storage initialised")
 
         if platform.system() == "Linux":
             self.loop.add_signal_handler(
@@ -42,7 +41,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def shutdown(self) -> None:
         # ToDo: Shutdown all tasks
         logging.info("Shutting down")
-        self.db.stop()
+        self.ds.save()
         await self.close()
 
     async def update_website_metrics(self) -> None:
@@ -59,8 +58,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
 
-        deleted = self.db.delete_guild_mentions(guild.id)
-        if deleted != 0:
+        if self.ds.remove_guild_options(guild.id) is True:
             logging.info(f"Removed guild settings for {guild.id}")
 
     async def set_playing(self, title: str) -> None:
@@ -146,7 +144,8 @@ class SpaceXLaunchBotClient(discord.Client):
             send_mentions: If True, get mentions from db and send as well.
 
         """
-        channel_ids = self.db.get_subbed_channels()
+        channel_ids = self.ds.get_subbed_channels()
+        guild_opts = self.ds.get_all_guilds_options()
         invalid_ids = set()
 
         for channel_id in channel_ids:
@@ -158,11 +157,10 @@ class SpaceXLaunchBotClient(discord.Client):
 
             await self._send_s(channel, to_send)
 
-            if (
-                send_mentions
-                and (mentions := self.db.get_guild_mentions(channel.guild.id)) != ""
-            ):
-                await self._send_s(channel, mentions)
+            if send_mentions:
+                if (opts := guild_opts.get(channel.guild.id)) is not None:
+                    if (mentions := opts.get("mentions")) is not None:
+                        await self._send_s(channel, mentions)
 
         # Remove any channels from db that are picked up as invalid
-        self.db.remove_subbed_channels(invalid_ids)
+        self.ds.remove_subbed_channels(invalid_ids)

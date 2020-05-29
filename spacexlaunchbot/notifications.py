@@ -65,7 +65,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
         return
 
     # Shortened to save space, ls = launching soon, li = launch information
-    ls_notif_sent, old_li_embed_dict = client.db.get_notification_task_store()
+    ls_notif_sent, old_li_embed_dict = client.ds.get_notification_task_vars()
     new_li_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
     new_li_embed_dict = new_li_embed.to_dict()
 
@@ -119,7 +119,8 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
         ls_notif_sent = True
 
     # Save any changed data to db
-    client.db.set_notification_task_store(ls_notif_sent, embed_dict_to_save)
+    client.ds.set_notification_task_vars(ls_notif_sent, embed_dict_to_save)
+    client.ds.save()
 
 
 async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
