@@ -7,7 +7,7 @@ jobs=0
 [BASIC]
 
 # Ignore variable naming scheme for these.
-good-names=ex,db
+good-names=ex,ds
 
 
 [MESSAGES CONTROL]
