@@ -10,29 +10,17 @@ IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )
 
+# A map of rocket id (in the API) to the image to represent it
 ROCKET_ID_IMAGES = {
     "falcon9": f"{IMAGE_BASE_URL}/falcon_9.png",
     "falconheavy": f"{IMAGE_BASE_URL}/falcon_heavy.png",
     "falcon1": f"{IMAGE_BASE_URL}/logo.jpg",
 }
 
-PAYLOAD_INFO = """Type: {}
-Orbit: {}
-Mass: {}
-Manufacturer: {}
-Customer{}: {}
-"""
-
-CORE_INFO = """Serial: {}
-Flight: {}
-Landing: {}
-Landing Type: {}
-Landing Vehicle: {}
-"""
-
-LAUNCH_DATE_INFO = """{}
-Precision: {}
-"""
+# Templates for embed fields
+PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}\nManufacturer: {}\nCustomer{}: {}"
+CORE_INFO = "Serial: {}\nFlight: {}\nLanding: {}\nLanding Type: {}\nLanding Vehicle: {}"
+LAUNCH_DATE_INFO = "{}\nPrecision: {}"
 
 
 class EmbedWithFields(discord.Embed):
