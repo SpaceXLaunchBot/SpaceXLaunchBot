@@ -1,7 +1,7 @@
 import logging
 import os
 
-from discord import Colour
+from discord import Color
 
 #
 # Meta
@@ -83,6 +83,6 @@ NOTIF_TASK_LAUNCH_DELTA = 30
 # Misc
 #
 
-COLOUR_ERROR_RED = Colour.from_rgb(255, 0, 0)
-COLOUR_FALCON_RED = Colour.from_rgb(238, 15, 70)
-COLOUR_INFO_ORANGE = Colour.from_rgb(200, 74, 0)
+COLOUR_ERROR_RED = Color.from_rgb(255, 0, 0)
+COLOUR_FALCON_RED = Color.from_rgb(238, 15, 70)
+COLOUR_INFO_ORANGE = Color.from_rgb(200, 74, 0)

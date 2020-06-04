@@ -1,90 +1,19 @@
-import copy
-from typing import Dict
+from typing import Dict, List
 
 import discord
 
 import config
 import utils
 
-HELP_EMBED = discord.Embed(
-    title="SpaceXLaunchBot Commands",
-    description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
-    color=config.COLOUR_FALCON_RED,
-)
-HELP_EMBED.add_field(
-    name="nextlaunch",
-    value="Send the latest launch information message to the current channel",
-)
-HELP_EMBED.add_field(
-    name="addchannel",
-    value="Add the current channel to the notification service\n"
-    "*Only admins can use this command*",
-)
-HELP_EMBED.add_field(
-    name="removechannel",
-    value="Remove the current channel from the notification service\n"
-    "*Only admins can use this command*",
-)
-HELP_EMBED.add_field(
-    name="setmentions @mention",
-    value='Set roles/users to be mentioned when a "launching soon" message is sent. '
-    "Can be formatted with multiple mentions in any order, like this: `slb setmentions"
-    " @role1 @user1 @here`. Calling `setmentions` multiple times will not stack the "
-    "mentions, it will just overwrite your previous mentions\n"
-    "*Only admins can use this command*",
-)
-HELP_EMBED.add_field(
-    name="removementions",
-    value="Remove all mentions set for the current guild\n"
-    "*Only admins can use this command*",
-)
-HELP_EMBED.add_field(
-    name="getmentions",
-    value='Show the mentions you have set for "launching soon" notifications\n'
-    "*Only admins can use this command*",
-)
-HELP_EMBED.add_field(
-    name="info", value="Send information about the bot to the current channel"
-)
-HELP_EMBED.add_field(name="help", value="List these commands")
-
-NEXT_LAUNCH_ERROR_EMBED = discord.Embed(
-    title="Error",
-    description=f"An launch_info_embed error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
-)
-API_ERROR_EMBED = discord.Embed(
-    title="Error",
-    description=f"An API error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
-)
-GENERAL_ERROR_EMBED = discord.Embed(
-    title="Error",
-    description=f"An error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
-)
-DB_ERROR_EMBED = discord.Embed(
-    title="Error",
-    description=f"A database error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
-)
-
-LEGACY_PREFIX_WARNING_EMBED = discord.Embed(
-    title="New Prefix In Use",
-    description="You used a command with the old prefix (!), SpaceXLaunchBot has "
-    'moved to using "slb" as a prefix, e.g. `slb help`. This warning will be removed '
-    "soon.",
-    color=config.COLOUR_INFO_ORANGE,
-)
-
 # Use Github as image hosting
-LOGO_BASE_URL = (
+IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )
+
 ROCKET_ID_IMAGES = {
-    "falcon9": f"{LOGO_BASE_URL}/falcon_9.png",
-    "falconheavy": f"{LOGO_BASE_URL}/falcon_heavy.png",
-    "falcon1": f"{LOGO_BASE_URL}/logo.jpg",
+    "falcon9": f"{IMAGE_BASE_URL}/falcon_9.png",
+    "falconheavy": f"{IMAGE_BASE_URL}/falcon_heavy.png",
+    "falcon1": f"{IMAGE_BASE_URL}/logo.jpg",
 }
 
 PAYLOAD_INFO = """Type: {}
@@ -93,15 +22,36 @@ Mass: {}
 Manufacturer: {}
 Customer{}: {}
 """
+
 CORE_INFO = """Serial: {}
 Flight: {}
 Landing: {}
 Landing Type: {}
 Landing Vehicle: {}
 """
+
 LAUNCH_DATE_INFO = """{}
 Precision: {}
 """
+
+
+class EmbedWithFields(discord.Embed):
+    def __init__(self, fields: List[List[str]], inline_all: bool = True, **kwargs):
+        """Takes the discord.Embed class and allows you to define fields immediately.
+
+        Args:
+            fields : A list of pairs of strings, the name and text of each field.
+            inline_all : Whether or not to inline all of the fields.
+
+        """
+        super().__init__(**kwargs)
+        for field in fields:
+            self.add_field(name=field[0], value=field[1], inline=inline_all)
+
+
+def md_link(name, url):
+    """Makes strings easier to read when defining markdown links."""
+    return f"[{name}]({url})"
 
 
 async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
@@ -150,9 +100,6 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
             utc_launch_date, launch_dict["tentative_max_precision"]
         ),
     )
-
-    # Basic embed structure built, copy into small version
-    launch_info_embed_small = copy.deepcopy(launch_info_embed)
 
     discussion_url = launch_dict["links"]["reddit_campaign"]
     if discussion_url is not None:
@@ -206,12 +153,6 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
             ),
         )
 
-    if len(launch_info_embed.title) > 256:
-        # Title too big to send, no way around this other than send an err
-        return GENERAL_ERROR_EMBED
-    if len(launch_info_embed) > 2048:
-        # If body is too big, send small embed
-        return launch_info_embed_small
     return launch_info_embed
 
 
@@ -228,65 +169,121 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
 
     embed_desc = ""
 
-    notif_embed = discord.Embed(
-        color=config.COLOUR_FALCON_RED,
+    if launch_dict["links"]["video_link"] is not None:
+        embed_desc += md_link("Livestream", launch_dict["links"]["video_link"]) + "\n"
+
+    if launch_dict["links"]["reddit_launch"] is not None:
+        embed_desc += (
+            md_link("r/SpaceX Launch Thread", launch_dict["links"]["reddit_launch"])
+            + "\n"
+        )
+
+    if launch_dict["links"]["presskit"] is not None:
+        md_link("Press kit", launch_dict["links"]["presskit"]) + "\n"
+
+    utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
+
+    notif_embed = EmbedWithFields(
         title="{} is launching soon!".format(launch_dict["mission_name"]),
+        description=embed_desc,
+        color=config.COLOUR_FALCON_RED,
+        fields=[["Launch date", utc_launch_date]],
     )
 
     if launch_dict["links"]["mission_patch_small"] is not None:
         notif_embed.set_thumbnail(url=launch_dict["links"]["mission_patch_small"])
+
     elif launch_dict["rocket"]["rocket_id"] in ROCKET_ID_IMAGES:
         notif_embed.set_thumbnail(
             url=ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
         )
 
-    # Embed links [using](markdown)
-    if launch_dict["links"]["video_link"] is not None:
-        embed_desc += f"[Livestream]({launch_dict['links']['video_link']})\n"
-    if launch_dict["links"]["reddit_launch"] is not None:
-        embed_desc += (
-            f"[r/SpaceX Launch Thread]({launch_dict['links']['reddit_launch']})\n"
-        )
-    if launch_dict["links"]["presskit"] is not None:
-        embed_desc += f"[Press kit]({launch_dict['links']['presskit']})\n"
-    notif_embed.description = embed_desc
-
-    utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
-    notif_embed.add_field(name="Launch date", value=utc_launch_date)
-
     return notif_embed
 
 
-async def get_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
+def get_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
     """Creates an info embed.
 
     Args:
         guild_count: The number of guilds the bot is currently a member of.
+        subbed_channel_count: The number of currently subscribed channels.
 
     Returns:
         A discord.Embed object.
 
     """
-
-    info_embed = discord.Embed(
+    return EmbedWithFields(
         title="SpaceXLaunchBot Information",
         color=config.COLOUR_FALCON_RED,
         description="A Discord bot for getting news, information, and notifications "
         "about upcoming SpaceX launches",
+        fields=[
+            ["Guild Count", f"{guild_count}"],
+            ["Subscribed Channel Count", f"{subbed_channel_count}"],
+            [
+                "Links",
+                f'{md_link("Github", config.BOT_GITHUB)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
+            ],
+            ["Contact", f"{config.BOT_OWNER}"],
+            [
+                "Help",
+                f"Use `{config.BOT_COMMAND_PREFIX} help` to get a list of commands",
+            ],
+        ],
     )
 
-    info_embed.add_field(name="Guild Count", value=f"{guild_count}")
-    info_embed.add_field(
-        name="Subscribed Channel Count", value=f"{subbed_channel_count}"
-    )
-    info_embed.add_field(
-        name="Links",
-        value=f"[GitHub]({config.BOT_GITHUB}), [Bot Invite]({config.BOT_INVITE_URL})",
-    )
-    info_embed.add_field(name="Contact", value=f"{config.BOT_OWNER}")
-    info_embed.add_field(
-        name="Help",
-        value=f"Use `{config.BOT_COMMAND_PREFIX} help` to get a list of commands",
-    )
 
-    return info_embed
+HELP_EMBED = EmbedWithFields(
+    title="SpaceXLaunchBot Commands",
+    description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
+    color=config.COLOUR_FALCON_RED,
+    inline_all=False,
+    fields=[
+        [
+            "nextlaunch",
+            "Send the latest launch information message to the current channel",
+        ],
+        [
+            "addchannel",
+            "Add the current channel to the notification service\n*Only admins can use this command*",
+        ],
+        [
+            "removechannel",
+            "Remove the current channel from the notification service\n*Only admins can use this command*",
+        ],
+        [
+            "setmentions @mention",
+            'Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `slb setmentions @role1 @user1 @here`. Calling `setmentions` multiple times will not stack the mentions, it will just overwrite your previous mentions\n*Only admins can use this command*',
+        ],
+        [
+            "removementions",
+            "Remove all mentions set for the current guild\n*Only admins can use this command*",
+        ],
+        [
+            "getmentions",
+            'Show the mentions you have set for "launching soon" notifications\n*Only admins can use this command*',
+        ],
+        ["info", "Send information about the bot to the current channel"],
+        ["help", "List these commands"],
+    ],
+)
+
+API_ERROR_EMBED = discord.Embed(
+    title="Error",
+    description=f"An API error occurred, contact {config.BOT_OWNER}",
+    color=config.COLOUR_ERROR_RED,
+)
+
+GENERAL_ERROR_EMBED = discord.Embed(
+    title="Error",
+    description=f"An error occurred, contact {config.BOT_OWNER}",
+    color=config.COLOUR_ERROR_RED,
+)
+
+LEGACY_PREFIX_WARNING_EMBED = discord.Embed(
+    title="New Prefix In Use",
+    description="You used a command with the old prefix (!), SpaceXLaunchBot has "
+    'moved to using "slb" as a prefix, e.g. `slb help`. This warning will be removed '
+    "soon.",
+    color=config.COLOUR_INFO_ORANGE,
+)

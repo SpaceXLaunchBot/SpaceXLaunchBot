@@ -118,7 +118,7 @@ async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
     sub_count = client.ds.subbed_channels_count()
-    info_embed = await embeds.get_info_embed(guild_count, sub_count)
+    info_embed = embeds.get_info_embed(guild_count, sub_count)
     return info_embed
 
 
