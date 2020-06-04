@@ -19,9 +19,7 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     if timestamp is None:
         return "To Be Announced"
 
-    return datetime.datetime.utcfromtimestamp(timestamp).strftime(
-        "%Y-%m-%d %H:%M:%S UTC"
-    )
+    return datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def setup_logging() -> None:

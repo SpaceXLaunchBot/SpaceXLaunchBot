@@ -22,8 +22,9 @@ ROCKET_ID_IMAGES = {
 
 # Templates for embed fields
 PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}\nManufacturer: {}\nCustomer{}: {}"
-CORE_INFO = "Serial: {}\nFlight: {}\nLanding: {}\nLanding Type: {}\nLanding Vehicle: {}"
-LAUNCH_DATE_INFO = "{}\nPrecision: {}"
+CORE_INFO = (
+    "Serial: {}\nFlight: {}\nLanding: {}\nLanding Type: {}\nLanding Location: {}"
+)
 
 
 class EmbedWithFields(discord.Embed):
@@ -45,79 +46,49 @@ def md_link(name: str, url: str) -> str:
     return f"[{name}]({url})"
 
 
-async def create_launch_info_embed(launch_dict: Dict) -> discord.Embed:
+async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
     """Creates a "launch information" style embed from a dict of launch information.
 
     Args:
-        launch_dict: A dictionary of launch information from apis.spacex.
+        launch_info: A dictionary of launch information from apis.spacex.
 
     Returns:
         A Discord.Embed object.
 
     """
+    launch_date_str = await utils.utc_from_ts(launch_info["launch_date_unix"])
+
     fields = [
         [
-            "Launch vehicle",
-            "{} {}".format(
-                launch_dict["rocket"]["rocket_name"],
-                launch_dict["rocket"]["rocket_type"],
-            ),
+            "Launch Vehicle",
+            f'{launch_info["rocket"]["rocket_name"]} {launch_info["rocket"]["rocket_type"]}',
         ],
         [
-            "Launch date",
-            LAUNCH_DATE_INFO.format(
-                await utils.utc_from_ts(launch_dict["launch_date_unix"]),
-                launch_dict["tentative_max_precision"],
-            ),
+            "Launch Date (UTC)",
+            f'{launch_date_str}\nPrecision: {launch_info["tentative_max_precision"]}',
         ],
-        ["Launch site", launch_dict["launch_site"]["site_name_long"]],
+        ["Launch Site", launch_info["launch_site"]["site_name_long"]],
     ]
 
-    if (discussion_url := launch_dict["links"]["reddit_campaign"]) is not None:
-        fields.append(["r/SpaceX discussion", discussion_url])
-
-    if launch_dict["rocket"]["rocket_id"] == "falcon9":
-        # Falcon 9 always has 1 core, FH (or others) will be different
+    for core_dict in launch_info["rocket"]["first_stage"]["cores"]:
         fields.append(
             [
-                "Core info",
+                f"Core Info",
                 CORE_INFO.format(
-                    launch_dict["rocket"]["first_stage"]["cores"][0]["core_serial"],
-                    launch_dict["rocket"]["first_stage"]["cores"][0]["flight"],
-                    "Yes"
-                    if launch_dict["rocket"]["first_stage"]["cores"][0][
-                        "landing_intent"
-                    ]
-                    else "No",
-                    launch_dict["rocket"]["first_stage"]["cores"][0]["landing_type"],
-                    launch_dict["rocket"]["first_stage"]["cores"][0]["landing_vehicle"],
+                    core_dict["core_serial"],
+                    core_dict["flight"],
+                    core_dict["landing_intent"],
+                    core_dict["landing_type"],
+                    core_dict["landing_vehicle"],
                 ),
             ]
         )
 
-    elif launch_dict["rocket"]["rocket_id"] == "falconheavy":
-        for core_num, core_dict in enumerate(
-            launch_dict["rocket"]["first_stage"]["cores"]
-        ):
-            fields.append(
-                [
-                    # +1 so it's not 0 indexed
-                    f"Core {core_num+1} info",
-                    CORE_INFO.format(
-                        core_dict["core_serial"],
-                        core_dict["flight"],
-                        core_dict["landing_intent"],
-                        core_dict["landing_type"],
-                        core_dict["landing_vehicle"],
-                    ),
-                ]
-            )
-
     # Add a field for each payload, with basic information
-    for payload in launch_dict["rocket"]["second_stage"]["payloads"]:
+    for payload in launch_info["rocket"]["second_stage"]["payloads"]:
         fields.append(
             [
-                "Payload: {}".format(payload["payload_id"]),
+                f'Payload: {payload["payload_id"]}',
                 PAYLOAD_INFO.format(
                     payload["payload_type"],
                     payload["orbit"],
@@ -129,36 +100,29 @@ async def create_launch_info_embed(launch_dict: Dict) -> discord.Embed:
             ]
         )
 
-    # Having desc set to `None` breaks things
-    if launch_dict["details"] is None:
-        launch_dict["details"] = ""
-
     launch_info_embed = EmbedWithFields(
         color=config.COLOUR_FALCON_RED,
-        description=launch_dict["details"],
-        title="Launch #{} - {}".format(
-            launch_dict["flight_number"], launch_dict["mission_name"]
+        description=(
+            f'{launch_info["details"] or ""} '
+            + f'{md_link("Click for r/SpaceX Thread", launch_info["links"]["reddit_campaign"])}.'
         ),
+        title=f'Launch #{launch_info["flight_number"]} - {launch_info["mission_name"]}',
         fields=fields,
     )
 
-    # Set thumbnail depending on rocket ID, use mission patch if available
-    if launch_dict["links"]["mission_patch_small"] is not None:
-        launch_info_embed.set_thumbnail(url=launch_dict["links"]["mission_patch_small"])
-
-    elif launch_dict["rocket"]["rocket_id"] in ROCKET_ID_IMAGES:
-        launch_info_embed.set_thumbnail(
-            url=ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
-        )
+    if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
+        launch_info_embed.set_thumbnail(url=patch_url)
+    elif (rocket_img_url := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
+        launch_info_embed.set_thumbnail(url=rocket_img_url)
 
     return launch_info_embed
 
 
-async def create_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
+async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
     """Create a "launching soon" style embed from a dict of launch information.
 
     Args:
-        launch_dict: A dictionary of launch information from apis.spacex.
+        launch_info: A dictionary of launch information from apis.spacex.
 
     Returns:
         A Discord.Embed object.
@@ -166,35 +130,28 @@ async def create_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
     """
 
     embed_desc = ""
+    utc_launch_date = await utils.utc_from_ts(launch_info["launch_date_unix"])
 
-    if launch_dict["links"]["video_link"] is not None:
-        embed_desc += md_link("Livestream", launch_dict["links"]["video_link"]) + "\n"
+    if (video_url := launch_info["links"]["video_link"]) is not None:
+        embed_desc += md_link("Livestream", video_url) + "\n"
 
-    if launch_dict["links"]["reddit_launch"] is not None:
-        embed_desc += (
-            md_link("r/SpaceX Launch Thread", launch_dict["links"]["reddit_launch"])
-            + "\n"
-        )
+    if (reddit_url := launch_info["links"]["reddit_launch"]) is not None:
+        embed_desc += md_link("r/SpaceX Launch Thread", reddit_url) + "\n"
 
-    if launch_dict["links"]["presskit"] is not None:
-        embed_desc += md_link("Press kit", launch_dict["links"]["presskit"]) + "\n"
-
-    utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
+    if (press_kit_url := launch_info["links"]["presskit"]) is not None:
+        embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
     notif_embed = EmbedWithFields(
-        title="{} is launching soon!".format(launch_dict["mission_name"]),
+        title="{} is launching soon!".format(launch_info["mission_name"]),
         description=embed_desc,
         color=config.COLOUR_FALCON_RED,
-        fields=[["Launch date", utc_launch_date]],
+        fields=[["Launch date (UTC)", utc_launch_date]],
     )
 
-    if launch_dict["links"]["mission_patch_small"] is not None:
-        notif_embed.set_thumbnail(url=launch_dict["links"]["mission_patch_small"])
-
-    elif launch_dict["rocket"]["rocket_id"] in ROCKET_ID_IMAGES:
-        notif_embed.set_thumbnail(
-            url=ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
-        )
+    if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
+        notif_embed.set_thumbnail(url=patch_url)
+    elif (rocket_img_url := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
+        notif_embed.set_thumbnail(url=rocket_img_url)
 
     return notif_embed
 

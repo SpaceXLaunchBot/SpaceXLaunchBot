@@ -54,12 +54,3 @@ The `slb addchannel` command allows admins to "subscribe" text channels to the b
 See the Github [project page](https://github.com/r-spacex/SpaceXLaunchBot/projects/1) for planned updates.
 
 If you want to request a feature, [open an issue](https://github.com/r-spacex/SpaceXLaunchBot/issues/new).
-
-## Deployment
-
-```bash
-docker run -d --name spacexlaunchbot \
-    -v /var/lib/spacexlaunchbot:/docker-volume \
-    --env-file /path/to/variables.env \
-    psidex/spacexlaunchbot
-```
