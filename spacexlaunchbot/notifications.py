@@ -66,7 +66,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
 
     # Shortened to save space, ls = launching soon, li = launch information
     ls_notif_sent, old_li_embed_dict = client.ds.get_notification_task_vars()
-    new_li_embed = await embeds.get_launch_info_embed(next_launch_dict)
+    new_li_embed = await embeds.create_launch_info_embed(next_launch_dict)
     new_li_embed_dict = new_li_embed.to_dict()
 
     # This is the embed that will be saved to the notification task store
@@ -112,7 +112,9 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
         and ls_notif_sent is False
     ):
         logging.info("Launch is soon, sending out notifications")
-        launching_soon_embed = await embeds.get_launching_soon_embed(next_launch_dict)
+        launching_soon_embed = await embeds.create_launching_soon_embed(
+            next_launch_dict
+        )
         await client.send_all_subscribed(launching_soon_embed, True)
         ls_notif_sent = True
 

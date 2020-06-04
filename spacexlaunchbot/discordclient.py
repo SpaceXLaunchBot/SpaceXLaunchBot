@@ -120,9 +120,7 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.warning(f"Forbidden: {ex}")
 
         except discord.errors.HTTPException as ex:
-            # Strings must be <=2000 chars
-            # len(embed) must be <=2048
-            # len(embed.title) must be <=256
+            # Length/size is most likely cause, not sure of the exact limits
             logging.warning(f"HTTPException: {ex}, {len(to_send)=}")
 
     async def send_all_subscribed(
