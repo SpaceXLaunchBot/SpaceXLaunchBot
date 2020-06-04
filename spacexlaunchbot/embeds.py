@@ -5,6 +5,9 @@ import discord
 import config
 import utils
 
+# TODO: Have function that validates size of embed
+#  See https://discord.com/developers/docs/resources/channel#embed-limits
+
 # Use Github as image hosting
 IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
