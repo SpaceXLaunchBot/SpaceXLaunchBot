@@ -179,7 +179,7 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
         )
 
     if launch_dict["links"]["presskit"] is not None:
-        md_link("Press kit", launch_dict["links"]["presskit"]) + "\n"
+        embed_desc += md_link("Press kit", launch_dict["links"]["presskit"]) + "\n"
 
     utc_launch_date = await utils.utc_from_ts(launch_dict["launch_date_unix"])
 
