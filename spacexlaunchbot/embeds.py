@@ -130,9 +130,9 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
     # Set thumbnail depending on rocket ID, use mission patch if available
     if launch_dict["links"]["mission_patch_small"] is not None:
         launch_info_embed.set_thumbnail(url=launch_dict["links"]["mission_patch_small"])
-    elif launch_dict["rocket"]["rocket_id"] in statics.ROCKET_ID_IMAGES:
+    elif launch_dict["rocket"]["rocket_id"] in ROCKET_ID_IMAGES:
         launch_info_embed.set_thumbnail(
-            url=statics.ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
+            url=ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
         )
 
     launch_info_embed.add_field(
@@ -208,7 +208,7 @@ async def get_launch_info_embed(launch_dict: Dict) -> discord.Embed:
 
     if len(launch_info_embed.title) > 256:
         # Title too big to send, no way around this other than send an err
-        return statics.GENERAL_ERROR_EMBED
+        return GENERAL_ERROR_EMBED
     if len(launch_info_embed) > 2048:
         # If body is too big, send small embed
         return launch_info_embed_small
@@ -235,9 +235,9 @@ async def get_launching_soon_embed(launch_dict: Dict) -> discord.Embed:
 
     if launch_dict["links"]["mission_patch_small"] is not None:
         notif_embed.set_thumbnail(url=launch_dict["links"]["mission_patch_small"])
-    elif launch_dict["rocket"]["rocket_id"] in statics.ROCKET_ID_IMAGES:
+    elif launch_dict["rocket"]["rocket_id"] in ROCKET_ID_IMAGES:
         notif_embed.set_thumbnail(
-            url=statics.ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
+            url=ROCKET_ID_IMAGES[launch_dict["rocket"]["rocket_id"]]
         )
 
     # Embed links [using](markdown)
