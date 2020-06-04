@@ -2,8 +2,7 @@ from typing import Callable, Dict
 
 import apis
 import config
-import embedcreators
-import statics
+import embeds
 
 
 def req_id_owner(func: Callable) -> Callable:
@@ -43,9 +42,9 @@ async def _next_launch(**kwargs):
     next_launch_dict = await apis.spacex.get_launch_dict()
 
     if next_launch_dict == {}:
-        launch_info_embed = statics.API_ERROR_EMBED
+        launch_info_embed = embeds.API_ERROR_EMBED
     else:
-        launch_info_embed = await embedcreators.get_launch_info_embed(next_launch_dict)
+        launch_info_embed = await embeds.get_launch_info_embed(next_launch_dict)
 
     return launch_info_embed
 
@@ -119,12 +118,12 @@ async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
     sub_count = client.ds.subbed_channels_count()
-    info_embed = await embedcreators.get_info_embed(guild_count, sub_count)
+    info_embed = await embeds.get_info_embed(guild_count, sub_count)
     return info_embed
 
 
 async def _help(**kwargs):
-    return statics.HELP_EMBED
+    return embeds.HELP_EMBED
 
 
 @req_id_owner
@@ -144,7 +143,7 @@ async def _debug_launching_soon(**kwargs):
     if launch_dict == {}:
         return
 
-    lse = await embedcreators.get_launching_soon_embed(launch_dict)
+    lse = await embeds.get_launching_soon_embed(launch_dict)
     return lse
 
 
@@ -165,7 +164,7 @@ async def _debug_launch_information(**kwargs):
     if launch_dict == {}:
         return
 
-    lie = await embedcreators.get_launch_info_embed(launch_dict)
+    lie = await embeds.get_launch_info_embed(launch_dict)
     return lie
 
 

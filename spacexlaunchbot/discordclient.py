@@ -1,7 +1,7 @@
+import asyncio
 import logging
 import platform
 import signal
-import sys
 from typing import Union
 
 import discord
@@ -11,12 +11,12 @@ import apis
 import commands
 import config
 import notifications
-import statics
+import embeds
 import storage
 
 
 class SpaceXLaunchBotClient(discord.Client):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
 
@@ -29,7 +29,6 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             logging.info("Signal handler for SIGTERM registered")
 
-        # Create asyncio tasks now
         self.loop.create_task(notifications.notification_task(self))
         discordhealthcheck.start(self)
 
@@ -39,9 +38,11 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.update_website_metrics()
 
     async def shutdown(self) -> None:
-        # ToDo: Shutdown all tasks
+        """Saves data to disk, cancels asyncio tasks, and disconnects from Discord"""
         logging.info("Shutting down")
         self.ds.save()
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
         await self.close()
 
     async def update_website_metrics(self) -> None:
@@ -62,12 +63,6 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.info(f"Removed guild settings for {guild.id}")
 
     async def set_playing(self, title: str) -> None:
-        """Set the bots current "Playing: " status.
-
-        Args:
-            title: The title of the "game" the bot is playing.
-
-        """
         await self.change_presence(activity=discord.Game(name=title))
 
     async def on_message(self, message: discord.message) -> None:
@@ -79,7 +74,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # ToDo: Temporary, remove after n months
         if message_parts[0].startswith(config.BOT_COMMAND_PREFIX_LEGACY):
             if message_parts[0][1:] in commands.CMD_LOOKUP:
-                await self._send_s(message.channel, statics.LEGACY_PREFIX_WARNING_EMBED)
+                await self._send_s(message.channel, embeds.LEGACY_PREFIX_WARNING_EMBED)
             return
 
         if message_parts[0] != config.BOT_COMMAND_PREFIX:
@@ -116,22 +111,19 @@ class SpaceXLaunchBotClient(discord.Client):
 
         """
         try:
-            if isinstance(to_send, str):
-                if len(to_send) > 2000:
-                    logging.warning("Failed to send message: len of to_send > 2000")
-                else:
-                    await channel.send(to_send)
+            if isinstance(to_send, discord.Embed):
+                await channel.send(embed=to_send)
+            else:
+                await channel.send(to_send)
 
-            elif isinstance(to_send, discord.Embed):
-                if len(to_send) > 2048 or len(to_send.title) > 256:
-                    logging.warning("Failed to send message: len of embed too long")
-                else:
-                    await channel.send(embed=to_send)
+        except discord.errors.Forbidden as ex:
+            logging.warning(f"Forbidden: {ex}")
 
-        except (discord.errors.Forbidden, discord.errors.HTTPException):
-            ex, val, _ = sys.exc_info()
-            if ex is not None:  # MyPy must be pleased.
-                logging.warning(f"Failed to send message: {ex.__name__}: {val}")
+        except discord.errors.HTTPException as ex:
+            # Strings must be <=2000 chars
+            # len(embed) must be <=2048
+            # len(embed.title) must be <=256
+            logging.warning(f"HTTPException: {ex}, {len(to_send)=}")
 
     async def send_all_subscribed(
         self, to_send: Union[str, discord.Embed], send_mentions: bool = False

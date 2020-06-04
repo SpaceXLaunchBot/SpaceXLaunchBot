@@ -1,7 +1,7 @@
+import logging
 import pickle  # nosec
 from copy import deepcopy
 from typing import Tuple, Set, Dict, Any, Union
-import logging
 
 
 class DataStore:

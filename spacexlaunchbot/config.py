@@ -15,6 +15,10 @@ BOT_GAME = "with rockets"
 BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 411618411169447950
 BOT_INVITE_PERMISSIONS = "19456"
+BOT_INVITE_URL = (
+    "https://discord.com/oauth2/authorize?scope=bot"
+    f"&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
+)
 
 #
 # Docker
@@ -58,7 +62,7 @@ BOT_LIST_DATA = [
 # Logging
 #
 
-LOG_FORMAT = "%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(message)s"
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(module)s | %(funcName)s | %(message)s"
 LOG_LEVEL = logging.INFO
 
 PICKLE_DUMP_LOCATION = DOCKER_VOLUME_NAME + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
