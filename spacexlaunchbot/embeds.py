@@ -50,33 +50,32 @@ def embed_is_valid(embed: discord.Embed) -> bool:
         True if it is within size limits, otherwise False.
 
     """
-    total_count = 0
+    if len(embed.fields) > 25:
+        return False
 
+    total_len = 0
     comparisons = [
         [len(embed.title), 256],
         [len(embed.description), 2048],
-        [len(embed.fields), 25],
         [len(embed.footer), 2048],
         [len(embed.author.name), 256],
     ]
 
-    for comp in comparisons:
-        if comp[0] > comp[1]:
+    for length, limit in comparisons:
+        if length > limit:
             return False
-        total_count += comp[0]
+        total_len += length
 
     for field in embed.fields:
-        if (length := len(field.name)) > 256:
+        if (name_length := len(field.name)) > 256 or (
+            value_length := len(field.value)
+        ) > 1024:
             return False
-        else:
-            total_count += length
 
-        if (length := len(field.value)) > 1024:
-            return False
-        else:
-            total_count += length
+        total_len += name_length
+        total_len += value_length
 
-    if total_count > 6000:
+    if total_len > 6000:
         return False
 
     return True

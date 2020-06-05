@@ -3,6 +3,8 @@ import pickle  # nosec
 from copy import deepcopy
 from typing import Tuple, Set, Dict, Any, Union
 
+# ToDo: Use @property for methods?
+
 
 class DataStore:
     """A simple class to store data. Dynamically loads from pickled file if possible.

@@ -14,7 +14,7 @@
     <a href="https://github.com/r-spacex/SpaceXLaunchBot/actions">
         <img src="https://github.com/r-spacex/SpaceXLaunchBot/workflows/CI/badge.svg" alt="Github CI Build Status"/>
     </a>
-    <a href="https://discordapp.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
+    <a href="https://discord.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
