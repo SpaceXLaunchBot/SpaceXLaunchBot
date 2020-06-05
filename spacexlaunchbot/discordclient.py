@@ -112,7 +112,10 @@ class SpaceXLaunchBotClient(discord.Client):
         """
         try:
             if isinstance(to_send, discord.Embed):
-                await channel.send(embed=to_send)
+                if embeds.embed_is_valid(to_send):
+                    await channel.send(embed=to_send)
+                else:
+                    logging.warning("Embed is too large to send")
             else:
                 await channel.send(to_send)
 

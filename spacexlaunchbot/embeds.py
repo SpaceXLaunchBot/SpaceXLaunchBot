@@ -5,9 +5,6 @@ import discord
 import config
 from utils import md_link, utc_from_ts
 
-# TODO: Have function that validates size of embed
-#  See https://discord.com/developers/docs/resources/channel#embed-limits
-
 # Use Github as image hosting
 IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
@@ -39,6 +36,50 @@ class EmbedWithFields(discord.Embed):
         super().__init__(**kwargs)
         for field in fields:
             self.add_field(name=field[0], value=field[1], inline=inline_all)
+
+
+def embed_is_valid(embed: discord.Embed) -> bool:
+    """Determines if an embed is within the size limits for discord.
+
+    See https://discord.com/developers/docs/resources/channel#embed-limits.
+
+    Args:
+        embed: The discord.Embed object to validate.
+
+    Returns:
+        True if it is within size limits, otherwise False.
+
+    """
+    total_count = 0
+
+    comparisons = [
+        [len(embed.title), 256],
+        [len(embed.description), 2048],
+        [len(embed.fields), 25],
+        [len(embed.footer), 2048],
+        [len(embed.author.name), 256],
+    ]
+
+    for comp in comparisons:
+        if comp[0] > comp[1]:
+            return False
+        total_count += comp[0]
+
+    for field in embed.fields:
+        if (length := len(field.name)) > 256:
+            return False
+        else:
+            total_count += length
+
+        if (length := len(field.value)) > 1024:
+            return False
+        else:
+            total_count += length
+
+    if total_count > 6000:
+        return False
+
+    return True
 
 
 async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
@@ -122,7 +163,6 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
         A Discord.Embed object.
 
     """
-
     embed_desc = ""
     utc_launch_date = utc_from_ts(launch_info["launch_date_unix"])
 
