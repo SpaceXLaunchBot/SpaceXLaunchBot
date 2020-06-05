@@ -94,13 +94,15 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
 
     launch_info_embed = EmbedWithFields(
         color=config.COLOUR_FALCON_RED,
-        description=(
-            f'{launch_info["details"] or ""} '
-            + f'{md_link("Click for r/SpaceX Thread", launch_info["links"]["reddit_campaign"])}.'
-        ),
+        description=launch_info["details"] or "",
         title=f'Launch #{launch_info["flight_number"]} - {launch_info["mission_name"]}',
         fields=fields,
     )
+
+    if (reddit_url := launch_info["links"]["reddit_campaign"]) is not None:
+        launch_info_embed.description += (
+            f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
+        )
 
     if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
         launch_info_embed.set_thumbnail(url=patch_url)
