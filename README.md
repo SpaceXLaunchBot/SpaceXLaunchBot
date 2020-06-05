@@ -19,7 +19,10 @@
     </a>
     <a href="https://ko-fi.com/M4M18XB1">
         <img src="https://img.shields.io/badge/Support%20Me-Ko--fi-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
-    </a>    
+    </a>
+    <a href="https://github.com/psf/black">
+        <img src="https://img.shields.io/badge/Code%20Style-Black-000000.svg" alt="Black code formatter"/>
+    </a>
 </p>
 
 A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
