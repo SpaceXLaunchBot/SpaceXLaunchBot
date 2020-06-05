@@ -1,12 +1,11 @@
 import datetime
 import logging
-import logging.handlers
 from typing import Union
 
 import config
 
 
-async def utc_from_ts(timestamp: Union[int, None]) -> str:
+def utc_from_ts(timestamp: Union[int, None]) -> str:
     """Convert a unix timestamp to a formatted date string.
 
     Args:
@@ -18,13 +17,16 @@ async def utc_from_ts(timestamp: Union[int, None]) -> str:
     """
     if timestamp is None:
         return "To Be Announced"
-
     return datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def setup_logging() -> None:
     """Setup logging."""
     logging.basicConfig(level=config.LOG_LEVEL, format=config.LOG_FORMAT)
-
     # Change discord to only log ERROR level and above
     logging.getLogger("discord").setLevel(logging.ERROR)
+
+
+def md_link(name: str, url: str) -> str:
+    """Makes strings easier to read when defining markdown links."""
+    return f"[{name}]({url})"

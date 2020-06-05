@@ -3,7 +3,7 @@ from typing import Dict, List
 import discord
 
 import config
-import utils
+from utils import md_link, utc_from_ts
 
 # TODO: Have function that validates size of embed
 #  See https://discord.com/developers/docs/resources/channel#embed-limits
@@ -21,7 +21,7 @@ ROCKET_ID_IMAGES = {
 }
 
 # Templates for embed fields
-PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}\nManufacturer: {}\nCustomer{}: {}"
+PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer: {}\nCustomer{}: {}"
 CORE_INFO = (
     "Serial: {}\nFlight: {}\nLanding: {}\nLanding Type: {}\nLanding Location: {}"
 )
@@ -41,11 +41,6 @@ class EmbedWithFields(discord.Embed):
             self.add_field(name=field[0], value=field[1], inline=inline_all)
 
 
-def md_link(name: str, url: str) -> str:
-    """Makes strings easier to read when defining markdown links."""
-    return f"[{name}]({url})"
-
-
 async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
     """Creates a "launch information" style embed from a dict of launch information.
 
@@ -56,7 +51,7 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
         A Discord.Embed object.
 
     """
-    launch_date_str = await utils.utc_from_ts(launch_info["launch_date_unix"])
+    launch_date_str = utc_from_ts(launch_info["launch_date_unix"])
 
     fields = [
         [
@@ -71,18 +66,15 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
     ]
 
     for core_dict in launch_info["rocket"]["first_stage"]["cores"]:
-        fields.append(
-            [
-                f"Core Info",
-                CORE_INFO.format(
-                    core_dict["core_serial"],
-                    core_dict["flight"],
-                    core_dict["landing_intent"],
-                    core_dict["landing_type"],
-                    core_dict["landing_vehicle"],
-                ),
-            ]
-        )
+        core_info = f'Serial: {core_dict["core_serial"]}\nFlight: {core_dict["flight"]}'
+
+        if core_dict["landing_intent"] is False:
+            core_info += "\nLanding: No"
+        else:
+            core_info += f'\nLanding: Yes\nLanding Type: {core_dict["landing_type"]}'
+            core_info += f'\nLanding Location: {core_dict["landing_vehicle"]}'
+
+        fields.append(["Core Info", core_info])
 
     # Add a field for each payload, with basic information
     for payload in launch_info["rocket"]["second_stage"]["payloads"]:
@@ -130,7 +122,7 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
     """
 
     embed_desc = ""
-    utc_launch_date = await utils.utc_from_ts(launch_info["launch_date_unix"])
+    utc_launch_date = utc_from_ts(launch_info["launch_date_unix"])
 
     if (video_url := launch_info["links"]["video_link"]) is not None:
         embed_desc += md_link("Livestream", video_url) + "\n"
