@@ -72,8 +72,7 @@ def embed_is_valid(embed: discord.Embed) -> bool:
         ) > 1024:
             return False
 
-        total_len += name_length
-        total_len += value_length
+        total_len += name_length + value_length
 
     if total_len > 6000:
         return False
