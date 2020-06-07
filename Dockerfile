@@ -1,15 +1,13 @@
 FROM python:3.8-slim-buster
 
-WORKDIR /opt/SpaceXLaunchBot
+WORKDIR /SpaceXLaunchBot
 COPY . .
 
-RUN pip install -r requirements.txt
 ENV INSIDE_DOCKER "True"
+RUN python setup.py install
 
 HEALTHCHECK CMD discordhealthcheck || exit 1
-
-# -u so stdout shows up in Docker log.
-CMD ["python","-u","./spacexlaunchbot/main.py"]
+CMD spacexlaunchbot
 
 # docker run -d --name spacexlaunchbot \
 #     -v /path/to/dir:/docker-volume \

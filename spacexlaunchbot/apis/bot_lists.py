@@ -2,7 +2,8 @@ from typing import Dict
 
 import aiohttp
 
-import config
+# ToDo: Pass config, dont use ..
+from .. import config
 
 
 async def _post_count_to_bot_list(bl_data: Dict[str, str], guild_count: int) -> None:

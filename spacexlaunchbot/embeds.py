@@ -2,10 +2,13 @@ from typing import Dict, List
 
 import discord
 
-import config
-from utils import md_link, utc_from_ts
+from . import config
+from .utils import md_link, utc_from_ts
 
-# Use Github as image hosting
+# A couple of pylint rules we want in the rest of the project are broken in this file.
+# superfluous-parens is erroneously picked up when := is used after an elif?
+# pylint: disable=line-too-long,superfluous-parens
+
 IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )

@@ -1,6 +1,6 @@
-import config
-import discordclient
-import utils
+from . import config
+from . import discordclient
+from . import utils
 
 
 def main() -> None:

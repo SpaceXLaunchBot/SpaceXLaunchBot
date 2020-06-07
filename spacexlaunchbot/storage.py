@@ -28,7 +28,7 @@ class DataStore:
         try:
             with open(self._dump_loc, "rb") as f_in:
                 tmp = pickle.load(f_in)  # nosec
-            logging.info(f"Loaded from disk")
+            logging.info("Loaded from disk")
             self.__dict__.update(tmp)
         except FileNotFoundError:
             pass

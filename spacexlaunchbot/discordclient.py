@@ -7,12 +7,12 @@ from typing import Union
 import discord
 import discordhealthcheck
 
-import apis
-import commands
-import config
-import notifications
-import embeds
-import storage
+from . import apis
+from . import commands
+from . import config
+from . import notifications
+from . import embeds
+from . import storage
 
 
 class SpaceXLaunchBotClient(discord.Client):

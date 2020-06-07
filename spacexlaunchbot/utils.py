@@ -2,7 +2,7 @@ import datetime
 import logging
 from typing import Union
 
-import config
+from . import config
 
 
 def utc_from_ts(timestamp: Union[int, None]) -> str:

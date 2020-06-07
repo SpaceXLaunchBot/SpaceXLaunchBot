@@ -2,12 +2,12 @@ import asyncio
 import datetime
 import logging
 
+import discord
 from dictdiffer import diff
 
-import apis
-import config
-import discordclient  # pylint: disable=unused-import
-import embeds
+from . import apis
+from . import config
+from . import embeds
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
@@ -49,7 +49,7 @@ def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
     return changes
 
 
-async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") -> None:
+async def _check_and_send_notifs(client: discord.Client) -> None:
     """Checks what notification messages need to be sent, and sends them.
 
     Updates database values if they need updating.
@@ -123,7 +123,7 @@ async def _check_and_send_notifs(client: "discordclient.SpaceXLaunchBotClient") 
     client.ds.save()
 
 
-async def notification_task(client: "discordclient.SpaceXLaunchBotClient") -> None:
+async def notification_task(client: discord.Client) -> None:
     """An async task to send out launching soon & launch info notifications."""
     await client.wait_until_ready()
     logging.info("Starting")

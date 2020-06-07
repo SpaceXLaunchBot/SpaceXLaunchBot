@@ -1,8 +1,8 @@
 from typing import Callable, Dict
 
-import apis
-import config
-import embeds
+from . import apis
+from . import config
+from . import embeds
 
 
 def req_id_owner(func: Callable) -> Callable:

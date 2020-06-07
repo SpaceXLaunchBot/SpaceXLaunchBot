@@ -9,9 +9,8 @@ scripts
 .dockerignore
 .gitignore
 .pylintrc
+setup.cfg
 Dockerfile
 LICENSE
-mypy.ini
-README.md
 requirements-dev.txt
 variables.env
