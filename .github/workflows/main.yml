@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Pylint
-        run: bash ./scripts/pylint_ci
+        run: pylint --rcfile=setup.cfg ./spacexlaunchbot
 
       - name: Flake8
         run: flake8 ./spacexlaunchbot
