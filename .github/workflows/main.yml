@@ -35,6 +35,12 @@ jobs:
 
       - name: Tests
         run: pytest
+        env:
+          SLB_API_TOKEN_DISCORD=for-testing
+          SLB_API_TOKEN_BOT_LIST_DBL=for-testing
+          SLB_API_TOKEN_BOT_LIST_BOD=for-testing
+          SLB_API_TOKEN_BOT_LIST_DBG=for-testing
+          SLB_API_TOKEN_BOT_LIST_BFD=for-testing
 
       - name: Build Docker image
         run: docker build -t psidex/spacexlaunchbot .
