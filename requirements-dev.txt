@@ -3,3 +3,4 @@ mypy
 bandit
 flake8
 pytest
+vulture

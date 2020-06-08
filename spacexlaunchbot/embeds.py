@@ -22,9 +22,6 @@ ROCKET_ID_IMAGES = {
 
 # Templates for embed fields
 PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer: {}\nCustomer{}: {}"
-CORE_INFO = (
-    "Serial: {}\nFlight: {}\nLanding: {}\nLanding Type: {}\nLanding Location: {}"
-)
 
 
 class EmbedWithFields(discord.Embed):
@@ -261,12 +258,6 @@ HELP_EMBED = EmbedWithFields(
 API_ERROR_EMBED = discord.Embed(
     title="Error",
     description=f"An API error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
-)
-
-GENERAL_ERROR_EMBED = discord.Embed(
-    title="Error",
-    description=f"An error occurred, contact {config.BOT_OWNER}",
     color=config.COLOUR_ERROR_RED,
 )
 

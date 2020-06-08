@@ -21,17 +21,20 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
-      - name: Pylint
+      - name: Lint (Pylint)
         run: pylint --rcfile=setup.cfg ./spacexlaunchbot
 
-      - name: Flake8
+      - name: Lint (Flake8)
         run: flake8 ./spacexlaunchbot
 
-      - name: MyPy
+      - name: Type analysis (MyPy)
         run: mypy ./spacexlaunchbot
 
-      - name: Bandit
+      - name: Security analysis (Bandit)
         run: bandit -r ./spacexlaunchbot
+
+      - name: Unused code detection (Vulture)
+        run: vulture --ignore-names on_* ./spacexlaunchbot
 
       - name: Tests
         run: pytest
