@@ -2,15 +2,15 @@
 
 .git
 .github
-images
-scripts
 .mypy_cache
+.pytest_cache
+images
+tests
 
 .dockerignore
 .gitignore
-.pylintrc
-setup.cfg
 Dockerfile
 LICENSE
 requirements-dev.txt
+setup.cfg
 variables.env
