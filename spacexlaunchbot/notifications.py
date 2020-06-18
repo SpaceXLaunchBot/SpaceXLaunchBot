@@ -31,22 +31,22 @@ def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
 
         # The first index is the type of diff. We are looking for changes.
         if difference[0] == "change":
+            if difference[1] == "image.url":
+                # The second index ([1]) is the key, or in the case of fields, it is a list
+                # like: ['fields', 0, 'value'].
+                # Here we check it is a fields value that has changed, otherwise ignore it.
+                if (
+                    isinstance(difference[1], list)
+                    and difference[1][0] == "fields"
+                    and difference[1][2] == "value"
+                ):
+                    # diff[1][1] is the fields index in the embed dict.
+                    changes.append(embed1["fields"][difference[1][1]]["name"])
 
-            # The second index ([1]) is the key, or in the case of fields, it is a list
-            # like: ['fields', 0, 'value'].
-            # Here we check it is a fields value that has changed, otherwise ignore it.
-            if (
-                isinstance(difference[1], list)
-                and difference[1][0] == "fields"
-                and difference[1][2] == "value"
-            ):
-                # diff[1][1] is the fields index in the embed dict.
-                changes.append(embed1["fields"][difference[1][1]]["name"])
+                else:
+                    changes.append(difference[1])
 
-            else:
-                changes.append(difference[1])
-
-    return changes
+        return changes
 
 
 async def _check_and_send_notifs(client: discord.Client) -> None:
