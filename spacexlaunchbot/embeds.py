@@ -1,8 +1,7 @@
+import random
 from typing import Dict, List
 
 import discord
-
-import random
 
 from . import config
 from .utils import md_link, utc_from_ts
@@ -150,8 +149,8 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
     elif (rocket_img_url := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
         launch_info_embed.set_thumbnail(url=rocket_img_url)
 
-    if (reddit_url := launch_info["links"]["flickr_images"]) is not None:
-        launch_info_embed.set_image(url=random.choice(launch_info["links"]["flickr_images"]))
+    if (flickr_urls := launch_info["links"]["flickr_images"]) is not None:
+        launch_info_embed.set_image(url=random.choice(flickr_urls))
 
     return launch_info_embed
 
