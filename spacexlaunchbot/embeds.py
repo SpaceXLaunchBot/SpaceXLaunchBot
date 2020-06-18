@@ -150,7 +150,7 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
         launch_info_embed.set_thumbnail(url=rocket_img_url)
 
     if (flickr_urls := launch_info["links"]["flickr_images"]) is not None:
-        launch_info_embed.set_image(url=random.choice(flickr_urls))
+        launch_info_embed.set_image(url=random.choice(flickr_urls))  # nosec
 
     return launch_info_embed
 
