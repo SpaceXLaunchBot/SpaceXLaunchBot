@@ -49,7 +49,7 @@ def get_embed_dict_differences(embed1: dict, embed2: dict) -> list:
             else:
                 changes.append(difference[1])
 
-        return changes
+    return changes
 
 
 async def _check_and_send_notifs(client: discord.Client) -> None:
