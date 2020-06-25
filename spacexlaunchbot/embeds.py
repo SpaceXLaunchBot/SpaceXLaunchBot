@@ -149,7 +149,7 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
     elif (rocket_img_url := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
         launch_info_embed.set_thumbnail(url=rocket_img_url)
 
-    if (flickr_urls := launch_info["links"]["flickr_images"]) is not None:
+    if (flickr_urls := launch_info["links"]["flickr_images"]) is not []:
         launch_info_embed.set_image(url=random.choice(flickr_urls))  # nosec
 
     return launch_info_embed
