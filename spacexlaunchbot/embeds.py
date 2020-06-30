@@ -146,8 +146,8 @@ async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
 
     if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
         launch_info_embed.set_thumbnail(url=patch_url)
-    elif (rocket_img_url := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
-        launch_info_embed.set_thumbnail(url=rocket_img_url)
+    elif (rocket_id := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
+        launch_info_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
 
     if flickr_urls := launch_info["links"]["flickr_images"]:
         launch_info_embed.set_image(url=random.choice(flickr_urls))  # nosec
@@ -188,7 +188,7 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
         notif_embed.set_thumbnail(url=patch_url)
     elif (rocket_id := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
         notif_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
-        # EmbedProxy(url='falcon9')
+
     return notif_embed
 
 
