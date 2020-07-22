@@ -1,4 +1,4 @@
-discord.py>=1.3.3
+discord.py>=1.3.4
 aiohttp<3.7.0,>=3.6.0
 dictdiffer
 discordhealthcheck>=0.0.2
