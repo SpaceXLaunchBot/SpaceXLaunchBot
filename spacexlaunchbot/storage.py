@@ -1,9 +1,9 @@
 import logging
 import pickle  # nosec
 from copy import deepcopy
-from typing import Tuple, Set, Dict, Any, Union
+from typing import Tuple, Dict, Any
 
-# ToDo: Use @property for methods?
+from .notifications import NotificationType
 
 
 class DataStore:
@@ -20,79 +20,73 @@ class DataStore:
     def __init__(self, save_file_location: str):
         self._dump_loc = save_file_location
 
-        self._subscribed_channels: Set[int] = set()
-        self._launching_soon_notif_sent: bool = False
-        self._launch_information_embed_dict: Dict = {}
-        self._guild_options: Dict[int, Dict[str, Any]] = {}
+        # Map of subscribed channel -> channel options.
+        self._subscribed_channels: Dict[int, Dict[str, Any]] = {}
+        # Boolean indicating if a notification has been sent for the current schedule,
+        self._current_schedule_notification_sent: bool = False
+        # A dict of the most previously sent schedule embed (for comparison).
+        self._previous_schedule_embed_dict: Dict = {}
 
         try:
             with open(self._dump_loc, "rb") as f_in:
                 tmp = pickle.load(f_in)  # nosec
-            logging.info("Loaded from disk")
             self.__dict__.update(tmp)
+            logging.info(f"Updated self.__dict__ from {self._dump_loc}")
         except FileNotFoundError:
-            pass
+            logging.info(f"Could not find file at location: {self._dump_loc}")
 
     def save(self) -> None:
         # Idea from https://stackoverflow.com/a/2842727/6396652.
         to_dump = {
             "_subscribed_channels": self._subscribed_channels,
-            "_launching_soon_notif_sent": self._launching_soon_notif_sent,
-            "_launch_information_embed_dict": self._launch_information_embed_dict,
-            "_guild_options": self._guild_options,
+            "_current_schedule_notification_sent": self._current_schedule_notification_sent,
+            "_previous_schedule_embed_dict": self._previous_schedule_embed_dict,
         }
         with open(self._dump_loc, "wb") as f_out:
             pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)
 
     def get_notification_task_vars(self) -> Tuple[bool, Dict]:
         return (
-            self._launching_soon_notif_sent,
-            deepcopy(self._launch_information_embed_dict),
+            self._current_schedule_notification_sent,
+            deepcopy(self._previous_schedule_embed_dict),
         )
 
     def set_notification_task_vars(
-        self, ls_notif_sent: bool, li_embed_dict: Dict
+        self,
+        current_schedule_notification_sent: bool,
+        previous_schedule_embed_dict: Dict,
     ) -> None:
-        self._launching_soon_notif_sent = ls_notif_sent
-        self._launch_information_embed_dict = deepcopy(li_embed_dict)
+        self._current_schedule_notification_sent = current_schedule_notification_sent
+        self._previous_schedule_embed_dict = deepcopy(previous_schedule_embed_dict)
 
-    def set_guild_option(self, guild_id: int, option: str, value: Any) -> None:
-        if guild_id in self._guild_options:
-            self._guild_options[guild_id][option] = value
-        else:
-            self._guild_options[guild_id] = {option: value}
+    def add_subbed_channel(
+        self, channel_id: int, notif_type: NotificationType, launch_mentions: str,
+    ) -> bool:
+        """Add a channel to subscribed channels.
 
-    def get_guild_options(self, guild_id: int) -> Union[None, Dict[str, Any]]:
-        if guild_id in self._guild_options:
-            return deepcopy(self._guild_options[guild_id])
-        return None
+        Args:
+            guild_id: The guild the channel is in (useful for if the bot gets removed).
+            channel_id: The channel to add.
+            notif_type: The type of subscription.
+            launch_mentions: The mentions for launch notifications.
 
-    def get_all_guilds_options(self) -> Dict[int, Dict[str, Any]]:
-        return deepcopy(self._guild_options)
-
-    def remove_guild_options(self, guild_id: int) -> bool:
-        if self._guild_options.get(guild_id) is not None:
-            del self._guild_options[guild_id]
-            return True
-        return False
-
-    def add_subbed_channel(self, channel_id: int) -> bool:
+        """
         if channel_id not in self._subscribed_channels:
-            self._subscribed_channels.add(channel_id)
+            self._subscribed_channels[channel_id] = {
+                "type": notif_type,
+                "mentions": launch_mentions,
+            }
             return True
         return False
 
-    def get_subbed_channels(self) -> Set[int]:
+    def get_subbed_channels(self) -> Dict[int, Dict[str, Any]]:
         return deepcopy(self._subscribed_channels)
 
     def remove_subbed_channel(self, channel_id: int) -> bool:
         if channel_id in self._subscribed_channels:
-            self._subscribed_channels.remove(channel_id)
+            del self._subscribed_channels[channel_id]
             return True
         return False
-
-    def remove_subbed_channels(self, channels_to_remove: Set[int]) -> None:
-        self._subscribed_channels = self._subscribed_channels - channels_to_remove
 
     def subbed_channels_count(self) -> int:
         return len(self._subscribed_channels)

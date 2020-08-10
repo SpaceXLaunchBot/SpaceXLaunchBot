@@ -2,7 +2,6 @@ from typing import Dict
 
 import aiohttp
 
-# ToDo: Pass config, dont use ..
 from .. import config
 
 

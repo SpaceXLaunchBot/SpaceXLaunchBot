@@ -1,5 +1,6 @@
 import logging
 import os
+from enum import Enum
 
 from discord import Color
 
@@ -10,7 +11,6 @@ from discord import Color
 BOT_OWNER = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "slb"
-BOT_COMMAND_PREFIX_LEGACY = "!"
 BOT_GAME = "with rockets"
 BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 411618411169447950
@@ -24,7 +24,7 @@ BOT_INVITE_URL = (
 # Docker
 #
 
-INSIDE_DOCKER = os.environ.get("INSIDE_DOCKER", False)
+INSIDE_DOCKER = bool(os.environ.get("INSIDE_DOCKER", False))
 DOCKER_VOLUME_NAME = "/docker-volume/"
 
 #
@@ -33,27 +33,26 @@ DOCKER_VOLUME_NAME = "/docker-volume/"
 
 API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
 
-DEFAULT_BL_TOKEN = "test-token-pls-ignore"
-
+BOT_LIST_DEFAULT_TOKEN = "test-token-pls-ignore"
 BOT_LIST_DATA = [
     {
         "url": f"https://bots.ondiscord.xyz/bot-api/bots/{BOT_CLIENT_ID}/guilds",
-        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_BOD", DEFAULT_BL_TOKEN),
+        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_BOD", BOT_LIST_DEFAULT_TOKEN),
         "guild_count_parameter": "guildCount",
     },
     {
         "url": f"https://top.gg/api/bots/{BOT_CLIENT_ID}/stats",
-        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_DBL", DEFAULT_BL_TOKEN),
+        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_DBL", BOT_LIST_DEFAULT_TOKEN),
         "guild_count_parameter": "server_count",
     },
     {
         "url": f"https://discord.bots.gg/api/v1/bots/{BOT_CLIENT_ID}/stats",
-        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_DBG", DEFAULT_BL_TOKEN),
+        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_DBG", BOT_LIST_DEFAULT_TOKEN),
         "guild_count_parameter": "guildCount",
     },
     {
         "url": f"https://botsfordiscord.com/api/bot/{BOT_CLIENT_ID}",
-        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_BFD", DEFAULT_BL_TOKEN),
+        "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_BFD", BOT_LIST_DEFAULT_TOKEN),
         "guild_count_parameter": "server_count",
     },
 ]
@@ -64,6 +63,10 @@ BOT_LIST_DATA = [
 
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(module)s | %(funcName)s | %(message)s"
 LOG_LEVEL = logging.INFO
+
+#
+# Storage
+#
 
 PICKLE_DUMP_LOCATION = DOCKER_VOLUME_NAME + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
 

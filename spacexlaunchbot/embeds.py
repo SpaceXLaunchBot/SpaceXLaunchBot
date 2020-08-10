@@ -81,7 +81,7 @@ def embed_is_valid(embed: discord.Embed) -> bool:
     return True
 
 
-async def create_launch_info_embed(launch_info: Dict) -> discord.Embed:
+async def create_launch_schedule_embed(launch_info: Dict) -> discord.Embed:
     """Creates a "launch information" style embed from a dict of launch information.
 
     Args:

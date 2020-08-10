@@ -29,26 +29,25 @@ A Discord bot for getting news, information, and notifications about upcoming Sp
 
 ## Commands
 
+#TODO:
+
 Command|Description|Permissions needed
 ---|---|---
 `slb nextlaunch`|Send the latest launch information message to the current channel|None
-`slb addchannel`|Add the current channel to the notification service|Admin
-`slb removechannel`|Remove the current channel from the notification service|Admin
-`slb setmentions @mention`|Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `slb setmentions @role1 @user1 @here`. Calling `setmentions` multiple times will not stack the mentions, it will just overwrite your previous mentions|Admin
-`slb removementions`|Remove all mentions set for the current guild|Admin
-`slb getmentions`|Show the mentions you have set for "launching soon" notifications|Admin
+`slb add`|Add the current channel to the notification service|Admin
+`slb remove`|Remove the current channel from the notification service|Admin
 `slb info`|Send information about the bot to the current channel|None
 `slb help`|List these commands|None
 
 ## Notifications
 
-The `slb addchannel` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
+The `add` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
 
-- A **launch information message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every minute.
+- A **schedule message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every minute.
 
 ![launch_info](images/screenshots/launch_info.png)
 
-- A **launching soon message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent 30 minutes before a launch.
+- A **launch message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent 30 minutes before a launch.
 
 ![launch_soon](images/screenshots/launch_soon.png)
 

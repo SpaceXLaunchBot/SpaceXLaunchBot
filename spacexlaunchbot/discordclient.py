@@ -58,9 +58,8 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
-
-        if self.ds.remove_guild_options(guild.id) is True:
-            logging.info(f"Removed guild settings for {guild.id}")
+        # Any subscribed channels from this guild will be removed later by
+        # send_notification_to_all_subscribed.
 
     async def set_playing(self, title: str) -> None:
         await self.change_presence(activity=discord.Game(name=title))
@@ -70,13 +69,6 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         message_parts = message.content.lower().split(" ")
-
-        # ToDo: Temporary, remove after n months
-        if message_parts[0].startswith(config.BOT_COMMAND_PREFIX_LEGACY):
-            if message_parts[0][1:] in commands.CMD_LOOKUP:
-                await self._send_s(message.channel, embeds.LEGACY_PREFIX_WARNING_EMBED)
-            return
-
         if message_parts[0] != config.BOT_COMMAND_PREFIX:
             return
 
@@ -85,12 +77,12 @@ class SpaceXLaunchBotClient(discord.Client):
         try:
             command_used = message_parts[1]
             run_command = commands.CMD_LOOKUP[command_used]
-            to_send = await run_command(client=self, message=message)
+            to_send = await run_command(
+                client=self, message=message, operands=message_parts[2:]
+            )
 
         except (KeyError, IndexError):
-            # Message contained wrong or no command
-            pass
-
+            pass  # Message contained wrong or no command
         except TypeError:
             logging.exception(f"run_command TypeError: {message.content=}")
 
@@ -119,41 +111,50 @@ class SpaceXLaunchBotClient(discord.Client):
             else:
                 await channel.send(to_send)
 
-        except discord.errors.Forbidden as ex:
-            logging.warning(f"Forbidden: {ex}")
+        except discord.errors.Forbidden:
+            # TODO: Count how many times this happens and unsub when n have happened?
+            pass
 
         except discord.errors.HTTPException as ex:
             # Length/size is most likely cause,
             # see https://discord.com/developers/docs/resources/channel#embed-limits
             logging.warning(f"HTTPException: {ex}")
 
-    async def send_all_subscribed(
-        self, to_send: Union[str, discord.Embed], send_mentions: bool = False
+    async def send_notification_to_all_subscribed(
+        self,
+        to_send: Union[str, discord.Embed],
+        sending_notification_type: notifications.NotificationType,
     ) -> None:
-        """Send a message to all subscribed channels.
+        """Send a notification message to all channels subscribed to the given type.
 
         Args:
             to_send: A String or discord.Embed object.
-            send_mentions: If True, get mentions from db and send as well.
+            sending_notification_type: The type of notification being sent.
 
         """
         channel_ids = self.ds.get_subbed_channels()
-        guild_opts = self.ds.get_all_guilds_options()
         invalid_ids = set()
 
         for channel_id in channel_ids:
-            channel = self.get_channel(channel_id)
+            subscription_opts = channel_ids[channel_id]
 
+            if (
+                subscription_opts["type"] != notifications.NotificationType.all
+                and subscription_opts["type"] != sending_notification_type
+            ):
+                continue
+
+            channel = self.get_channel(channel_id)
             if channel is None:
                 invalid_ids.add(channel_id)
                 continue
 
             await self._send_s(channel, to_send)
 
-            if send_mentions:
-                if (opts := guild_opts.get(channel.guild.id)) is not None:
-                    if (mentions := opts.get("mentions")) is not None:
-                        await self._send_s(channel, mentions)
+            if sending_notification_type == notifications.NotificationType.launch:
+                mentions = subscription_opts.get("mentions", "")
+                if mentions != "":
+                    await self._send_s(channel, mentions)
 
-        # Remove any channels from db that are picked up as invalid
-        self.ds.remove_subbed_channels(invalid_ids)
+        for cid in invalid_ids:
+            self.ds.remove_subbed_channel(cid)
