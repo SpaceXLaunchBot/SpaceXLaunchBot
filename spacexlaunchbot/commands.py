@@ -3,7 +3,7 @@ from typing import Callable, Dict
 from . import apis
 from . import config
 from . import embeds
-from .notifications import NotificationType
+from .consts import NotificationType
 
 
 def req_id_owner(func: Callable) -> Callable:

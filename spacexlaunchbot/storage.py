@@ -3,7 +3,7 @@ import pickle  # nosec
 from copy import deepcopy
 from typing import Tuple, Dict, Any
 
-from .notifications import NotificationType
+from .consts import NotificationType
 
 
 class DataStore:
@@ -20,7 +20,8 @@ class DataStore:
     def __init__(self, save_file_location: str):
         self._dump_loc = save_file_location
 
-        # Map of subscribed channel -> channel options.
+        # Map of {subscribed channel id: {channel options}}.
+        # Supported channel options are currently "type" and "mentions".
         self._subscribed_channels: Dict[int, Dict[str, Any]] = {}
         # Boolean indicating if a notification has been sent for the current schedule,
         self._current_schedule_notification_sent: bool = False
@@ -65,7 +66,6 @@ class DataStore:
         """Add a channel to subscribed channels.
 
         Args:
-            guild_id: The guild the channel is in (useful for if the bot gets removed).
             channel_id: The channel to add.
             notif_type: The type of subscription.
             launch_mentions: The mentions for launch notifications.

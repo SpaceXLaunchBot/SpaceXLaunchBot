@@ -4,6 +4,7 @@ from typing import Dict, List
 import discord
 
 from . import config
+from .consts import Colour
 from .utils import md_link, utc_from_ts
 
 # A couple of pylint rules we want in the rest of the project are broken in this file.
@@ -30,8 +31,8 @@ class EmbedWithFields(discord.Embed):
         """Takes the discord.Embed class and allows you to define fields immediately.
 
         Args:
-            fields : A list of pairs of strings, the name and text of each field.
-            inline_all : Whether or not to inline all of the fields.
+            fields: A list of pairs of strings, the name and text of each field.
+            inline_all: Whether or not to inline all of the fields.
 
         """
         super().__init__(**kwargs)
@@ -39,7 +40,7 @@ class EmbedWithFields(discord.Embed):
             self.add_field(name=field[0], value=field[1], inline=inline_all)
 
 
-def embed_is_valid(embed: discord.Embed) -> bool:
+def embed_size_ok(embed: discord.Embed) -> bool:
     """Determines if an embed is within the size limits for discord.
 
     See https://discord.com/developers/docs/resources/channel#embed-limits.
@@ -68,9 +69,8 @@ def embed_is_valid(embed: discord.Embed) -> bool:
         total_len += length
 
     for field in embed.fields:
-        if (name_length := len(field.name)) > 256 or (
-            value_length := len(field.value)
-        ) > 1024:
+        name_length, value_length = len(field.name), len(field.value)
+        if name_length > 256 or value_length > 1024:
             return False
 
         total_len += name_length + value_length
@@ -133,7 +133,7 @@ async def create_launch_schedule_embed(launch_info: Dict) -> discord.Embed:
         )
 
     launch_info_embed = EmbedWithFields(
-        color=config.COLOUR_FALCON_RED,
+        color=Colour.red_falcon,
         description=launch_info["details"] or "",
         title=f'Launch #{launch_info["flight_number"]} - {launch_info["mission_name"]}',
         fields=fields,
@@ -180,7 +180,7 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
     notif_embed = EmbedWithFields(
         title="{} is launching soon!".format(launch_info["mission_name"]),
         description=embed_desc,
-        color=config.COLOUR_FALCON_RED,
+        color=Colour.red_falcon,
         fields=[["Launch date (UTC)", utc_launch_date]],
     )
 
@@ -205,7 +205,7 @@ def create_bot_info_embed(guild_count: int, subbed_channel_count: int) -> discor
     """
     return EmbedWithFields(
         title="SpaceXLaunchBot Information",
-        color=config.COLOUR_FALCON_RED,
+        color=Colour.red_falcon,
         description="A Discord bot for getting news, information, and notifications "
         "about upcoming SpaceX launches",
         fields=[
@@ -213,9 +213,9 @@ def create_bot_info_embed(guild_count: int, subbed_channel_count: int) -> discor
             ["Subscribed Channel Count", f"{subbed_channel_count}"],
             [
                 "Links",
-                f'{md_link("Github", config.BOT_GITHUB)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
+                f'{md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
             ],
-            ["Contact", f"{config.BOT_OWNER}"],
+            ["Contact", f"{config.BOT_OWNER_NAME}"],
             [
                 "Help",
                 f"Use `{config.BOT_COMMAND_PREFIX} help` to get a list of commands",
@@ -224,10 +224,11 @@ def create_bot_info_embed(guild_count: int, subbed_channel_count: int) -> discor
     )
 
 
+# TODO: Update with new commands from readme.
 HELP_EMBED = EmbedWithFields(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
-    color=config.COLOUR_FALCON_RED,
+    color=Colour.red_falcon,
     inline_all=False,
     fields=[
         [
@@ -261,8 +262,8 @@ HELP_EMBED = EmbedWithFields(
 
 API_ERROR_EMBED = discord.Embed(
     title="Error",
-    description=f"An API error occurred, contact {config.BOT_OWNER}",
-    color=config.COLOUR_ERROR_RED,
+    description=f"An API error occurred, contact {config.BOT_OWNER_NAME}",
+    color=Colour.red_error,
 )
 
 LEGACY_PREFIX_WARNING_EMBED = discord.Embed(
@@ -270,5 +271,5 @@ LEGACY_PREFIX_WARNING_EMBED = discord.Embed(
     description="You used a command with the old prefix (!), SpaceXLaunchBot has "
     'moved to using "slb" as a prefix, e.g. `slb help`. This warning will be removed '
     "soon.",
-    color=config.COLOUR_INFO_ORANGE,
+    color=Colour.orange_info,
 )

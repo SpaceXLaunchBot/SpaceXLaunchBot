@@ -1,25 +1,15 @@
 import asyncio
 import datetime
 import logging
-from enum import Enum
 
-import discord
-
-from . import apis
 from . import config
+from .apis import spacex
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
-# TODO: https://stackoverflow.com/a/41409392/6396652
-class NotificationType(Enum):
-    all = 0
-    schedule = 1
-    launch = 2
-
-
-async def _check_and_send_notifs(client: discord.Client) -> None:
+async def _check_and_send_notifs(client) -> None:
     """Checks what notification messages need to be sent, and sends them.
 
     Updates database values if they need updating.
@@ -28,7 +18,7 @@ async def _check_and_send_notifs(client: discord.Client) -> None:
         client: The Discord client to use to send messages.
 
     """
-    next_launch_dict = await apis.spacex.get_launch_dict()
+    next_launch_dict = await spacex.get_launch_dict()
     if next_launch_dict == {}:
         return
 
@@ -46,7 +36,7 @@ async def _check_and_send_notifs(client: discord.Client) -> None:
     pass
 
 
-async def notification_task(client: discord.Client) -> None:
+async def notification_task(client) -> None:
     """An async task to send out launching soon & launch info notifications."""
     logging.info("Waiting for client ready")
     await client.wait_until_ready()

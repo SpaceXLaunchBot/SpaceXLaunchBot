@@ -1,18 +1,15 @@
 import logging
 import os
-from enum import Enum
-
-from discord import Color
 
 #
 # Meta
 #
 
-BOT_OWNER = "Dragon#0571"
+BOT_OWNER_NAME = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "slb"
-BOT_GAME = "with rockets"
-BOT_GITHUB = "https://github.com/r-spacex/SpaceXLaunchBot"
+BOT_GAME_NAME = "with rockets"
+BOT_GITHUB_URL = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 411618411169447950
 BOT_INVITE_PERMISSIONS = "19456"
 BOT_INVITE_URL = (
@@ -81,11 +78,3 @@ NOTIF_TASK_API_INTERVAL = 1
 # How many minutes to look into the future for an upcoming launch time
 # Must be > NOTIF_TASK_API_INTERVAL else you risk skipping a launch
 NOTIF_TASK_LAUNCH_DELTA = 30
-
-#
-# Misc
-#
-
-COLOUR_ERROR_RED = Color.from_rgb(255, 0, 0)
-COLOUR_FALCON_RED = Color.from_rgb(238, 15, 70)
-COLOUR_INFO_ORANGE = Color.from_rgb(200, 74, 0)

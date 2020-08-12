@@ -10,9 +10,10 @@ import discordhealthcheck
 from . import apis
 from . import commands
 from . import config
-from . import notifications
 from . import embeds
+from . import notifications
 from . import storage
+from .consts import NotificationType
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -34,7 +35,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_ready(self) -> None:
         logging.info("Connected to Discord API")
-        await self.set_playing(config.BOT_GAME)
+        await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 
     async def shutdown(self) -> None:
@@ -104,7 +105,7 @@ class SpaceXLaunchBotClient(discord.Client):
         """
         try:
             if isinstance(to_send, discord.Embed):
-                if embeds.embed_is_valid(to_send):
+                if embeds.embed_size_ok(to_send):
                     await channel.send(embed=to_send)
                 else:
                     logging.warning("Embed is too large to send")
@@ -120,16 +121,14 @@ class SpaceXLaunchBotClient(discord.Client):
             # see https://discord.com/developers/docs/resources/channel#embed-limits
             logging.warning(f"HTTPException: {ex}")
 
-    async def send_notification_to_all_subscribed(
-        self,
-        to_send: Union[str, discord.Embed],
-        sending_notification_type: notifications.NotificationType,
+    async def send_notification(
+        self, to_send: Union[str, discord.Embed], notification_type: NotificationType,
     ) -> None:
         """Send a notification message to all channels subscribed to the given type.
 
         Args:
-            to_send: A String or discord.Embed object.
-            sending_notification_type: The type of notification being sent.
+            to_send: A string or discord.Embed object.
+            notification_type: The type of notification being sent.
 
         """
         channel_ids = self.ds.get_subbed_channels()
@@ -139,8 +138,8 @@ class SpaceXLaunchBotClient(discord.Client):
             subscription_opts = channel_ids[channel_id]
 
             if (
-                subscription_opts["type"] != notifications.NotificationType.all
-                and subscription_opts["type"] != sending_notification_type
+                subscription_opts["type"] != NotificationType.all
+                and subscription_opts["type"] != notification_type
             ):
                 continue
 
@@ -151,10 +150,10 @@ class SpaceXLaunchBotClient(discord.Client):
 
             await self._send_s(channel, to_send)
 
-            if sending_notification_type == notifications.NotificationType.launch:
+            if notification_type == NotificationType.launch:
                 mentions = subscription_opts.get("mentions", "")
                 if mentions != "":
                     await self._send_s(channel, mentions)
 
-        for cid in invalid_ids:
-            self.ds.remove_subbed_channel(cid)
+        for channel_id in invalid_ids:
+            self.ds.remove_subbed_channel(channel_id)

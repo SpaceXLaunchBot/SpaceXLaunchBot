@@ -22,7 +22,7 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
         async with aiohttp.ClientSession() as session:
             async with session.get(spacex_api_url) as response:
                 if response.status != 200:
-                    logging.error(f"Response status: {response.status}")
+                    logging.error(f"Failed with response status: {response.status}")
                     return {}
                 return await response.json()
 
