@@ -23,8 +23,9 @@ class DataStore:
         # Map of {subscribed channel id: {channel options}}.
         # Supported channel options are currently "type" and "mentions".
         self._subscribed_channels: Dict[int, Dict[str, Any]] = {}
-        # Boolean indicating if a notification has been sent for the current schedule,
-        self._current_schedule_notification_sent: bool = False
+        # Boolean indicating if a launch notification has been sent for the current
+        # schedule.
+        self._launch_embed_for_current_schedule_sent: bool = False
         # A dict of the most previously sent schedule embed (for comparison).
         self._previous_schedule_embed_dict: Dict = {}
 
@@ -41,7 +42,7 @@ class DataStore:
         # pylint: disable=line-too-long
         to_dump = {
             "_subscribed_channels": self._subscribed_channels,
-            "_current_schedule_notification_sent": self._current_schedule_notification_sent,
+            "_launch_embed_for_current_schedule_sent": self._launch_embed_for_current_schedule_sent,
             "_previous_schedule_embed_dict": self._previous_schedule_embed_dict,
         }
         with open(self._dump_path, "wb") as f_out:
@@ -49,16 +50,18 @@ class DataStore:
 
     def get_notification_task_vars(self) -> Tuple[bool, Dict]:
         return (
-            self._current_schedule_notification_sent,
+            self._launch_embed_for_current_schedule_sent,
             deepcopy(self._previous_schedule_embed_dict),
         )
 
     def set_notification_task_vars(
         self,
-        current_schedule_notification_sent: bool,
+        launch_embed_for_current_schedule_sent: bool,
         previous_schedule_embed_dict: Dict,
     ) -> None:
-        self._current_schedule_notification_sent = current_schedule_notification_sent
+        self._launch_embed_for_current_schedule_sent = (
+            launch_embed_for_current_schedule_sent
+        )
         self._previous_schedule_embed_dict = deepcopy(previous_schedule_embed_dict)
         self.save()
 

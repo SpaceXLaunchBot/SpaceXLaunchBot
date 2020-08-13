@@ -80,7 +80,7 @@ def embed_size_ok(embed: discord.Embed) -> bool:
     return True
 
 
-async def create_schedule_embed(launch_info: Dict) -> discord.Embed:
+def create_schedule_embed(launch_info: Dict) -> discord.Embed:
     """Creates an informational (schedule) embed from a dict of launch information.
 
     Args:
@@ -154,7 +154,7 @@ async def create_schedule_embed(launch_info: Dict) -> discord.Embed:
     return schedule_embed
 
 
-async def create_launch_embed(launch_info: Dict) -> discord.Embed:
+def create_launch_embed(launch_info: Dict) -> discord.Embed:
     """Create a launc embed from a dict of launch information.
 
     Args:

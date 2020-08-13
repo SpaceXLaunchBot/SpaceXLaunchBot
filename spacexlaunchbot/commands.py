@@ -43,7 +43,7 @@ async def _next_launch(**kwargs):
     next_launch_dict = await apis.spacex.get_launch_dict()
     if next_launch_dict == {}:
         return embeds.API_ERROR_EMBED
-    return await embeds.create_schedule_embed(next_launch_dict)
+    return embeds.create_schedule_embed(next_launch_dict)
 
 
 @req_id_owner
@@ -95,7 +95,7 @@ async def _debug_launch_embed(**kwargs):
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
         return "API returned {}"
-    return await embeds.create_launch_embed(launch_dict)
+    return embeds.create_launch_embed(launch_dict)
 
 
 @req_id_owner
@@ -110,7 +110,7 @@ async def _debug_schedule_embed(**kwargs):
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
         return "API returned {}"
-    return await embeds.create_schedule_embed(launch_dict)
+    return embeds.create_schedule_embed(launch_dict)
 
 
 @req_id_owner
