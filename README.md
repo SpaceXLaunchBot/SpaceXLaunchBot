@@ -32,7 +32,7 @@ A Discord bot for getting news, information, and notifications about upcoming Sp
 Command|Description|Permissions needed
 ---|---|---
 `slb nextlaunch`|Send the latest launch information message to the current channel|None
-`slb add [all\|schedule\|launch] #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type. If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
+`slb add type #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
 `slb remove`|Remove the current channel from the notification service|Admin
 `slb info`|Send information about the bot to the current channel|None
 `slb help`|List these commands|None
