@@ -31,8 +31,9 @@ A Discord bot for getting news, information, and notifications about upcoming Sp
 
 Command|Description|Permissions needed
 ---|---|---
-`slb nextlaunch`|Send the latest launch information message to the current channel|None
-`slb add type #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
+`slb nextlaunch`|Send the latest launch schedule message to the current channel|None
+`slb launch [launch number]`|Send the launch schedule message for the given launch number to the current channel|None
+`slb add [type] #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
 `slb remove`|Remove the current channel from the notification service|Admin
 `slb info`|Send information about the bot to the current channel|None
 `slb help`|List these commands|None
@@ -53,7 +54,7 @@ If you want to receive both types of notification you can use **all**.
 
 Currently there is no way to update the type and/or mentions you have set for a channel. If you need to change these just call `slb remove` and then `slb add` with your new options.
 
-### Example Command Usage
+## Example Command Usage
 
 `slb add all @me @elon`
 `slb add schedule`

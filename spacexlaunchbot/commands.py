@@ -44,8 +44,19 @@ def _req_perm_admin(func: Callable) -> Callable:
 
 
 async def _next_launch(**kwargs):
-    # TODO: Allow user to request specific launch number.
     next_launch_dict = await apis.spacex.get_launch_dict()
+    if next_launch_dict == {}:
+        return embeds.API_ERROR_EMBED
+    return embeds.create_schedule_embed(next_launch_dict)
+
+
+async def _launch(**kwargs):
+    operands = kwargs["operands"]
+    try:
+        launch_number = int(operands[0])
+    except ValueError:
+        return "Invalid launch number"
+    next_launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if next_launch_dict == {}:
         return embeds.API_ERROR_EMBED
     return embeds.create_schedule_embed(next_launch_dict)
@@ -143,6 +154,7 @@ async def _shutdown(**kwargs):
 
 COMMAND_LOOKUP: Dict[str, Callable] = {
     "nextlaunch": _next_launch,
+    "launch": _launch,
     "add": _add,
     "remove": _remove,
     "info": _info,

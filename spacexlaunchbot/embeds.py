@@ -276,10 +276,14 @@ HELP_EMBED = EmbedWithFields(
     fields=[
         [
             "nextlaunch",
-            "Send the latest launch information message to the current channel",
+            "Send the latest launch schedule message to the current channel",
         ],
         [
-            "add type #channel, @user, @role, etc.",
+            "launch [launch number]",
+            "Send the launch schedule message for the given launch number to the current channel",
+        ],
+        [
+            "add [type] #channel, @user, @role, etc.",
             "Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent\n*Only admins can use this command*",
         ],
         [
