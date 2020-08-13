@@ -40,7 +40,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def shutdown(self) -> None:
         """Saves data to disk, cancels asyncio tasks, and disconnects from Discord"""
         logging.info("Shutting down")
-        self.ds._save()
+        self.ds.save()
         for task in asyncio.Task.all_tasks():
             task.cancel()
         await self.close()
@@ -76,7 +76,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         try:
             command_used = message_parts[1]
-            run_command = commands.CMD_LOOKUP[command_used]
+            run_command = commands.COMMAND_LOOKUP[command_used]
             to_send = await run_command(
                 client=self, message=message, operands=message_parts[2:]
             )

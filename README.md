@@ -51,6 +51,8 @@ The `add` command allows admins to subscribe text channels to the bots notificat
 
 If you want to receive both types of notification you can use **all**.
 
+Currently there is no way to update the type and/pr mentions you have set for a channel. If you need to change these just call `slb remove` and then `slb add` with your new options.
+
 ### Example Command Usage
 
 `slb add all @me @elon`

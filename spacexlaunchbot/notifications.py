@@ -7,8 +7,8 @@ from . import config
 from . import embeds
 from .apis import spacex
 
-ONE_MINUTE = 60
-LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
+_ONE_MINUTE = 60
+_LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
 class NotificationType(Enum):
@@ -19,7 +19,7 @@ class NotificationType(Enum):
     launch = 2
 
 
-async def _check_and_send_notificationss(client) -> None:
+async def _check_and_send_notifications(client) -> None:
     """Checks what notification messages need to be sent, and sends them.
 
     Updates database values if they need updating.
@@ -42,8 +42,12 @@ async def _check_and_send_notificationss(client) -> None:
     #
 
     schedule_embed = embeds.create_schedule_embed(next_launch_dict)
-    if schedule_embed.to_dict() != previous_schedule_embed_dict:
-        # TODO: Write to footer what changes occurred.
+    diff_str = embeds.diff_schedule_embed_dicts(
+        previous_schedule_embed_dict, schedule_embed.to_dict()
+    )
+
+    if diff_str != "":
+        schedule_embed.set_footer(text=diff_str)
         await client.send_notification(schedule_embed, NotificationType.schedule)
         launch_embed_for_current_schedule_sent = False
 
@@ -58,13 +62,15 @@ async def _check_and_send_notificationss(client) -> None:
         launch_timestamp = 0
 
     current_time = datetime.datetime.utcnow()
-    current_time_plus_delta = (current_time + LAUNCHING_SOON_DELTA).timestamp()
+    current_time_plus_delta = (current_time + _LAUNCHING_SOON_DELTA).timestamp()
 
     # If the launch time is within the next NOTIF_TASK_LAUNCH_DELTA, and if the
-    # launch_timestamp is not in the past, and we haven't already sent the notif.
+    # launch_timestamp is not in the past, and we haven't already sent the notif,
+    # and the launch time precision is at the best.
     if (
         current_time_plus_delta >= launch_timestamp >= current_time.timestamp()
         and launch_embed_for_current_schedule_sent is False
+        and next_launch_dict.get("tentative_max_precision", "") == "hour"
     ):
         launch_embed_for_current_schedule_sent = True
         launch_embed = embeds.create_launch_embed(next_launch_dict)
@@ -86,5 +92,5 @@ async def notification_task(client) -> None:
     logging.info("Starting")
 
     while not client.is_closed():
-        await _check_and_send_notificationss(client)
-        await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+        await _check_and_send_notifications(client)
+        await asyncio.sleep(_ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)

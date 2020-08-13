@@ -6,7 +6,11 @@ from . import embeds
 from .notifications import NotificationType
 
 
-def req_id_owner(func: Callable) -> Callable:
+async def _return_none() -> None:
+    return None
+
+
+def _req_id_owner(func: Callable) -> Callable:
     """A function wrapper that only runs the wrapped function if
     kwargs["message"].author.id == config.BOT_OWNER_ID.
 
@@ -17,12 +21,12 @@ def req_id_owner(func: Callable) -> Callable:
         message = kwargs["message"]
         if message.author.id == config.BOT_OWNER_ID:
             return func(**kwargs)
-        return None
+        return _return_none()
 
     return wrapper
 
 
-def req_perm_admin(func: Callable) -> Callable:
+def _req_perm_admin(func: Callable) -> Callable:
     """A function wrapper that only runs the wrapped function if
     kwargs["message"].author has the administrator permission.
 
@@ -34,7 +38,7 @@ def req_perm_admin(func: Callable) -> Callable:
         perms = message.author.permissions_in(message.channel)
         if getattr(perms, "administrator", False):
             return func(**kwargs)
-        return None
+        return _return_none()
 
     return wrapper
 
@@ -47,7 +51,7 @@ async def _next_launch(**kwargs):
     return embeds.create_schedule_embed(next_launch_dict)
 
 
-@req_perm_admin
+@_req_perm_admin
 async def _add(**kwargs):
     client, message, operands = kwargs["client"], kwargs["message"], kwargs["operands"]
     notif_type_str, notif_mentions = operands[0], operands[1:]
@@ -67,7 +71,7 @@ async def _add(**kwargs):
     return "This channel has been added to the notification service"
 
 
-@req_perm_admin
+@_req_perm_admin
 async def _remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
     if client.ds.remove_subbed_channel(message.channel.id) is False:
@@ -86,7 +90,7 @@ async def _help(**kwargs):
     return embeds.HELP_EMBED
 
 
-@req_id_owner
+@_req_id_owner
 async def _debug_launch_embed(**kwargs):
     """Send launching soon embed for the given launch.
     """
@@ -101,7 +105,7 @@ async def _debug_launch_embed(**kwargs):
     return embeds.create_launch_embed(launch_dict)
 
 
-@req_id_owner
+@_req_id_owner
 async def _debug_schedule_embed(**kwargs):
     """Send schedule embed for the given launch.
     """
@@ -116,13 +120,13 @@ async def _debug_schedule_embed(**kwargs):
     return embeds.create_schedule_embed(launch_dict)
 
 
-@req_id_owner
+@_req_id_owner
 async def _debug_subscribed_channels_dict(**kwargs):
     client = kwargs["client"]
     return str(client.ds.get_subbed_channels())
 
 
-@req_id_owner
+@_req_id_owner
 async def _reset_notification_task_store(**kwargs):
     """Reset notification_task_store to default values (will trigger new notifications).
     """
@@ -131,13 +135,13 @@ async def _reset_notification_task_store(**kwargs):
     return "Reset using `set_notification_task_vars(False, {})`"
 
 
-@req_id_owner
+@_req_id_owner
 async def _shutdown(**kwargs):
     client = kwargs["client"]
     await client.shutdown()
 
 
-CMD_LOOKUP: Dict[str, Callable] = {
+COMMAND_LOOKUP: Dict[str, Callable] = {
     "nextlaunch": _next_launch,
     "add": _add,
     "remove": _remove,

@@ -111,7 +111,7 @@ class TestClient(discord.Client):
             print(f"with mentions {mentions}")
             newDs.add_subbed_channel(cid, NotificationType.all, mentions)
 
-        newDs._save()
+        newDs.save()
 
 
 print("Logging into discord")
