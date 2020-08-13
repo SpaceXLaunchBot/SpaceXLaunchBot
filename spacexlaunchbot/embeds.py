@@ -226,7 +226,7 @@ def create_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Em
 # TODO: Update with new commands from readme.
 HELP_EMBED = EmbedWithFields(
     title="SpaceXLaunchBot Commands",
-    description=f"Command prefix: {config.BOT_COMMAND_PREFIX}",
+    description=f"Command prefix: `{config.BOT_COMMAND_PREFIX}`",
     color=Colour.red_falcon,
     inline_all=False,
     fields=[
@@ -235,24 +235,12 @@ HELP_EMBED = EmbedWithFields(
             "Send the latest launch information message to the current channel",
         ],
         [
-            "addchannel",
-            "Add the current channel to the notification service\n*Only admins can use this command*",
+            "add [all|schedule|launch] #channel, @user, @role, etc.",
+            "Add the current channel to the notification service with the given notification type. If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent\n*Only admins can use this command*",
         ],
         [
-            "removechannel",
+            "remove",
             "Remove the current channel from the notification service\n*Only admins can use this command*",
-        ],
-        [
-            "setmentions @mention",
-            'Set roles/users to be mentioned when a "launching soon" message is sent. Can be formatted with multiple mentions in any order, like this: `slb setmentions @role1 @user1 @here`. Calling `setmentions` multiple times will not stack the mentions, it will just overwrite your previous mentions\n*Only admins can use this command*',
-        ],
-        [
-            "removementions",
-            "Remove all mentions set for the current guild\n*Only admins can use this command*",
-        ],
-        [
-            "getmentions",
-            'Show the mentions you have set for "launching soon" notifications\n*Only admins can use this command*',
         ],
         ["info", "Send information about the bot to the current channel"],
         ["help", "List these commands"],

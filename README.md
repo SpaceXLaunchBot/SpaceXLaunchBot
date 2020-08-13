@@ -29,27 +29,33 @@ A Discord bot for getting news, information, and notifications about upcoming Sp
 
 ## Commands
 
-#TODO:
-
 Command|Description|Permissions needed
 ---|---|---
 `slb nextlaunch`|Send the latest launch information message to the current channel|None
-`slb add`|Add the current channel to the notification service|Admin
+`add [all\|schedule\|launch] #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type. If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
 `slb remove`|Remove the current channel from the notification service|Admin
 `slb info`|Send information about the bot to the current channel|None
 `slb help`|List these commands|None
 
 ## Notifications
 
-The `add` command allows admins to "subscribe" text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
+The `add` command allows admins to subscribe text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
 
-- A **schedule message** shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently the bot checks for changes every minute.
+- A **schedule** notification shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently changes are checked for every 60 seconds.
 
 ![launch_info](images/screenshots/launch_info.png)
 
-- A **launch message** provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent 30 minutes before a launch.
+- A **launch** notification provides useful links to things such as the livestream and press kit. This message is only sent through the notification service and will be sent 30 minutes before a launch. You can choose to have a list of mentions sent to alert users to this notification.
 
 ![launch_soon](images/screenshots/launch_soon.png)
+
+If you want to receive both types of notification you can use **all**.
+
+### Example Command Usage
+
+`slb add all @me @elon`
+`slb add schedule`
+`slb add launch @everyone`
 
 ## New Features
 

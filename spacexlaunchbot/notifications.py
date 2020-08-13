@@ -36,7 +36,7 @@ async def _check_and_send_notifs(client) -> None:
     schedule_embed = embeds.create_schedule_embed(next_launch_dict)
     if schedule_embed.to_dict() != previous_schedule_embed_dict:
         # TODO: Write to footer what changes occurred.
-        client.send_notification(schedule_embed, NotificationType.schedule)
+        await client.send_notification(schedule_embed, NotificationType.schedule)
         launch_embed_for_current_schedule_sent = False
 
     #
@@ -60,7 +60,7 @@ async def _check_and_send_notifs(client) -> None:
     ):
         launch_embed_for_current_schedule_sent = True
         launch_embed = embeds.create_launch_embed(next_launch_dict)
-        client.send_notification(launch_embed, NotificationType.launch)
+        await client.send_notification(launch_embed, NotificationType.launch)
 
     #
     # Save data
