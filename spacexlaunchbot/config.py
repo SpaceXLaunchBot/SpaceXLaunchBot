@@ -22,7 +22,7 @@ BOT_INVITE_URL = (
 #
 
 INSIDE_DOCKER = bool(os.environ.get("INSIDE_DOCKER", False))
-DOCKER_VOLUME_NAME = "/docker-volume/"
+DOCKER_VOLUME_PATH = "/docker-volume/"
 
 #
 # API
@@ -65,7 +65,7 @@ LOG_LEVEL = logging.INFO
 # Storage
 #
 
-PICKLE_DUMP_LOCATION = DOCKER_VOLUME_NAME + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
+PICKLE_DUMP_LOCATION = DOCKER_VOLUME_PATH + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
 
 #
 # Notifications

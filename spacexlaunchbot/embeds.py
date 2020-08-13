@@ -7,8 +7,7 @@ from . import config
 from .consts import Colour
 from .utils import md_link, utc_from_ts
 
-# A couple of pylint rules we want in the rest of the project are broken in this file.
-# superfluous-parens is erroneously picked up when := is used after an elif?
+# superfluous-parens is erroneously picked sometimes when using :=?
 # pylint: disable=line-too-long,superfluous-parens
 
 IMAGE_BASE_URL = (
@@ -81,8 +80,8 @@ def embed_size_ok(embed: discord.Embed) -> bool:
     return True
 
 
-async def create_launch_schedule_embed(launch_info: Dict) -> discord.Embed:
-    """Creates a "launch information" style embed from a dict of launch information.
+async def create_schedule_embed(launch_info: Dict) -> discord.Embed:
+    """Creates an informational (schedule) embed from a dict of launch information.
 
     Args:
         launch_info: A dictionary of launch information from apis.spacex.
@@ -132,7 +131,7 @@ async def create_launch_schedule_embed(launch_info: Dict) -> discord.Embed:
             ]
         )
 
-    launch_info_embed = EmbedWithFields(
+    schedule_embed = EmbedWithFields(
         color=Colour.red_falcon,
         description=launch_info["details"] or "",
         title=f'Launch #{launch_info["flight_number"]} - {launch_info["mission_name"]}',
@@ -140,23 +139,23 @@ async def create_launch_schedule_embed(launch_info: Dict) -> discord.Embed:
     )
 
     if (reddit_url := launch_info["links"]["reddit_campaign"]) is not None:
-        launch_info_embed.description += (
+        schedule_embed.description += (
             f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
         )
 
     if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
-        launch_info_embed.set_thumbnail(url=patch_url)
+        schedule_embed.set_thumbnail(url=patch_url)
     elif (rocket_id := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
-        launch_info_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
+        schedule_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
 
     if flickr_urls := launch_info["links"]["flickr_images"]:
-        launch_info_embed.set_image(url=random.choice(flickr_urls))  # nosec
+        schedule_embed.set_image(url=random.choice(flickr_urls))  # nosec
 
-    return launch_info_embed
+    return schedule_embed
 
 
-async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
-    """Create a "launching soon" style embed from a dict of launch information.
+async def create_launch_embed(launch_info: Dict) -> discord.Embed:
+    """Create a launc embed from a dict of launch information.
 
     Args:
         launch_info: A dictionary of launch information from apis.spacex.
@@ -177,7 +176,7 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
     if (press_kit_url := launch_info["links"]["presskit"]) is not None:
         embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
-    notif_embed = EmbedWithFields(
+    launch_embed = EmbedWithFields(
         title="{} is launching soon!".format(launch_info["mission_name"]),
         description=embed_desc,
         color=Colour.red_falcon,
@@ -185,14 +184,14 @@ async def create_launching_soon_embed(launch_info: Dict) -> discord.Embed:
     )
 
     if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
-        notif_embed.set_thumbnail(url=patch_url)
+        launch_embed.set_thumbnail(url=patch_url)
     elif (rocket_id := launch_info["rocket"]["rocket_id"]) in ROCKET_ID_IMAGES:
-        notif_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
+        launch_embed.set_thumbnail(url=ROCKET_ID_IMAGES[rocket_id])
 
-    return notif_embed
+    return launch_embed
 
 
-def create_bot_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
+def create_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
     """Creates an info embed.
 
     Args:

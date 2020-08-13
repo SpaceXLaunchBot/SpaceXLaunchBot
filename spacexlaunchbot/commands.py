@@ -43,8 +43,7 @@ async def _next_launch(**kwargs):
     next_launch_dict = await apis.spacex.get_launch_dict()
     if next_launch_dict == {}:
         return embeds.API_ERROR_EMBED
-    else:
-        return await embeds.create_launch_schedule_embed(next_launch_dict)
+    return await embeds.create_schedule_embed(next_launch_dict)
 
 
 @req_id_owner
@@ -77,7 +76,7 @@ async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
     sub_count = client.ds.subbed_channels_count()
-    return embeds.create_bot_info_embed(guild_count, sub_count)
+    return embeds.create_info_embed(guild_count, sub_count)
 
 
 async def _help(**kwargs):
@@ -85,7 +84,7 @@ async def _help(**kwargs):
 
 
 @req_id_owner
-async def _debug_launching_soon(**kwargs):
+async def _debug_launch_embed(**kwargs):
     """Send launching soon embed for the given launch.
     """
     try:
@@ -96,12 +95,12 @@ async def _debug_launching_soon(**kwargs):
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
         return "API returned {}"
-    return await embeds.create_launching_soon_embed(launch_dict)
+    return await embeds.create_launch_embed(launch_dict)
 
 
 @req_id_owner
-async def _debug_launch_information(**kwargs):
-    """Send launch information embed for the given launch.
+async def _debug_schedule_embed(**kwargs):
+    """Send schedule embed for the given launch.
     """
     try:
         launch_number = int("".join(kwargs["operands"]))
@@ -111,7 +110,13 @@ async def _debug_launch_information(**kwargs):
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
         return "API returned {}"
-    return await embeds.create_launch_schedule_embed(launch_dict)
+    return await embeds.create_schedule_embed(launch_dict)
+
+
+@req_id_owner
+async def _debug_subscribed_channels_dict(**kwargs):
+    client = kwargs["client"]
+    return str(client.ds.get_subbed_channels())
 
 
 @req_id_owner
@@ -135,8 +140,9 @@ CMD_LOOKUP: Dict[str, Callable] = {
     "remove": _remove,
     "info": _info,
     "help": _help,
-    "dbgls": _debug_launching_soon,
-    "dbgli": _debug_launch_information,
-    "resetnts": _reset_notification_task_store,
+    "dl": _debug_launch_embed,
+    "ds": _debug_schedule_embed,
+    "dc": _debug_subscribed_channels_dict,
+    "rn": _reset_notification_task_store,
     "shutdown": _shutdown,
 }
