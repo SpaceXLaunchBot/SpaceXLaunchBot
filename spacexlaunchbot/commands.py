@@ -47,7 +47,7 @@ async def _next_launch(**kwargs):
     return embeds.create_schedule_embed(next_launch_dict)
 
 
-@req_id_owner
+@req_perm_admin
 async def _add(**kwargs):
     client, message, operands = kwargs["client"], kwargs["message"], kwargs["operands"]
     notif_type_str, notif_mentions = operands[0], operands[1:]
@@ -65,7 +65,7 @@ async def _add(**kwargs):
     return "This channel has been added to the notification service"
 
 
-@req_id_owner
+@req_perm_admin
 async def _remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
     if client.ds.remove_subbed_channel(message.channel.id) is False:

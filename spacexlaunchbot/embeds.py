@@ -251,11 +251,3 @@ API_ERROR_EMBED = discord.Embed(
     description=f"An API error occurred, contact {config.BOT_OWNER_NAME}",
     color=Colour.red_error,
 )
-
-LEGACY_PREFIX_WARNING_EMBED = discord.Embed(
-    title="New Prefix In Use",
-    description="You used a command with the old prefix (!), SpaceXLaunchBot has "
-    'moved to using "slb" as a prefix, e.g. `slb help`. This warning will be removed '
-    "soon.",
-    color=Colour.orange_info,
-)
