@@ -11,9 +11,8 @@ from . import apis
 from . import commands
 from . import config
 from . import embeds
-from . import notifications
 from . import storage
-from .consts import NotificationType
+from .notifications import notification_task, NotificationType
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -30,7 +29,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             logging.info("Signal handler for SIGTERM registered")
 
-        self.loop.create_task(notifications.notification_task(self))
+        self.loop.create_task(notification_task(self))
         discordhealthcheck.start(self)
 
     async def on_ready(self) -> None:
@@ -41,7 +40,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def shutdown(self) -> None:
         """Saves data to disk, cancels asyncio tasks, and disconnects from Discord"""
         logging.info("Shutting down")
-        self.ds.save()
+        self.ds._save()
         for task in asyncio.Task.all_tasks():
             task.cancel()
         await self.close()
@@ -138,8 +137,8 @@ class SpaceXLaunchBotClient(discord.Client):
             subscription_opts = channel_ids[channel_id]
 
             if (
-                subscription_opts["type"] != NotificationType.all
-                and subscription_opts["type"] != notification_type
+                subscription_opts.notification_type != NotificationType.all
+                and subscription_opts.notification_type != notification_type
             ):
                 continue
 
@@ -151,7 +150,7 @@ class SpaceXLaunchBotClient(discord.Client):
             await self._send_s(channel, to_send)
 
             if notification_type == NotificationType.launch:
-                mentions = subscription_opts.get("mentions", "")
+                mentions = subscription_opts.launch_mentions
                 if mentions != "":
                     await self._send_s(channel, mentions)
 

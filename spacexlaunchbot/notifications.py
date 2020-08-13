@@ -1,17 +1,25 @@
 import asyncio
 import datetime
 import logging
+from enum import Enum
 
 from . import config
 from . import embeds
 from .apis import spacex
-from .consts import NotificationType
 
 ONE_MINUTE = 60
 LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
-async def _check_and_send_notifs(client) -> None:
+class NotificationType(Enum):
+    """Represents each type of notification."""
+
+    all = 0
+    schedule = 1
+    launch = 2
+
+
+async def _check_and_send_notificationss(client) -> None:
     """Checks what notification messages need to be sent, and sends them.
 
     Updates database values if they need updating.
@@ -78,5 +86,5 @@ async def notification_task(client) -> None:
     logging.info("Starting")
 
     while not client.is_closed():
-        await _check_and_send_notifs(client)
+        await _check_and_send_notificationss(client)
         await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)

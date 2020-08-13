@@ -8,7 +8,7 @@ from typing import Tuple, Set, Dict, Any, Union
 import discord
 
 from spacexlaunchbot.config import PICKLE_DUMP_LOCATION, API_TOKEN_DISCORD
-from spacexlaunchbot.consts import NotificationType
+from spacexlaunchbot.notifications import NotificationType
 from spacexlaunchbot.storage import DataStore
 
 
@@ -86,7 +86,7 @@ class OldDataStore:
         return len(self._subscribed_channels)
 
 
-class testClient(discord.Client):
+class TestClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -111,9 +111,9 @@ class testClient(discord.Client):
             print(f"with mentions {mentions}")
             newDs.add_subbed_channel(cid, NotificationType.all, mentions)
 
-        newDs.save()
+        newDs._save()
 
 
 print("Logging into discord")
-client = testClient()
+client = TestClient()
 client.run(API_TOKEN_DISCORD)

@@ -4,7 +4,6 @@ from typing import Dict, List
 import discord
 
 from . import config
-from .consts import Colour
 from .utils import md_link, utc_from_ts
 
 # superfluous-parens is erroneously picked sometimes when using :=?
@@ -21,8 +20,12 @@ ROCKET_ID_IMAGES = {
     "falcon1": f"{IMAGE_BASE_URL}/logo.jpg",
 }
 
-# Templates for embed fields
-PAYLOAD_INFO = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer: {}\nCustomer{}: {}"
+
+class Colour:
+    # pylint: disable=too-few-public-methods
+    red_error = discord.Color.from_rgb(255, 0, 0)
+    red_falcon = discord.Color.from_rgb(238, 15, 70)
+    # orange_info = Color.from_rgb(200, 74, 0)
 
 
 class EmbedWithFields(discord.Embed):
@@ -116,11 +119,12 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
         fields.append(["Core Info", core_info])
 
     # Add a field for each payload, with basic information
+    payload_info = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer: {}\nCustomer{}: {}"
     for payload in launch_info["rocket"]["second_stage"]["payloads"]:
         fields.append(
             [
                 f'Payload: {payload["payload_id"]}',
-                PAYLOAD_INFO.format(
+                payload_info.format(
                     payload["payload_type"],
                     payload["orbit"],
                     payload["payload_mass_kg"],

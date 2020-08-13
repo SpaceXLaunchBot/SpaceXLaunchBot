@@ -3,7 +3,7 @@ from typing import Callable, Dict
 from . import apis
 from . import config
 from . import embeds
-from .consts import NotificationType
+from .notifications import NotificationType
 
 
 def req_id_owner(func: Callable) -> Callable:
@@ -57,8 +57,10 @@ async def _add(**kwargs):
     except KeyError:
         return "Invalid notification type"
 
+    notif_mentions_str = " ".join(notif_mentions)
+
     if (
-        client.ds.add_subbed_channel(message.channel.id, notif_type, notif_mentions)
+        client.ds.add_subbed_channel(message.channel.id, notif_type, notif_mentions_str)
         is False
     ):
         return "This channel is already subscribed to the notification service"
