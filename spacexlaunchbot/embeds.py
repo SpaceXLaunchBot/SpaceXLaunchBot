@@ -223,7 +223,6 @@ def create_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Em
     )
 
 
-# TODO: Update with new commands from readme.
 HELP_EMBED = EmbedWithFields(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: `{config.BOT_COMMAND_PREFIX}`",

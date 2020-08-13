@@ -40,6 +40,7 @@ def req_perm_admin(func: Callable) -> Callable:
 
 
 async def _next_launch(**kwargs):
+    # TODO: Allow user to request specific launch number.
     next_launch_dict = await apis.spacex.get_launch_dict()
     if next_launch_dict == {}:
         return embeds.API_ERROR_EMBED
