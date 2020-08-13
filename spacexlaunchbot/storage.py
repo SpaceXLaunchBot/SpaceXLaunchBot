@@ -28,8 +28,7 @@ class DataStore:
     def __init__(self, pickle_file_path: str):
         self._pickle_file_path = pickle_file_path
 
-        # Map of {subscribed channel id: {channel options}}.
-        # Supported channel options are currently "type" and "mentions".
+        # Map of {subscribed channel id: SubscriptionOptions}.
         self._subscribed_channels: Dict[int, SubscriptionOptions] = {}
         # Boolean indicating if a launch notification has been sent for the current
         # schedule.
