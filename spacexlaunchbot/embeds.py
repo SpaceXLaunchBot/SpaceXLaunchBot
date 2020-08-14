@@ -195,12 +195,15 @@ def create_launch_embed(launch_info: Dict) -> discord.Embed:
     return launch_embed
 
 
-def create_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Embed:
+def create_info_embed(
+    guild_count: int, subbed_channel_count: int, latency_ms: float
+) -> discord.Embed:
     """Creates an info embed.
 
     Args:
         guild_count: The number of guilds the bot is currently a member of.
         subbed_channel_count: The number of currently subscribed channels.
+        latency_s: The latency to Discord in ms.
 
     Returns:
         A discord.Embed object.
@@ -214,6 +217,7 @@ def create_info_embed(guild_count: int, subbed_channel_count: int) -> discord.Em
         fields=[
             ["Guild Count", f"{guild_count}"],
             ["Subscribed Channel Count", f"{subbed_channel_count}"],
+            ["Latency to Discord", f"{latency_ms}ms"],
             [
                 "Links",
                 f'{md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',

@@ -47,6 +47,7 @@ async def _check_and_send_notifications(client) -> None:
     )
 
     if diff_str != "":
+        logging.info(f"Sending notifications for launch schedule, diff: {diff_str}")
         schedule_embed.set_footer(text=diff_str)
         await client.send_notification(schedule_embed, NotificationType.schedule)
         launch_embed_for_current_schedule_sent = False
@@ -72,6 +73,7 @@ async def _check_and_send_notifications(client) -> None:
         and launch_embed_for_current_schedule_sent is False
         and next_launch_dict.get("tentative_max_precision", "") == "hour"
     ):
+        logging.info(f"Sending notifications for launch @ timestamp {launch_timestamp}")
         launch_embed_for_current_schedule_sent = True
         launch_embed = embeds.create_launch_embed(next_launch_dict)
         await client.send_notification(launch_embed, NotificationType.launch)

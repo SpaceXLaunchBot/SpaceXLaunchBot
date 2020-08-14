@@ -104,5 +104,6 @@ class DataStore:
             return True
         return False
 
+    @property
     def subbed_channels_count(self) -> int:
         return len(self._subscribed_channels)

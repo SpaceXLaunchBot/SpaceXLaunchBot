@@ -1,3 +1,4 @@
+import logging
 from typing import Callable, Dict
 
 from . import apis
@@ -52,14 +53,16 @@ async def _next_launch(**kwargs):
 
 async def _launch(**kwargs):
     operands = kwargs["operands"]
+
     try:
         launch_number = int(operands[0])
     except ValueError:
         return "Invalid launch number"
-    next_launch_dict = await apis.spacex.get_launch_dict(launch_number)
-    if next_launch_dict == {}:
+
+    launch_dict = await apis.spacex.get_launch_dict(launch_number)
+    if launch_dict == {}:
         return embeds.API_ERROR_EMBED
-    return embeds.create_schedule_embed(next_launch_dict)
+    return embeds.create_schedule_embed(launch_dict)
 
 
 @_req_perm_admin
@@ -79,6 +82,7 @@ async def _add(**kwargs):
         is False
     ):
         return "This channel is already subscribed to the notification service"
+    logging.info(f"{message.channel.id} subscribed to {notif_type_str}")
     return "This channel has been added to the notification service"
 
 
@@ -87,14 +91,16 @@ async def _remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
     if client.ds.remove_subbed_channel(message.channel.id) is False:
         return "This channel was not previously subscribed to the notification service"
+    logging.info(f"{message.channel.id} unsubscribed")
     return "This channel has been removed from the notification service"
 
 
 async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
-    sub_count = client.ds.subbed_channels_count()
-    return embeds.create_info_embed(guild_count, sub_count)
+    return embeds.create_info_embed(
+        guild_count, client.ds.subbed_channels_count, client.latency_ms
+    )
 
 
 async def _help(**kwargs):
@@ -103,10 +109,11 @@ async def _help(**kwargs):
 
 @_req_id_owner
 async def _debug_launch_embed(**kwargs):
-    """Send launching soon embed for the given launch.
-    """
+    """Send a launch notification embed for the given launch."""
+    operands = kwargs["operands"]
+
     try:
-        launch_number = int("".join(kwargs["operands"]))
+        launch_number = int(operands[0])
     except ValueError:
         return "Invalid launch number"
 
@@ -117,30 +124,10 @@ async def _debug_launch_embed(**kwargs):
 
 
 @_req_id_owner
-async def _debug_schedule_embed(**kwargs):
-    """Send schedule embed for the given launch.
-    """
-    try:
-        launch_number = int("".join(kwargs["operands"]))
-    except ValueError:
-        return "Invalid launch number"
-
-    launch_dict = await apis.spacex.get_launch_dict(launch_number)
-    if launch_dict == {}:
-        return "API returned {}"
-    return embeds.create_schedule_embed(launch_dict)
-
-
-@_req_id_owner
-async def _debug_subscribed_channels_dict(**kwargs):
-    client = kwargs["client"]
-    return str(client.ds.get_subbed_channels())
-
-
-@_req_id_owner
 async def _reset_notification_task_store(**kwargs):
     """Reset notification_task_store to default values (will trigger new notifications).
     """
+    logging.warn("reset notification task store command called")
     client = kwargs["client"]
     client.ds.set_notification_task_vars(False, {})
     return "Reset using `set_notification_task_vars(False, {})`"
@@ -148,6 +135,7 @@ async def _reset_notification_task_store(**kwargs):
 
 @_req_id_owner
 async def _shutdown(**kwargs):
+    logging.info("shutdown command called")
     client = kwargs["client"]
     await client.shutdown()
 
@@ -160,8 +148,6 @@ COMMAND_LOOKUP: Dict[str, Callable] = {
     "info": _info,
     "help": _help,
     "dl": _debug_launch_embed,
-    "ds": _debug_schedule_embed,
-    "dc": _debug_subscribed_channels_dict,
     "rn": _reset_notification_task_store,
     "shutdown": _shutdown,
 }

@@ -32,8 +32,24 @@ class SpaceXLaunchBotClient(discord.Client):
         self.loop.create_task(notification_task(self))
         discordhealthcheck.start(self)
 
+    @property
+    def latency_ms(self) -> int:
+        """Converts the latency property to an int representing the value in ms."""
+        return int(self.latency * 1000)
+
+    async def on_connect(self) -> None:
+        logging.info(f"Connected to Discord API with a latency of {self.latency_ms}ms")
+
+    async def on_disconnect(self) -> None:
+        logging.info("Disconnected from Discord API")
+
+    async def on_resumed(self) -> None:
+        logging.info(
+            f"Resumed connection to Discord API with a latency of {self.latency_ms}ms"
+        )
+
     async def on_ready(self) -> None:
-        logging.info("Connected to Discord API")
+        logging.info(f"Client ready")
         await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 
@@ -59,7 +75,7 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
         # Any subscribed channels from this guild will be removed later by
-        # send_notification_to_all_subscribed.
+        # send_notification.
 
     async def set_playing(self, title: str) -> None:
         await self.change_presence(activity=discord.Game(name=title))
