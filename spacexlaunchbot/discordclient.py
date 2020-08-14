@@ -49,7 +49,7 @@ class SpaceXLaunchBotClient(discord.Client):
         )
 
     async def on_ready(self) -> None:
-        logging.info(f"Client ready")
+        logging.info("Client ready")
         await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 

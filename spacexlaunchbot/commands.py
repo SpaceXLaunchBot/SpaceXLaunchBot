@@ -127,7 +127,7 @@ async def _debug_launch_embed(**kwargs):
 async def _reset_notification_task_store(**kwargs):
     """Reset notification_task_store to default values (will trigger new notifications).
     """
-    logging.warn("reset notification task store command called")
+    logging.warning("reset notification task store command called")
     client = kwargs["client"]
     client.ds.set_notification_task_vars(False, {})
     return "Reset using `set_notification_task_vars(False, {})`"
