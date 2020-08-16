@@ -93,18 +93,18 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
         A Discord.Embed object.
 
     """
-    launch_date_str = utc_from_ts(launch_info["launch_date_unix"])
+    launch_date_str = utc_from_ts(launch_info["date_unix"])
 
     fields = [
         [
             "Launch Vehicle",
-            f'{launch_info["rocket"]["rocket_name"]} {launch_info["rocket"]["rocket_type"]}',
+            f'{launch_info["rocket"]["name"]} {launch_info["rocket"]["type"]}',
         ],
         [
             "Launch Date (UTC)",
-            f'{launch_date_str}\nPrecision: {launch_info["tentative_max_precision"]}',
+            f'{launch_date_str}\nPrecision: {launch_info["date_precision"]}',
         ],
-        ["Launch Site", launch_info["launch_site"]["site_name_long"]],
+        ["Launch Site", launch_info["launchpad"]["full_name"]],
     ]
 
     for core_dict in launch_info["rocket"]["first_stage"]["cores"]:
@@ -169,7 +169,7 @@ def create_launch_embed(launch_info: Dict) -> discord.Embed:
 
     """
     embed_desc = ""
-    utc_launch_date = utc_from_ts(launch_info["launch_date_unix"])
+    launch_date_str = utc_from_ts(launch_info["date_unix"])
 
     if (video_url := launch_info["links"]["video_link"]) is not None:
         embed_desc += md_link("Livestream", video_url) + "\n"
@@ -184,7 +184,7 @@ def create_launch_embed(launch_info: Dict) -> discord.Embed:
         title="{} is launching soon!".format(launch_info["mission_name"]),
         description=embed_desc,
         color=Colour.red_falcon,
-        fields=[["Launch date (UTC)", utc_launch_date]],
+        fields=[["Launch date (UTC)", launch_date_str]],
     )
 
     if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:

@@ -15,16 +15,31 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
     If launch_number <= 0 (the default), get the "next" launch.
     """
 
-    route = launch_number if launch_number > 0 else "next"
-    spacex_api_url = f"https://api.spacexdata.com/v3/launches/{route}"
+    body = {
+        "query": {"flight_number": launch_number},
+        "options": {
+            "limit": 1,
+            "sort": {"flight_number": "asc"},
+            "populate": ["payloads", "rocket", "launchpad"],
+        },
+    }
+
+    if launch_number <= 0:
+        # Search for the next upcoming launch instead.
+        del body["query"]["flight_number"]
+        body["query"]["upcoming"] = True
+
+    spacex_api_url = f"https://api.spacexdata.com/v4/launches/query"
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(spacex_api_url) as response:
+            async with session.post(spacex_api_url, json=body) as response:
                 if response.status != 200:
                     logging.error(f"Failed with response status: {response.status}")
                     return {}
-                return await response.json()
+                # Query endpoints return Mongo query responses.
+                # Limit is set to 1 and it's pretty much guaranteed there will be data.
+                return (await response.json())["docs"][0]
 
     except aiohttp.client_exceptions.ClientConnectorError:
         logging.error("Cannot connect to api.spacexdata.com")

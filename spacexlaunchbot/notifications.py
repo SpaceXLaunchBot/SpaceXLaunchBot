@@ -57,7 +57,7 @@ async def _check_and_send_notifications(client) -> None:
     #
 
     try:
-        launch_timestamp = int(next_launch_dict["launch_date_unix"])
+        launch_timestamp = int(next_launch_dict["date_unix"])
     except ValueError:
         # Doesn't have a date, don't trigger notifications
         launch_timestamp = 0
@@ -71,7 +71,7 @@ async def _check_and_send_notifications(client) -> None:
     if (
         current_time_plus_delta >= launch_timestamp >= current_time.timestamp()
         and launch_embed_for_current_schedule_sent is False
-        and next_launch_dict.get("tentative_max_precision", "") == "hour"
+        and next_launch_dict.get("date_precision", "") == "hour"
     ):
         logging.info(f"Sending notifications for launch @ timestamp {launch_timestamp}")
         launch_embed_for_current_schedule_sent = True
