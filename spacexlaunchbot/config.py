@@ -25,6 +25,12 @@ INSIDE_DOCKER = bool(os.environ.get("INSIDE_DOCKER", False))
 DOCKER_VOLUME_PATH = "/docker-volume/"
 
 #
+# Storage
+#
+
+PICKLE_DUMP_LOCATION = DOCKER_VOLUME_PATH + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
+
+#
 # API
 #
 
@@ -60,12 +66,6 @@ BOT_LIST_DATA = [
 
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(module)s | %(funcName)s | %(message)s"
 LOG_LEVEL = logging.INFO
-
-#
-# Storage
-#
-
-PICKLE_DUMP_LOCATION = DOCKER_VOLUME_PATH + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
 
 #
 # Notifications

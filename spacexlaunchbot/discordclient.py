@@ -54,12 +54,11 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.update_website_metrics()
 
     async def shutdown(self) -> None:
-        """Saves data to disk, cancels asyncio tasks, and disconnects from Discord"""
+        """Disconnects from Discord and cancels asyncio tasks"""
         logging.info("Shutting down")
-        self.ds.save()
+        await self.close()
         for task in asyncio.Task.all_tasks():
             task.cancel()
-        await self.close()
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""

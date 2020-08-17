@@ -1,14 +1,16 @@
 # Everything that isn't actually relevant to running the bot.
 
-.git
-.github
-.mypy_cache
-.pytest_cache
+# Any .dir or .file
+.*
+
+# Dirs
+__pycache__
+**/__pycache__
 images
 tests
 
-.dockerignore
-.gitignore
+# Files
+*.pkl
 Dockerfile
 LICENSE
 requirements-dev.txt
