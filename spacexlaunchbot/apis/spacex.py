@@ -15,8 +15,9 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
     If launch_number <= 0 (the default), get the "next" launch.
     """
 
-    body = {
-        "query": {"flight_number": launch_number},
+    # mypy complains unless we tell it that the values are dicts.
+    body: Dict[str, Dict] = {
+        "query": {},
         "options": {
             "limit": 1,
             "sort": {"flight_number": "asc"},
@@ -36,11 +37,11 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
     }
 
     if launch_number <= 0:
-        # Search for the next upcoming launch instead.
-        del body["query"]["flight_number"]
         body["query"]["upcoming"] = True
+    else:
+        body["query"]["flight_number"] = launch_number
 
-    spacex_api_url = f"https://api.spacexdata.com/v4/launches/query"
+    spacex_api_url = "https://api.spacexdata.com/v4/launches/query"
 
     try:
         async with aiohttp.ClientSession() as session:
