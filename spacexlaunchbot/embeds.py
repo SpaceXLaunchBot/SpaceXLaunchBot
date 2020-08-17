@@ -14,10 +14,10 @@ _IMAGE_BASE_URL = (
 )
 
 # A map of rocket id (in the API) to the image to represent it
-_ROCKET_ID_IMAGES = {
-    "falcon9": f"{_IMAGE_BASE_URL}/falcon_9.png",
-    "falconheavy": f"{_IMAGE_BASE_URL}/falcon_heavy.png",
-    "falcon1": f"{_IMAGE_BASE_URL}/logo.jpg",
+_ROCKET_NAME_IMAGES = {
+    "Falcon 9": f"{_IMAGE_BASE_URL}/falcon_9.png",
+    "Falcon Heavy": f"{_IMAGE_BASE_URL}/falcon_heavy.png",
+    "Falcon 1": f"{_IMAGE_BASE_URL}/logo.jpg",
 }
 
 
@@ -93,6 +93,8 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
         A Discord.Embed object.
 
     """
+    # TODO: The "launch" command can request a launch that won't have all the data and
+    #  currently will cause errors (e.g. NoneType TypeError as data does not exist).
     launch_date_str = utc_from_ts(launch_info["date_unix"])
 
     fields = [
@@ -107,29 +109,34 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
         ["Launch Site", launch_info["launchpad"]["full_name"]],
     ]
 
-    for core_dict in launch_info["rocket"]["first_stage"]["cores"]:
-        core_info = f'Serial: {core_dict["core_serial"]}\nFlight: {core_dict["flight"]}'
+    for core_dict in launch_info["cores"]:
+        core_info = (
+            f'Serial: {core_dict["core"]["serial"]}\nFlight: {core_dict["flight"]}'
+        )
 
-        if core_dict["landing_intent"] is False:
+        if core_dict["landing_attempt"] is False:
             core_info += "\nLanding: No"
         else:
             core_info += f'\nLanding: Yes\nLanding Type: {core_dict["landing_type"]}'
-            core_info += f'\nLanding Location: {core_dict["landing_vehicle"]}'
+
+        if core_dict["landpad"] is not None:
+            core_info += f'\nLanding Location: {core_dict["landpad"]["name"]}'
 
         fields.append(["Core Info", core_info])
 
     # Add a field for each payload, with basic information
-    payload_info = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer: {}\nCustomer{}: {}"
-    for payload in launch_info["rocket"]["second_stage"]["payloads"]:
+    payload_info = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer{}: {}\nCustomer{}: {}"
+    for payload in launch_info["payloads"]:
         fields.append(
             [
-                f'Payload: {payload["payload_id"]}',
+                f'Payload: {payload["name"]}',
                 payload_info.format(
-                    payload["payload_type"],
+                    payload["type"],
                     payload["orbit"],
-                    payload["payload_mass_kg"],
-                    payload["manufacturer"],
-                    "(s)" if len(payload["customers"]) > 1 else "",
+                    payload["mass_kg"],
+                    "s" if len(payload["manufacturers"]) > 1 else "",
+                    ", ".join(payload["manufacturers"]),
+                    "s" if len(payload["customers"]) > 1 else "",
                     ", ".join(payload["customers"]),
                 ),
             ]
@@ -138,21 +145,21 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
     schedule_embed = EmbedWithFields(
         color=Colour.red_falcon,
         description=launch_info["details"] or "",
-        title=f'Launch #{launch_info["flight_number"]} - {launch_info["mission_name"]}',
+        title=f'Launch #{launch_info["flight_number"]} - {launch_info["name"]}',
         fields=fields,
     )
 
-    if (reddit_url := launch_info["links"]["reddit_campaign"]) is not None:
-        schedule_embed.description += (
+    if (reddit_url := launch_info["links"]["reddit"]["campaign"]) is not None:
+        schedule_embed.description += "\n" + (
             f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
         )
 
-    if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
+    if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
         schedule_embed.set_thumbnail(url=patch_url)
-    elif (rocket_id := launch_info["rocket"]["rocket_id"]) in _ROCKET_ID_IMAGES:
-        schedule_embed.set_thumbnail(url=_ROCKET_ID_IMAGES[rocket_id])
+    elif (rocket_id := launch_info["rocket"]["name"]) in _ROCKET_NAME_IMAGES:
+        schedule_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
-    if flickr_urls := launch_info["links"]["flickr_images"]:
+    if flickr_urls := launch_info["links"]["flickr"]["original"]:
         schedule_embed.set_image(url=random.choice(flickr_urls))  # nosec
 
     return schedule_embed
@@ -171,26 +178,26 @@ def create_launch_embed(launch_info: Dict) -> discord.Embed:
     embed_desc = ""
     launch_date_str = utc_from_ts(launch_info["date_unix"])
 
-    if (video_url := launch_info["links"]["video_link"]) is not None:
+    if (video_url := launch_info["links"]["webcast"]) is not None:
         embed_desc += md_link("Livestream", video_url) + "\n"
 
-    if (reddit_url := launch_info["links"]["reddit_launch"]) is not None:
+    if (reddit_url := launch_info["links"]["reddit"]["launch"]) is not None:
         embed_desc += md_link("r/SpaceX Launch Thread", reddit_url) + "\n"
 
     if (press_kit_url := launch_info["links"]["presskit"]) is not None:
         embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
     launch_embed = EmbedWithFields(
-        title="{} is launching soon!".format(launch_info["mission_name"]),
+        title="{} is launching soon!".format(launch_info["name"]),
         description=embed_desc,
         color=Colour.red_falcon,
         fields=[["Launch date (UTC)", launch_date_str]],
     )
 
-    if (patch_url := launch_info["links"]["mission_patch_small"]) is not None:
+    if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
         launch_embed.set_thumbnail(url=patch_url)
-    elif (rocket_id := launch_info["rocket"]["rocket_id"]) in _ROCKET_ID_IMAGES:
-        launch_embed.set_thumbnail(url=_ROCKET_ID_IMAGES[rocket_id])
+    elif (rocket_id := launch_info["rocket"]["name"]) in _ROCKET_NAME_IMAGES:
+        launch_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
     return launch_embed
 
@@ -203,7 +210,7 @@ def create_info_embed(
     Args:
         guild_count: The number of guilds the bot is currently a member of.
         subbed_channel_count: The number of currently subscribed channels.
-        latency_s: The latency to Discord in ms.
+        latency_ms: The latency to Discord in ms.
 
     Returns:
         A discord.Embed object.
@@ -256,7 +263,7 @@ def diff_schedule_embed_dicts(old_embed: Dict, new_embed: Dict) -> str:
     # This detects all field changes except if old_embed has a field that new_embed
     # does not (e.g. a payload was removed). Not going to worry about this for now as
     # it's unlikely to happen.
-    # TODO: ^
+    # TODO: Detect field removals.
     for field in new_embed.get("fields", []):
         name = field["name"]
         if name in old_embed_fields:

@@ -20,7 +20,18 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
         "options": {
             "limit": 1,
             "sort": {"flight_number": "asc"},
-            "populate": ["payloads", "rocket", "launchpad"],
+            "populate": [
+                "payloads",
+                "rocket",
+                "launchpad",
+                {
+                    "path": "cores",
+                    "populate": [
+                        {"path": "landpad", "select": "name"},
+                        {"path": "core", "select": "serial"},
+                    ],
+                },
+            ],
         },
     }
 
