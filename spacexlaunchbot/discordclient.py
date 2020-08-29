@@ -79,7 +79,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def set_playing(self, title: str) -> None:
         await self.change_presence(activity=discord.Game(name=title))
 
-    async def on_message(self, message: discord.message) -> None:
+    async def on_message(self, message: discord.Message) -> None:
         if message.author.bot or not message.guild:
             return
 

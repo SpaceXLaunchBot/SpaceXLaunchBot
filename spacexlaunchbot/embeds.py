@@ -110,9 +110,12 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
     ]
 
     for core_dict in launch_info["cores"]:
-        core_info = (
-            f'Serial: {core_dict["core"]["serial"]}\nFlight: {core_dict["flight"]}'
-        )
+        core_info = ""
+
+        if core_dict["core"] is not None:
+            core_info += f'Serial: {core_dict["core"]["serial"]}\n'
+
+        core_info += f'Flight: {core_dict["flight"]}'
 
         if core_dict["landing_attempt"] is False:
             core_info += "\nLanding: No"
