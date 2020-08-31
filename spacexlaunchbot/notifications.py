@@ -87,8 +87,8 @@ async def _check_and_send_notifications(client) -> None:
     )
 
 
-async def notification_task(client) -> None:
-    """An async task to send out launching soon & launch info notifications."""
+async def start_notification_loop(client) -> None:
+    """A loop that sends out launching soon & launch info notifications."""
     logging.info("Waiting for client ready")
     await client.wait_until_ready()
     logging.info("Starting")

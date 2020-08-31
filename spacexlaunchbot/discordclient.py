@@ -12,7 +12,7 @@ from . import commands
 from . import config
 from . import embeds
 from . import storage
-from .notifications import notification_task, NotificationType
+from .notifications import start_notification_loop, NotificationType
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -23,14 +23,12 @@ class SpaceXLaunchBotClient(discord.Client):
         self.ds = storage.DataStore(config.PICKLE_DUMP_LOCATION)
         logging.info("Data storage initialised")
 
-        if platform.system() == "Linux":
-            self.loop.add_signal_handler(
-                signal.SIGTERM, lambda: self.loop.create_task(self.shutdown())
-            )
-            logging.info("Signal handler for SIGTERM registered")
+        # TODO: Handle docker stop event gracefully.
 
-        self.loop.create_task(notification_task(self))
+        self.notification_task = self.loop.create_task(start_notification_loop(self))
+        # TODO: start should return the Task obj.
         discordhealthcheck.start(self)
+        # self.healthcheck_task = discordhealthcheck.start(self)
 
     @property
     def latency_ms(self) -> int:
@@ -55,10 +53,12 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def shutdown(self) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
-        logging.info("Shutting down")
+        logging.info("Cancelling notification_task")
+        self.notification_task.cancel()
+        logging.info("Calling self.close")
+        # Currently this is known to cause a RuntimeError on Windows:
+        # https://github.com/Rapptz/discord.py/issues/5209
         await self.close()
-        for task in asyncio.Task.all_tasks():
-            task.cancel()
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
