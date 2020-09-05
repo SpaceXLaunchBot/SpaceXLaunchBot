@@ -20,7 +20,13 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info("Client initialised")
 
         if platform.system() != "Windows":
-            signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+            signals = (
+                signal.SIGHUP,
+                signal.SIGTERM,
+                signal.SIGINT,
+                signal.SIGKILL,
+                signal.SIGQUIT,
+            )
             logging.info("Not on Windows, registering signal handlers")
             for s in signals:
                 self.loop.add_signal_handler(
