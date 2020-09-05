@@ -15,6 +15,10 @@ from .notifications import start_notification_loop, NotificationType
 
 
 class SpaceXLaunchBotClient(discord.Client):
+    # The signals package is a bit iffy when it comes to pylint.
+    # See https://github.com/PyCQA/pylint/issues/2804
+    # pylint: disable=no-member
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
@@ -64,7 +68,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def shutdown(self, sig: signal.Signals = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
-        if signal is not None:
+        if sig is not None:
             logging.info(f"Shutdown due to signal: {sig.name}")
 
         logging.info("Cancelling notification_task")
