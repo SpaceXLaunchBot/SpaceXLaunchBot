@@ -94,5 +94,12 @@ async def start_notification_loop(client) -> None:
     logging.info("Starting")
 
     while not client.is_closed():
-        await _check_and_send_notifications(client)
-        await asyncio.sleep(_ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+        try:
+            await _check_and_send_notifications(client)
+            await asyncio.sleep(_ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+        except asyncio.CancelledError:
+            logging.info("Cancelled, stopping")
+            break
+
+    logging.info("Notification loop finished, saving data")
+    client.ds.save()

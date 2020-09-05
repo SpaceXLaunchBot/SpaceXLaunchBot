@@ -50,8 +50,11 @@ class SpaceXLaunchBotClient(discord.Client):
         """Disconnects from Discord and cancels asyncio tasks"""
         logging.info("Cancelling notification_task")
         self.notification_task.cancel()
+
         logging.info("Closing healthcheck server")
         self.healthcheck_server.close()
+        await self.healthcheck_server.wait_closed()
+
         logging.info("Calling self.close")
         # Currently this is known to cause a RuntimeError on Windows:
         # https://github.com/Rapptz/discord.py/issues/5209
