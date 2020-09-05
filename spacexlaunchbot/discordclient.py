@@ -39,8 +39,6 @@ class SpaceXLaunchBotClient(discord.Client):
         self.ds = storage.DataStore(config.PICKLE_DUMP_LOCATION)
         logging.info("Data storage initialised")
 
-        # TODO: Handle docker stop event gracefully.
-
         self.notification_task = self.loop.create_task(start_notification_loop(self))
         self.healthcheck_server = discordhealthcheck.start(self)
 
