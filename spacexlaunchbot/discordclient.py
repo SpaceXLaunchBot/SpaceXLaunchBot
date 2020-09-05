@@ -28,7 +28,6 @@ class SpaceXLaunchBotClient(discord.Client):
                 signal.SIGHUP,
                 signal.SIGTERM,
                 signal.SIGINT,
-                signal.SIGKILL,
                 signal.SIGQUIT,
             )
             logging.info("Not on Windows, registering signal handlers")
