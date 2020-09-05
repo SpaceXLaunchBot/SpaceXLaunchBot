@@ -23,7 +23,7 @@ class SpaceXLaunchBotClient(discord.Client):
         # TODO: Handle docker stop event gracefully.
 
         self.notification_task = self.loop.create_task(start_notification_loop(self))
-        self.healthcheck_task = discordhealthcheck.start(self)
+        self.healthcheck_server = discordhealthcheck.start(self)
 
     @property
     def latency_ms(self) -> int:
@@ -50,8 +50,8 @@ class SpaceXLaunchBotClient(discord.Client):
         """Disconnects from Discord and cancels asyncio tasks"""
         logging.info("Cancelling notification_task")
         self.notification_task.cancel()
-        logging.info("Cancelling healthcheck_task")
-        self.healthcheck_task.cancel()
+        logging.info("Closing healthcheck server")
+        self.healthcheck_server.close()
         logging.info("Calling self.close")
         # Currently this is known to cause a RuntimeError on Windows:
         # https://github.com/Rapptz/discord.py/issues/5209
