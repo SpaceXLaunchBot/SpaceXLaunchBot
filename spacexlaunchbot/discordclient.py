@@ -1,4 +1,6 @@
 import logging
+import platform
+import signal
 from typing import Union
 
 import discord
@@ -16,6 +18,14 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
+
+        if platform.system() != "Windows":
+            signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+            logging.info("Not on Windows, registering signal handlers")
+            for s in signals:
+                self.loop.add_signal_handler(
+                    s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
+                )
 
         self.ds = storage.DataStore(config.PICKLE_DUMP_LOCATION)
         logging.info("Data storage initialised")
@@ -46,8 +56,11 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 
-    async def shutdown(self) -> None:
+    async def shutdown(self, sig: signal.Signals = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
+        if signal is not None:
+            logging.info(f"Shutdown due to signal: {sig.name}")
+
         logging.info("Cancelling notification_task")
         self.notification_task.cancel()
 
