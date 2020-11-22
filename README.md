@@ -1,14 +1,11 @@
 <h1 align="center" style="font-weight: bold">SpaceX Launch Bot</h1>
 
 <p align="center">
-    <a href="https://discordbots.org/bot/411618411169447950" >
-        <img src="https://discordbots.org/api/widget/status/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot status" />
+    <a href="https://top.gg/bot/411618411169447950" >
+        <img src="https://top.gg/api/widget/servers/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot server count" />
     </a>
-    <a href="https://discordbots.org/bot/411618411169447950" >
-        <img src="https://discordbots.org/api/widget/servers/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot server count" />
-    </a>
-    <a href="https://discordbots.org/bot/411618411169447950" >
-        <img src="https://discordbots.org/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
+    <a href="https://top.gg/bot/411618411169447950" >
+        <img src="https://top.gg/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
     <a href="https://github.com/r-spacex/SpaceXLaunchBot/actions">

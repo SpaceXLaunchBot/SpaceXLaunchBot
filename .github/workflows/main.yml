@@ -2,8 +2,14 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+    paths:
+      - '**.py'
+      - 'requirements.txt'
+      - 'requirements-dev.txt'
+      - 'Dockerfile'
+      - 'setup.cfg'
+      - '.github/workflows/*.yml'
 
 jobs:
  build:
