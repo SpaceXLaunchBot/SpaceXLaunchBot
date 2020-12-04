@@ -36,14 +36,14 @@ class SpaceXLaunchBotClient(discord.Client):
                     s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
                 )
 
-        # TODO: Move DB params to config.
         self.ds = storage.DataStore(
             self.loop,
             config.PICKLE_DUMP_LOCATION,
-            user="slbsite",
-            password="slbsite",
-            host="localhost",
-            database="spacexlaunchbotsite",
+            user=config.DB_USER,
+            password=config.DB_PASS,
+            host=config.DB_HOST,
+            port=config.DB_PORT,
+            database=config.DB_NAME,
         )
         logging.info("Data storage initialised")
 

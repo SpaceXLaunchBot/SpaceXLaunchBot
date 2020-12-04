@@ -29,6 +29,11 @@ DOCKER_VOLUME_PATH = "/docker-volume/"
 #
 
 PICKLE_DUMP_LOCATION = DOCKER_VOLUME_PATH + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
+DB_USER = os.environ.get("SLB_DB_USER", "slb")
+DB_PASS = os.environ["SLB_DB_PASS"]
+DB_HOST = os.environ.get("SLB_DB_HOST", "localhost")
+DB_PORT = int(os.environ.get("SLB_DB_PORT", 5432))
+DB_NAME = os.environ.get("SLB_DB_NAME", "spacexlaunchbot")
 
 #
 # API
