@@ -77,10 +77,14 @@ async def _add(**kwargs):
 
     notif_mentions_str = " ".join(notif_mentions)
 
-    if (
-        client.ds.add_subbed_channel(message.channel.id, notif_type, notif_mentions_str)
-        is False
-    ):
+    added = await client.ds.add_subbed_channel(
+        str(message.channel.id),
+        message.channel.name,
+        str(message.guild.id),
+        notif_type,
+        notif_mentions_str,
+    )
+    if added is False:
         return "This channel is already subscribed to the notification service"
     logging.info(f"{message.channel.id} subscribed to {notif_type_str}")
     return "This channel has been added to the notification service"
@@ -89,7 +93,8 @@ async def _add(**kwargs):
 @_req_perm_admin
 async def _remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
-    if client.ds.remove_subbed_channel(message.channel.id) is False:
+    cid = str(message.channel.id)
+    if await client.ds.remove_subbed_channel(cid) is False:
         return "This channel was not previously subscribed to the notification service"
     logging.info(f"{message.channel.id} unsubscribed")
     return "This channel has been removed from the notification service"
@@ -98,9 +103,8 @@ async def _remove(**kwargs):
 async def _info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
-    return embeds.create_info_embed(
-        guild_count, client.ds.subbed_channels_count, client.latency_ms
-    )
+    channel_count = await client.ds.subbed_channels_count()
+    return embeds.create_info_embed(guild_count, channel_count, client.latency_ms)
 
 
 async def _help(**kwargs):

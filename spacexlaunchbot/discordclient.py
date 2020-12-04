@@ -36,7 +36,15 @@ class SpaceXLaunchBotClient(discord.Client):
                     s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
                 )
 
-        self.ds = storage.DataStore(config.PICKLE_DUMP_LOCATION)
+        # TODO: Move DB params to config.
+        self.ds = storage.DataStore(
+            self.loop,
+            config.PICKLE_DUMP_LOCATION,
+            user="slbsite",
+            password="slbsite",
+            host="localhost",
+            database="spacexlaunchbotsite",
+        )
         logging.info("Data storage initialised")
 
         self.notification_task = self.loop.create_task(start_notification_loop(self))
@@ -165,7 +173,7 @@ class SpaceXLaunchBotClient(discord.Client):
             notification_type: The type of notification being sent.
 
         """
-        channel_ids = self.ds.get_subbed_channels()
+        channel_ids = await self.ds.get_subbed_channels()
         invalid_ids = set()
 
         for channel_id in channel_ids:
@@ -190,4 +198,4 @@ class SpaceXLaunchBotClient(discord.Client):
                     await self._send_s(channel, mentions)
 
         for channel_id in invalid_ids:
-            self.ds.remove_subbed_channel(channel_id)
+            await self.ds.remove_subbed_channel(str(channel_id))

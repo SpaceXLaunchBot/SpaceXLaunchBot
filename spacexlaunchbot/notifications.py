@@ -102,4 +102,4 @@ async def start_notification_loop(client) -> None:
             break
 
     logging.info("Notification loop finished, saving data")
-    client.ds.save()
+    client.ds.save_state()
