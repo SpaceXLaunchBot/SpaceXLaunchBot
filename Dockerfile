@@ -14,8 +14,3 @@ ENTRYPOINT ["/tini", "--"]
 
 HEALTHCHECK CMD discordhealthcheck || exit 1
 CMD ["spacexlaunchbot"]
-
-# docker run -d --name spacexlaunchbot \
-#     -v /path/to/dir:/docker-volume \
-#     --env-file /path/to/variables.env \
-#     psidex/spacexlaunchbot
