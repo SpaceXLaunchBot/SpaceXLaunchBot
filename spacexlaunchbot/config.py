@@ -30,6 +30,13 @@ DOCKER_VOLUME_PATH = "/docker-volume/"
 
 PICKLE_DUMP_LOCATION = DOCKER_VOLUME_PATH + "slb.pkl" if INSIDE_DOCKER else "./slb.pkl"
 
+DB_HOST = os.environ.get("SLB_DB_HOST", "localhost")
+DB_PORT = int(os.environ.get("SLB_DB_PORT", 5432))
+
+DB_USER = os.environ.get("POSTGRES_USER", "slb")
+DB_PASS = os.environ["POSTGRES_PASSWORD"]
+DB_NAME = os.environ.get("POSTGRES_DB", "spacexlaunchbot")
+
 #
 # API
 #
