@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import pickle
+import pickle  # nosec
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Tuple, Dict
@@ -133,10 +133,12 @@ class DataStore:
         sql = "select * from subscribed_channels;"
         async with self.db_pool.acquire() as conn:
             records = await conn.fetch(sql)
-        for r in records:
-            cid = int(r["channel_id"])
-            notif_type = r["notification_type"]
-            mentions = r["launch_mentions"] if r["launch_mentions"] is not None else ""
+        for rec in records:
+            cid = int(rec["channel_id"])
+            notif_type = rec["notification_type"]
+            mentions = (
+                rec["launch_mentions"] if rec["launch_mentions"] is not None else ""
+            )
             channels[cid] = SubscriptionOptions(NotificationType[notif_type], mentions)
         return channels
 
