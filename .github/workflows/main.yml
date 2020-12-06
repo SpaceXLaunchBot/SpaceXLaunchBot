@@ -45,6 +45,7 @@ jobs:
       - name: Tests
         run: pytest
         env:
+          POSTGRES_PASSWORD: for-testing
           SLB_API_TOKEN_DISCORD: for-testing
           SLB_API_TOKEN_BOT_LIST_DBL: for-testing
           SLB_API_TOKEN_BOT_LIST_BOD: for-testing
