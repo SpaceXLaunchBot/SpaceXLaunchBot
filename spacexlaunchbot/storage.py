@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import pickle  # nosec
+import pickle
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Tuple, Dict
@@ -50,7 +50,7 @@ class DataStore:
 
         try:
             with open(self._pickle_file_path, "rb") as f_in:
-                tmp = pickle.load(f_in)  # nosec
+                tmp = pickle.load(f_in)
             self.__dict__.update(tmp)
             logging.info(f"Updated self.__dict__ from {self._pickle_file_path}")
         except FileNotFoundError:

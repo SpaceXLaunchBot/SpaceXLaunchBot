@@ -163,7 +163,7 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
         schedule_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
     if flickr_urls := launch_info["links"]["flickr"]["original"]:
-        schedule_embed.set_image(url=random.choice(flickr_urls))  # nosec
+        schedule_embed.set_image(url=random.choice(flickr_urls))
 
     return schedule_embed
 
