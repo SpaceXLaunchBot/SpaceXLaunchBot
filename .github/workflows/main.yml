@@ -36,9 +36,6 @@ jobs:
       - name: Type analysis (MyPy)
         run: mypy ./spacexlaunchbot
 
-      - name: Security analysis (Bandit)
-        run: bandit -r ./spacexlaunchbot
-
       - name: Unused code detection (Vulture)
         run: vulture --ignore-names on_* ./spacexlaunchbot
 
