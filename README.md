@@ -21,7 +21,7 @@
         <img src="https://img.shields.io/badge/Donate-Coffee-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
     </a>
     <a href="https://en.cryptobadges.io/donate/0x54A8Fe0C28B9DD4940266A78d70f11B621735A97">
-        <img src="https://img.shields.io/badge/Donate-ETH-5965a2.svg?style=flat&colorA=35383d" alt="Ethereum donate link"/>
+        <img src="https://img.shields.io/badge/Donate-Ether-5965a2.svg?style=flat&colorA=35383d" alt="Ethereum donate link"/>
     </a>
     <a href="https://github.com/psf/black">
         <img src="https://img.shields.io/badge/Code%20Style-Black-000000.svg?colorA=35383d" alt="Black code formatter"/>
