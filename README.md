@@ -20,7 +20,7 @@
     <a href="https://ko-fi.com/M4M18XB1">
         <img src="https://img.shields.io/badge/Donate-Coffee-orange.svg?style=flat&colorA=35383d" alt="Ko-fi donate link"/>
     </a>
-    <a href="https://en.cryptobadges.io/donate/0x54A8Fe0C28B9DD4940266A78d70f11B621735A97">
+    <a href="https://etherscan.io/address/0x54A8Fe0C28B9DD4940266A78d70f11B621735A97">
         <img src="https://img.shields.io/badge/Donate-Ether-5965a2.svg?style=flat&colorA=35383d" alt="Ethereum donate link"/>
     </a>
     <a href="https://github.com/psf/black">
