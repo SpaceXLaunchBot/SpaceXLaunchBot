@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import platform
 import signal
@@ -12,6 +13,7 @@ from . import config
 from . import embeds
 from . import storage
 from .notifications import start_notification_loop, NotificationType
+from .utils import disconnected_logger
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -50,6 +52,8 @@ class SpaceXLaunchBotClient(discord.Client):
         self.notification_task = self.loop.create_task(start_notification_loop(self))
         self.healthcheck_server = discordhealthcheck.start(self)
 
+        self.dc_logger: Union[asyncio.Task, None] = None
+
     @property
     def latency_ms(self) -> int:
         """Converts the latency property to an int representing the value in ms."""
@@ -59,9 +63,18 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(f"Connected to Discord API with a latency of {self.latency_ms}ms")
 
     async def on_disconnect(self) -> None:
-        logging.info("Disconnected from Discord API")
+        # Wait 2 seconds, if we don't reconnect, log it.
+        self.dc_logger = self.loop.create_task(disconnected_logger())
 
     async def on_resumed(self) -> None:
+        if self.dc_logger is None:
+            return  # Hmm
+
+        if not self.dc_logger.done():
+            # We're within the 2 seconds, cancel it and log nothing
+            self.dc_logger.cancel()
+            return
+
         logging.info(
             f"Resumed connection to Discord API with a latency of {self.latency_ms}ms"
         )

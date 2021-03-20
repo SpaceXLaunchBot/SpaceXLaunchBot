@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 from typing import Union
@@ -30,3 +31,15 @@ def setup_logging() -> None:
 def md_link(name: str, url: str) -> str:
     """Makes strings easier to read when defining markdown links."""
     return f"[{name}]({url})"
+
+
+async def disconnected_logger() -> None:
+    """Sleep for 2 seconds then log a disconnect."""
+    # NOTE: The whole reason for this function is so that the reconnect method can
+    # cancel this function running as a task, this prevents the log filling up with
+    # reconnection logs.
+    try:
+        await asyncio.sleep(2)
+        logging.info("Disconnected from Discord API")
+    except asyncio.CancelledError:
+        pass
