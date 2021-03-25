@@ -6,11 +6,7 @@ COPY . .
 ENV INSIDE_DOCKER "True"
 RUN python setup.py install
 
-# https://github.com/krallin/tini#using-tini
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
-
 HEALTHCHECK CMD discordhealthcheck || exit 1
-CMD ["spacexlaunchbot"]
+
+# We use ENTRYPOINT so it will recieve signals (https://stackoverflow.com/a/64960372/6396652).
+ENTRYPOINT ["spacexlaunchbot"]

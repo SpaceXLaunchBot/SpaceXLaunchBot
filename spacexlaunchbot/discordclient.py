@@ -13,7 +13,6 @@ from . import config
 from . import embeds
 from . import storage
 from .notifications import start_notification_loop, NotificationType
-from .utils import disconnected_logger
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -64,7 +63,19 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_disconnect(self) -> None:
         # Wait 2 seconds, if we don't reconnect, log it.
-        self.dc_logger = self.loop.create_task(disconnected_logger())
+        self.dc_logger = self.loop.create_task(self.disconnected_logger())
+
+    @staticmethod
+    async def disconnected_logger() -> None:
+        """Sleep for 2 seconds then log a disconnect."""
+        # NOTE: The whole reason for this function is so that the on_resumed method can
+        # cancel this function running as a task, this prevents the log filling up with
+        # reconnection logs.
+        try:
+            await asyncio.sleep(2)
+            logging.info("Disconnected from Discord API")
+        except asyncio.CancelledError:
+            pass
 
     async def on_resumed(self) -> None:
         if self.dc_logger is None:
@@ -94,6 +105,8 @@ class SpaceXLaunchBotClient(discord.Client):
 
         logging.info("Closing healthcheck server")
         self.healthcheck_server.close()
+
+        await self.notification_task.wait_closed()
         await self.healthcheck_server.wait_closed()
 
         logging.info("Calling self.close")
