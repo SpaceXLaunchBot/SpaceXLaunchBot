@@ -97,16 +97,17 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def shutdown(self, sig: signal.Signals = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
+        logging.info("Shutdown called")
+
         if sig is not None:
             logging.info(f"Shutdown due to signal: {sig.name}")
 
         logging.info("Cancelling notification_task")
         self.notification_task.cancel()
+        await self.notification_task
 
         logging.info("Closing healthcheck server")
         self.healthcheck_server.close()
-
-        await self.notification_task.wait_closed()
         await self.healthcheck_server.wait_closed()
 
         logging.info("Calling self.close")
@@ -190,7 +191,9 @@ class SpaceXLaunchBotClient(discord.Client):
             logging.warning(f"HTTPException: {ex}")
 
     async def send_notification(
-        self, to_send: Union[str, discord.Embed], notification_type: NotificationType,
+        self,
+        to_send: Union[str, discord.Embed],
+        notification_type: NotificationType,
     ) -> None:
         """Send a notification message to all channels subscribed to the given type.
 
