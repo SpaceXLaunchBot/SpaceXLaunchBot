@@ -1,5 +1,7 @@
 import datetime
+import json
 import logging
+import platform
 from typing import Union
 
 from . import config
@@ -30,3 +32,15 @@ def setup_logging() -> None:
 def md_link(name: str, url: str) -> str:
     """Makes strings easier to read when defining markdown links."""
     return f"[{name}]({url})"
+
+
+def sys_info():
+    """Returns a JSON string of system information (useful for debugging)."""
+    return json.dumps(
+        {
+            "platform": platform.system(),
+            "platform-release": platform.release(),
+            "platform-version": platform.version(),
+            "architecture": platform.machine(),
+        }
+    )

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import platform
 import signal
+import sys
 from typing import Union
 
 import discord
@@ -13,6 +14,7 @@ from . import config
 from . import embeds
 from . import storage
 from .notifications import start_notification_loop, NotificationType
+from .utils import sys_info
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -23,6 +25,8 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
+        logging.info(f"Interpreter: {sys.version}")
+        logging.info(f"System: {sys_info()}")
 
         if platform.system() != "Windows":
             signals = (
@@ -33,6 +37,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             logging.info("Not on Windows, registering signal handlers")
             for s in signals:
+                # TODO: This does work on a normal script but not here for some reason?
                 self.loop.add_signal_handler(
                     s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
                 )
@@ -102,6 +107,11 @@ class SpaceXLaunchBotClient(discord.Client):
         if sig is not None:
             logging.info(f"Shutdown due to signal: {sig.name}")
 
+        logging.info("Calling self.close")
+        # Currently this is known to cause a RuntimeError on Windows:
+        # https://github.com/Rapptz/discord.py/issues/5209
+        await self.close()
+
         logging.info("Cancelling notification_task")
         self.notification_task.cancel()
         await self.notification_task
@@ -110,10 +120,8 @@ class SpaceXLaunchBotClient(discord.Client):
         self.healthcheck_server.close()
         await self.healthcheck_server.wait_closed()
 
-        logging.info("Calling self.close")
-        # Currently this is known to cause a RuntimeError on Windows:
-        # https://github.com/Rapptz/discord.py/issues/5209
-        await self.close()
+        logging.info("Goodbye")
+        self.loop.stop()
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
