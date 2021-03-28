@@ -2,7 +2,6 @@ import asyncio
 import logging
 import platform
 import signal
-import sys
 from typing import Union
 
 import discord
@@ -25,8 +24,7 @@ class SpaceXLaunchBotClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logging.info("Client initialised")
-        logging.info(f"Interpreter: {sys.version}")
-        logging.info(f"System: {sys_info()}")
+        logging.info(sys_info())
 
         if platform.system() != "Windows":
             signals = (

@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import platform
+import sys
 from typing import Union
 
 from . import config
@@ -38,6 +39,7 @@ def sys_info():
     """Returns a JSON string of system information (useful for debugging)."""
     return json.dumps(
         {
+            "interpreter": sys.version,
             "platform": platform.system(),
             "platform-release": platform.release(),
             "platform-version": platform.version(),
