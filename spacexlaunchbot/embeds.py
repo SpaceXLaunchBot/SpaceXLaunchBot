@@ -169,7 +169,7 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
 
 
 def create_launch_embed(launch_info: Dict) -> discord.Embed:
-    """Create a launc embed from a dict of launch information.
+    """Create a launch embed from a dict of launch information.
 
     Args:
         launch_info: A dictionary of launch information from apis.spacex.
@@ -259,9 +259,9 @@ def diff_schedule_embed_dicts(old_embed: Dict, new_embed: Dict) -> str:
         diffs += ["image"]
 
     # Dict of name:value for old_embed fields.
-    old_embed_fields = {}
-    for field in old_embed.get("fields", []):
-        old_embed_fields[field["name"]] = field["value"]
+    old_embed_fields = {
+        field["name"]: field["value"] for field in old_embed.get("fields", [])
+    }
 
     # This detects all field changes except if old_embed has a field that new_embed
     # does not (e.g. a payload was removed). Not going to worry about this for now as

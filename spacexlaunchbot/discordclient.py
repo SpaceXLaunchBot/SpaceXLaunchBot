@@ -208,10 +208,10 @@ class SpaceXLaunchBotClient(discord.Client):
         for channel_id in channel_ids:
             subscription_opts = channel_ids[channel_id]
 
-            if (
-                subscription_opts.notification_type != NotificationType.all
-                and subscription_opts.notification_type != notification_type
-            ):
+            if subscription_opts.notification_type not in [
+                NotificationType.all,
+                notification_type,
+            ]:
                 continue
 
             channel = self.get_channel(channel_id)
