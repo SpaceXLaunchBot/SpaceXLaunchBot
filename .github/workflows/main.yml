@@ -8,6 +8,7 @@ on:
       - 'requirements.txt'
       - 'requirements-dev.txt'
       - 'Dockerfile'
+      - '.dockerignore'
       - 'setup.cfg'
       - '.github/workflows/*.yml'
 
