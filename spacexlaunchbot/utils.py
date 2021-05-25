@@ -35,7 +35,7 @@ def md_link(name: str, url: str) -> str:
     return f"[{name}]({url})"
 
 
-def sys_info():
+def sys_info() -> str:
     """Returns a JSON string of system information (useful for debugging)."""
     return json.dumps(
         {

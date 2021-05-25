@@ -113,7 +113,7 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.healthcheck_server.wait_closed()
 
         logging.info("Goodbye")
-        await self.logout()
+        await self.close()
 
     async def update_website_metrics(self) -> None:
         """Update Discord bot websites with guild count"""
