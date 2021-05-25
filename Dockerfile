@@ -3,6 +3,8 @@ FROM python:3.9-slim-buster
 WORKDIR /SpaceXLaunchBot
 COPY . .
 
+RUN printf "HASH = \"$(cat ./.git/refs/heads/master)\"\nSHORT_HASH = \"$(head -c 7 ./.git/refs/heads/master)\"\n" > ./spacexlaunchbot/version.py
+
 ENV INSIDE_DOCKER "True"
 RUN python setup.py install
 

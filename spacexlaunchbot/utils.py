@@ -6,6 +6,7 @@ import sys
 from typing import Union
 
 from . import config
+from . import version
 
 
 def utc_from_ts(timestamp: Union[int, None]) -> str:
@@ -44,5 +45,6 @@ def sys_info() -> str:
             "platform-release": platform.release(),
             "platform-version": platform.version(),
             "architecture": platform.machine(),
+            "commit-hash": version.HASH,
         }
     )

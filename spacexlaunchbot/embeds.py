@@ -4,6 +4,7 @@ from typing import Dict, List
 import discord
 
 from . import config
+from . import version
 from .utils import md_link, utc_from_ts
 
 # superfluous-parens is erroneously found sometimes when using :=?
@@ -228,7 +229,7 @@ def create_info_embed(
             ["Guild Count", f"{guild_count}"],
             ["Subscribed Channel Count", f"{subbed_channel_count}"],
             ["Latency to Discord", f"{latency_ms}ms"],
-            [
+            ["Running on Commit", version.SHORT_HASH][
                 "Links",
                 f'{md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
             ],
