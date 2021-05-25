@@ -2,6 +2,7 @@
 
 # Any .dir or .file
 .*
+!.git/refs/heads/master
 
 # Dirs
 __pycache__
