@@ -220,7 +220,7 @@ def create_info_embed(
         A discord.Embed object.
 
     """
-    return EmbedWithFields(
+    embed = EmbedWithFields(
         title="SpaceXLaunchBot Information",
         color=Colour.red_falcon,
         description="A Discord bot for getting news, information, and notifications "
@@ -229,7 +229,6 @@ def create_info_embed(
             ["Guild Count", f"{guild_count}"],
             ["Subscribed Channel Count", f"{subbed_channel_count}"],
             ["Latency to Discord", f"{latency_ms}ms"],
-            ["Running on Commit", version.SHORT_HASH],
             [
                 "Links",
                 f'{md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
@@ -241,6 +240,8 @@ def create_info_embed(
             ],
         ],
     )
+    embed.set_footer(text=f"Version {version.SHORT_HASH}")
+    return embed
 
 
 def diff_schedule_embed_dicts(old_embed: Dict, new_embed: Dict) -> str:
