@@ -169,7 +169,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         Args:
             channel: A discord.Channel object.
-            to_send: A String or discord.Embed object.
+            to_send: A string or discord.Embed object.
 
         """
         try:

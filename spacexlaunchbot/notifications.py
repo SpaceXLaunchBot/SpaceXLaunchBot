@@ -14,7 +14,7 @@ _LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELT
 class NotificationType(Enum):
     """Represents each type of notification."""
 
-    # TODO: Changing these to uppercase will require changing current records in DB.
+    # NOTE: Changing these to uppercase will require changing the enum in the db :/
     # pylint: disable=invalid-name
 
     all = 0

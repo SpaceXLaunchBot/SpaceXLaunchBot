@@ -108,6 +108,10 @@ async def _info(**kwargs):
 
 
 async def _help(**kwargs):
+    client = kwargs["client"]
+    sc = await client.ds.get_subbed_channels()
+    for _, so in sc.items():
+        print(so.notification_type)
     return embeds.HELP_EMBED
 
 
@@ -129,8 +133,7 @@ async def _debug_launch_embed(**kwargs):
 
 @_req_id_owner
 async def _reset_notification_task_store(**kwargs):
-    """Reset notification_task_store to default values (will trigger new notifications).
-    """
+    """Reset notification_task_store to default (will trigger new notifications)."""
     logging.warning("reset notification task store command called")
     client = kwargs["client"]
     client.ds.set_notification_task_vars(False, {})
