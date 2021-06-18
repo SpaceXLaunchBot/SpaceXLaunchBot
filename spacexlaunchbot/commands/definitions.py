@@ -1,57 +1,19 @@
 import logging
-from typing import Callable, Dict
 
-from . import apis
-from . import config
-from . import embeds
-from .notifications import NotificationType
-
-
-async def _return_none() -> None:
-    return None
+from .helpers import _req_id_owner, _req_perm_admin
+from .. import apis
+from .. import embeds
+from ..notifications import NotificationType
 
 
-def _req_id_owner(func: Callable) -> Callable:
-    """A function wrapper that only runs the wrapped function if
-    kwargs["message"].author.id == config.BOT_OWNER_ID.
-
-    The wrapped function will return None if message.author does not meet requirements.
-    """
-
-    def wrapper(**kwargs):
-        message = kwargs["message"]
-        if message.author.id == config.BOT_OWNER_ID:
-            return func(**kwargs)
-        return _return_none()
-
-    return wrapper
-
-
-def _req_perm_admin(func: Callable) -> Callable:
-    """A function wrapper that only runs the wrapped function if
-    kwargs["message"].author has the administrator permission.
-
-    The wrapped function will return None if message.author does not meet requirements.
-    """
-
-    def wrapper(**kwargs):
-        message = kwargs["message"]
-        perms = message.author.permissions_in(message.channel)
-        if getattr(perms, "administrator", False):
-            return func(**kwargs)
-        return _return_none()
-
-    return wrapper
-
-
-async def _next_launch(**kwargs):
+async def next_launch(**kwargs):
     next_launch_dict = await apis.spacex.get_launch_dict()
     if next_launch_dict == {}:
         return embeds.API_ERROR_EMBED
     return embeds.create_schedule_embed(next_launch_dict)
 
 
-async def _launch(**kwargs):
+async def launch(**kwargs):
     operands = kwargs["operands"]
 
     try:
@@ -66,7 +28,7 @@ async def _launch(**kwargs):
 
 
 @_req_perm_admin
-async def _add(**kwargs):
+async def add(**kwargs):
     client, message, operands = kwargs["client"], kwargs["message"], kwargs["operands"]
     notif_type_str, notif_mentions = operands[0], operands[1:]
 
@@ -98,7 +60,7 @@ async def _add(**kwargs):
 
 
 @_req_perm_admin
-async def _remove(**kwargs):
+async def remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
     cid = str(message.channel.id)
     if await client.ds.remove_subbed_channel(cid) is False:
@@ -112,19 +74,20 @@ async def _remove(**kwargs):
     )
 
 
-async def _info(**kwargs):
+async def info(**kwargs):
     client = kwargs["client"]
     guild_count = len(client.guilds)
     channel_count = await client.ds.subbed_channels_count()
     return embeds.create_info_embed(guild_count, channel_count, client.latency_ms)
 
 
-async def _help(**kwargs):
+async def help_cmd(**kwargs):
+    # Appended with _cmd as to not overwrite built-in `help`.
     return embeds.HELP_EMBED
 
 
 @_req_id_owner
-async def _debug_launch_embed(**kwargs):
+async def debug_launch_embed(**kwargs):
     """Send a launch notification embed for the given launch."""
     operands = kwargs["operands"]
 
@@ -140,7 +103,7 @@ async def _debug_launch_embed(**kwargs):
 
 
 @_req_id_owner
-async def _reset_notification_task_store(**kwargs):
+async def reset_notification_task_store(**kwargs):
     """Reset notification_task_store to default (will trigger new notifications)."""
     logging.warning("reset notification task store command called")
     client = kwargs["client"]
@@ -149,20 +112,7 @@ async def _reset_notification_task_store(**kwargs):
 
 
 @_req_id_owner
-async def _shutdown(**kwargs):
+async def shutdown(**kwargs):
     logging.info("shutdown command called")
     client = kwargs["client"]
     await client.shutdown()
-
-
-COMMAND_LOOKUP: Dict[str, Callable] = {
-    "nextlaunch": _next_launch,
-    "launch": _launch,
-    "add": _add,
-    "remove": _remove,
-    "info": _info,
-    "help": _help,
-    "dl": _debug_launch_embed,
-    "rn": _reset_notification_task_store,
-    "shutdown": _shutdown,
-}

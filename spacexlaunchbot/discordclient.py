@@ -163,7 +163,8 @@ class SpaceXLaunchBotClient(discord.Client):
 
     @staticmethod
     async def _send_s(
-        channel: discord.TextChannel, to_send: Union[str, discord.Embed]
+        channel: discord.TextChannel,
+        to_send: Union[str, discord.Embed],
     ) -> None:
         """Safely send a text / embed message to a channel. Logs any errors that occur.
 
@@ -173,11 +174,13 @@ class SpaceXLaunchBotClient(discord.Client):
 
         """
         try:
-            if isinstance(to_send, discord.Embed):
-                if embeds.embed_size_ok(to_send):
+            if isinstance(to_send, embeds.BetterEmbed):
+                if to_send.size_ok():
                     await channel.send(embed=to_send)
                 else:
                     logging.warning("Embed is too large to send")
+            elif isinstance(to_send, discord.Embed):
+                await channel.send(embed=to_send)
             else:
                 await channel.send(to_send)
 
