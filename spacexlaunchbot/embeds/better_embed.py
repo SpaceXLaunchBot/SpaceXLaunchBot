@@ -27,7 +27,7 @@ class BetterEmbed(discord.Embed):
     def size_ok(self) -> bool:
         """Determines if an embed is within the size limits for discord.
 
-        See https://discord.com/developers/docs/resources/channel#embed-limits.
+        See https://discord.com/developers/docs/resources/channel#embed-limits
 
         Returns:
             True if it is within size limits, otherwise False.
