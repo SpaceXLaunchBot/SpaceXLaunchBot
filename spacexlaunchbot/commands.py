@@ -57,7 +57,7 @@ async def _launch(**kwargs):
     try:
         launch_number = int(operands[0])
     except ValueError:
-        return "Invalid launch number"
+        return embeds.create_interaction_embed("Invalid launch number", success=False)
 
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
@@ -73,7 +73,9 @@ async def _add(**kwargs):
     try:
         notif_type = NotificationType[notif_type_str]
     except KeyError:
-        return "Invalid notification type"
+        return embeds.create_interaction_embed(
+            "Invalid notification type", success=False
+        )
 
     notif_mentions_str = " ".join(notif_mentions)
 
@@ -85,9 +87,14 @@ async def _add(**kwargs):
         notif_mentions_str,
     )
     if added is False:
-        return "This channel is already subscribed to the notification service"
+        return embeds.create_interaction_embed(
+            "This channel is already subscribed to the notification service",
+            success=False,
+        )
     logging.info(f"{message.channel.id} subscribed to {notif_type_str}")
-    return "This channel has been added to the notification service"
+    return embeds.create_interaction_embed(
+        "This channel has been added to the notification service"
+    )
 
 
 @_req_perm_admin
@@ -95,9 +102,14 @@ async def _remove(**kwargs):
     client, message = kwargs["client"], kwargs["message"]
     cid = str(message.channel.id)
     if await client.ds.remove_subbed_channel(cid) is False:
-        return "This channel was not previously subscribed to the notification service"
+        return embeds.create_interaction_embed(
+            "This channel was not previously subscribed to the notification service",
+            success=False,
+        )
     logging.info(f"{message.channel.id} unsubscribed")
-    return "This channel has been removed from the notification service"
+    return embeds.create_interaction_embed(
+        "This channel has been removed from the notification service"
+    )
 
 
 async def _info(**kwargs):
@@ -119,11 +131,11 @@ async def _debug_launch_embed(**kwargs):
     try:
         launch_number = int(operands[0])
     except ValueError:
-        return "Invalid launch number"
+        return embeds.create_interaction_embed("Invalid launch number", success=False)
 
     launch_dict = await apis.spacex.get_launch_dict(launch_number)
     if launch_dict == {}:
-        return "API returned {}"
+        return "API returned `{}`"
     return embeds.create_launch_embed(launch_dict)
 
 

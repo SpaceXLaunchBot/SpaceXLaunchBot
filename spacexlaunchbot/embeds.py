@@ -2,7 +2,6 @@ import random
 from typing import Dict, List
 
 import discord
-
 from . import config
 from . import version
 from .utils import md_link, utc_from_ts
@@ -24,23 +23,33 @@ _ROCKET_NAME_IMAGES = {
 
 class Colour:
     # pylint: disable=too-few-public-methods
-    red_error = discord.Color.from_rgb(255, 0, 0)
-    red_falcon = discord.Color.from_rgb(238, 15, 70)
-    # orange_info = Color.from_rgb(200, 74, 0)
+    RED_ERROR = discord.Color.from_rgb(255, 0, 0)
+    RED_FALCON = discord.Color.from_rgb(238, 15, 70)
+    ORANGE_INFO = discord.Color.from_rgb(255, 132, 0)
 
 
-class EmbedWithFields(discord.Embed):
-    def __init__(self, fields: List[List[str]], inline_all: bool = True, **kwargs):
-        """Takes the discord.Embed class and allows you to define fields immediately.
+class BetterEmbed(discord.Embed):
+    def __init__(
+        self,
+        fields: List[List[str]] = None,
+        footer: str = None,
+        inline_fields: bool = True,
+        **kwargs,
+    ):
+        """Extends the discord.Embed class to allow more immediate definition.
 
         Args:
             fields: A list of pairs of strings, the name and text of each field.
-            inline_all: Whether or not to inline all of the fields.
+            footer: The footer.
+            inline_fields: Whether or not to inline all of the fields.
 
         """
         super().__init__(**kwargs)
-        for field in fields:
-            self.add_field(name=field[0], value=field[1], inline=inline_all)
+        if fields is not None:
+            for field in fields:
+                self.add_field(name=field[0], value=field[1], inline=inline_fields)
+        if footer is not None:
+            self.set_footer(text=footer)
 
 
 def embed_size_ok(embed: discord.Embed) -> bool:
@@ -146,8 +155,8 @@ def create_schedule_embed(launch_info: Dict) -> discord.Embed:
             ]
         )
 
-    schedule_embed = EmbedWithFields(
-        color=Colour.red_falcon,
+    schedule_embed = BetterEmbed(
+        color=Colour.RED_FALCON,
         description=launch_info["details"] or "",
         title=f'Launch #{launch_info["flight_number"]} - {launch_info["name"]}',
         fields=fields,
@@ -191,10 +200,10 @@ def create_launch_embed(launch_info: Dict) -> discord.Embed:
     if (press_kit_url := launch_info["links"]["presskit"]) is not None:
         embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
-    launch_embed = EmbedWithFields(
+    launch_embed = BetterEmbed(
         title="{} is launching soon!".format(launch_info["name"]),
         description=embed_desc,
-        color=Colour.red_falcon,
+        color=Colour.RED_FALCON,
         fields=[["Launch date (UTC)", launch_date_str]],
     )
 
@@ -220,9 +229,9 @@ def create_info_embed(
         A discord.Embed object.
 
     """
-    embed = EmbedWithFields(
+    embed = BetterEmbed(
         title="SpaceXLaunchBot Information",
-        color=Colour.red_falcon,
+        color=Colour.RED_FALCON,
         description="A Discord bot for getting news, information, and notifications "
         "about upcoming SpaceX launches",
         fields=[
@@ -242,6 +251,26 @@ def create_info_embed(
     )
     embed.set_footer(text=f"Version {version.SHORT_HASH}")
     return embed
+
+
+def create_interaction_embed(
+    desc: str, success: bool = True, colour: Colour = Colour.ORANGE_INFO
+):
+    """Creates an embed to be sent in response to a command, e.g. `slb add`.
+
+    Args:
+        desc: What happened?
+        success: Was the interaction successful?
+        colour: The embed colour.
+
+    Returns:
+        A discord.Embed object.
+
+    """
+    return discord.Embed(
+        description=("✅" if success else "❌") + f" {desc}",
+        color=colour,
+    )
 
 
 def diff_schedule_embed_dicts(old_embed: Dict, new_embed: Dict) -> str:
@@ -285,11 +314,11 @@ def diff_schedule_embed_dicts(old_embed: Dict, new_embed: Dict) -> str:
     return f"Changed: {diffs[0]} + {len(diffs)-1} more"
 
 
-HELP_EMBED = EmbedWithFields(
+HELP_EMBED = BetterEmbed(
     title="SpaceXLaunchBot Commands",
     description=f"Command prefix: `{config.BOT_COMMAND_PREFIX}`",
-    color=Colour.red_falcon,
-    inline_all=False,
+    color=Colour.RED_FALCON,
+    inline_fields=False,
     fields=[
         [
             "nextlaunch",
@@ -315,5 +344,5 @@ HELP_EMBED = EmbedWithFields(
 API_ERROR_EMBED = discord.Embed(
     title="Error",
     description=f"An API error occurred, contact {config.BOT_OWNER_NAME}",
-    color=Colour.red_error,
+    color=Colour.RED_ERROR,
 )
