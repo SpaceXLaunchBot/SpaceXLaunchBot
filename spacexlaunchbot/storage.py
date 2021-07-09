@@ -159,11 +159,11 @@ class DataStore:
         """Register an action occurring to the metrics table.
 
         Args:
-            action: The name of the action, naming convention is camel_case
-            guild_id: The ID of the guild the action occurred in
+            action: The name of the action, naming convention is camel_case.
+            guild_id: The ID of the guild the action occurred in.
 
         Returns:
-            A bool indicating if the channel was added or not.
+            A bool indicating if the metric was registered or not.
 
         """
         sql = """
@@ -176,6 +176,33 @@ class DataStore:
                 sql,
                 action,
                 guild_id,
+            )
+            if response == "INSERT 0 1":
+                return True
+        return False
+
+    async def update_counts(self, guild_count: int) -> bool:
+        """Insert new guild and subscribed channel counts into the db.
+
+        Args:
+            guild_count: The number of guilds the bot is currently in.
+
+        Returns:
+            A bool indicating if the count was added or not.
+
+        """
+        subbed_count = await self.subbed_channels_count()
+
+        sql = """
+        insert into counts
+            (guild_count, subscribed_count, time)
+        values
+            ($1, $2, now());"""
+        async with self.db_pool.acquire() as conn:
+            response = await conn.execute(
+                sql,
+                guild_count,
+                subbed_count,
             )
             if response == "INSERT 0 1":
                 return True

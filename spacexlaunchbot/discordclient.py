@@ -95,7 +95,7 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self) -> None:
         logging.info("Client ready")
         await self.set_playing(config.BOT_GAME_NAME)
-        await self.update_website_metrics()
+        await self.update_count_metrics()
 
     async def shutdown(self, sig: signal.Signals = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
@@ -115,20 +115,21 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info("Goodbye")
         await self.close()
 
-    async def update_website_metrics(self) -> None:
-        """Update Discord bot websites with guild count"""
+    async def update_count_metrics(self) -> None:
+        """Update relevant places with guild count"""
         guild_count = len(self.guilds)
-        logging.info(f"Updating bot lists with a guild_count of {guild_count}")
+        logging.info(f"Updating count metrics with a guild_count of {guild_count}")
         await apis.bot_lists.post_all_bot_lists(guild_count)
+        await self.ds.update_counts(guild_count)
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
-        await self.update_website_metrics()
+        await self.update_count_metrics()
         await self.ds.register_metric("guild_join", str(guild.id))
 
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
-        await self.update_website_metrics()
+        await self.update_count_metrics()
         await self.ds.register_metric("guild_remove", str(guild.id))
         # Any subscribed channels from this guild will be removed later by
         # send_notification.
