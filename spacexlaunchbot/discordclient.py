@@ -2,6 +2,7 @@ import asyncio
 import logging
 import platform
 import signal
+from datetime import datetime
 from typing import Union
 
 import discord
@@ -12,8 +13,10 @@ from . import commands
 from . import config
 from . import embeds
 from . import storage
-from .notifications import start_notification_loop, NotificationType
+from .notifications import check_and_send_notifications, NotificationType
 from .utils import sys_info
+
+ONE_MINUTE = 60
 
 
 class SpaceXLaunchBotClient(discord.Client):
@@ -50,7 +53,8 @@ class SpaceXLaunchBotClient(discord.Client):
         )
         logging.info("Data storage initialised")
 
-        self.notification_task = self.loop.create_task(start_notification_loop(self))
+        self.notification_task = self.loop.create_task(self.start_notification_loop())
+        self.counts_task = self.loop.create_task(self.start_db_counts_loop())
         self.healthcheck_server = discordhealthcheck.start(self)
 
         self.dc_logger: Union[asyncio.Task, None] = None
@@ -60,24 +64,16 @@ class SpaceXLaunchBotClient(discord.Client):
         """Converts the latency property to an int representing the value in ms."""
         return int(self.latency * 1000)
 
+    #
+    # on_ methods
+    #
+
     async def on_connect(self) -> None:
         logging.info(f"Connected to Discord API with a latency of {self.latency_ms}ms")
 
     async def on_disconnect(self) -> None:
         # Wait 2 seconds, if we don't reconnect, log it.
         self.dc_logger = self.loop.create_task(self.disconnected_logger())
-
-    @staticmethod
-    async def disconnected_logger() -> None:
-        """Sleep for 2 seconds then log a disconnect."""
-        # NOTE: The whole reason for this function is so that the on_resumed method can
-        # cancel this function running as a task, this prevents the log filling up with
-        # reconnection logs.
-        try:
-            await asyncio.sleep(2)
-            logging.info("Disconnected from Discord API")
-        except asyncio.CancelledError:
-            pass
 
     async def on_resumed(self) -> None:
         if self.dc_logger is None:
@@ -95,47 +91,19 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_ready(self) -> None:
         logging.info("Client ready")
         await self.set_playing(config.BOT_GAME_NAME)
-        await self.update_count_metrics()
-
-    async def shutdown(self, sig: signal.Signals = None) -> None:
-        """Disconnects from Discord and cancels asyncio tasks"""
-        logging.info("Shutdown called")
-
-        if sig is not None:
-            logging.info(f"Shutdown due to signal: {sig.name}")
-
-        logging.info("Cancelling notification_task")
-        self.notification_task.cancel()
-        await self.notification_task
-
-        logging.info("Closing healthcheck server")
-        self.healthcheck_server.close()
-        await self.healthcheck_server.wait_closed()
-
-        logging.info("Goodbye")
-        await self.close()
-
-    async def update_count_metrics(self) -> None:
-        """Update relevant places with guild count"""
-        guild_count = len(self.guilds)
-        logging.info(f"Updating count metrics with a guild_count of {guild_count}")
-        await apis.bot_lists.post_all_bot_lists(guild_count)
-        await self.ds.update_counts(guild_count)
+        await self.update_website_metrics()
 
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
-        await self.update_count_metrics()
+        await self.update_website_metrics()
         await self.ds.register_metric("guild_join", str(guild.id))
 
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
-        await self.update_count_metrics()
+        await self.update_website_metrics()
         await self.ds.register_metric("guild_remove", str(guild.id))
         # Any subscribed channels from this guild will be removed later by
         # send_notification.
-
-    async def set_playing(self, title: str) -> None:
-        await self.change_presence(activity=discord.Game(name=title))
 
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot or not message.guild:
@@ -166,6 +134,61 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         await self._send_s(message.channel, to_send)
+
+    #
+    # Helpers
+    #
+
+    @staticmethod
+    async def disconnected_logger() -> None:
+        """Sleep for 2 seconds then log a disconnect."""
+        # NOTE: The whole reason for this function is so that the on_resumed method can
+        # cancel this function running as a task, this prevents the log filling up with
+        # reconnection logs.
+        try:
+            await asyncio.sleep(2)
+            logging.info("Disconnected from Discord API")
+        except asyncio.CancelledError:
+            pass
+
+    async def update_website_metrics(self) -> None:
+        """Update bot list websites with guild count"""
+        guild_count = len(self.guilds)
+        logging.info(f"Updating bot lists with a guild_count of {guild_count}")
+        await apis.bot_lists.post_all_bot_lists(guild_count)
+
+    #
+    # State change
+    #
+
+    async def shutdown(self, sig: signal.Signals = None) -> None:
+        """Disconnects from Discord and cancels asyncio tasks"""
+        logging.info("Shutdown called")
+
+        if sig is not None:
+            logging.info(f"Shutdown due to signal: {sig.name}")
+
+        logging.info("Cancelling notification_task")
+        self.notification_task.cancel()
+        await self.notification_task
+
+        logging.info("Cancelling counts_task")
+        self.counts_task.cancel()
+        await self.counts_task
+
+        logging.info("Closing healthcheck server")
+        self.healthcheck_server.close()
+        await self.healthcheck_server.wait_closed()
+
+        logging.info("Goodbye")
+        await self.close()
+
+    async def set_playing(self, title: str) -> None:
+        await self.change_presence(activity=discord.Game(name=title))
+
+    #
+    # Message sending
+    #
 
     @staticmethod
     async def _send_s(
@@ -237,3 +260,43 @@ class SpaceXLaunchBotClient(discord.Client):
 
         for channel_id in invalid_ids:
             await self.ds.remove_subbed_channel(str(channel_id))
+
+    #
+    # Background tasks
+    # TODO: Consolidate shared code into boilerplate method.
+    #
+
+    async def start_db_counts_loop(self) -> None:
+        """A loop that at midday sends the guild and subscribed counts to the db."""
+        logging.info("Waiting for client ready")
+        await self.wait_until_ready()
+        logging.info("Starting")
+
+        while not self.is_closed():
+            try:
+                # Simple and precise.
+                if datetime.now().hour in [0, 12]:
+                    await self.ds.update_counts(len(self.guilds))
+                await asyncio.sleep(ONE_MINUTE * 60)
+            except asyncio.CancelledError:
+                logging.info("Cancelled, stopping")
+                break
+
+        logging.info("Loop finished")
+
+    async def start_notification_loop(self) -> None:
+        """A loop that sends out launching soon & launch info notifications."""
+        logging.info("Waiting for client ready")
+        await self.wait_until_ready()
+        logging.info("Starting")
+
+        while not self.is_closed():
+            try:
+                await check_and_send_notifications(self)
+                await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+            except asyncio.CancelledError:
+                logging.info("Cancelled, stopping")
+                break
+
+        logging.info("Loop finished, saving data")
+        self.ds.save_state()

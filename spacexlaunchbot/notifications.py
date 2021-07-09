@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 from enum import Enum
@@ -7,7 +6,7 @@ from . import config
 from . import embeds
 from .apis import spacex
 
-_ONE_MINUTE = 60
+
 _LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
 
@@ -22,7 +21,7 @@ class NotificationType(Enum):
     launch = 2
 
 
-async def _check_and_send_notifications(client) -> None:
+async def check_and_send_notifications(client) -> None:
     """Checks what notification messages need to be sent, and sends them.
 
     Updates database values if they need updating.
@@ -88,21 +87,3 @@ async def _check_and_send_notifications(client) -> None:
     client.ds.set_notification_task_vars(
         launch_embed_for_current_schedule_sent, schedule_embed.to_dict()
     )
-
-
-async def start_notification_loop(client) -> None:
-    """A loop that sends out launching soon & launch info notifications."""
-    logging.info("Waiting for client ready")
-    await client.wait_until_ready()
-    logging.info("Starting")
-
-    while not client.is_closed():
-        try:
-            await _check_and_send_notifications(client)
-            await asyncio.sleep(_ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
-        except asyncio.CancelledError:
-            logging.info("Cancelled, stopping")
-            break
-
-    logging.info("Notification loop finished, saving data")
-    client.ds.save_state()
