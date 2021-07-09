@@ -57,7 +57,9 @@ Currently there is no way to update the type and/or mentions you have set for a 
 ## Example Command Usage
 
 `slb add all @me @elon`
+
 `slb add schedule`
+
 `slb add launch @everyone`
 
 ## New Features
