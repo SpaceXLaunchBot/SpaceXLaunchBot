@@ -3,7 +3,6 @@ import logging
 import pickle
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Tuple, Dict
 
 import asyncpg
 
@@ -46,7 +45,7 @@ class DataStore:
         # schedule.
         self._launch_embed_for_current_schedule_sent: bool = False
         # A dict of the most previously sent schedule embed (for comparison).
-        self._previous_schedule_embed_dict: Dict = {}
+        self._previous_schedule_embed_dict: dict = {}
 
         try:
             with open(self._pickle_file_path, "rb") as f_in:
@@ -66,7 +65,7 @@ class DataStore:
         with open(self._pickle_file_path, "wb") as f_out:
             pickle.dump(to_dump, f_out, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def get_notification_task_vars(self) -> Tuple[bool, Dict]:
+    def get_notification_task_vars(self) -> tuple[bool, dict]:
         return (
             self._launch_embed_for_current_schedule_sent,
             deepcopy(self._previous_schedule_embed_dict),
@@ -75,7 +74,7 @@ class DataStore:
     def set_notification_task_vars(
         self,
         launch_embed_for_current_schedule_sent: bool,
-        previous_schedule_embed_dict: Dict,
+        previous_schedule_embed_dict: dict,
     ) -> None:
         self._launch_embed_for_current_schedule_sent = (
             launch_embed_for_current_schedule_sent
@@ -128,7 +127,7 @@ class DataStore:
                 pass
         return False
 
-    async def get_subbed_channels(self) -> Dict[int, SubscriptionOptions]:
+    async def get_subbed_channels(self) -> dict[int, SubscriptionOptions]:
         channels = {}
         sql = "select * from subscribed_channels;"
         async with self.db_pool.acquire() as conn:
@@ -155,3 +154,29 @@ class DataStore:
         async with self.db_pool.acquire() as conn:
             records = await conn.fetch(sql)
         return int(records[0]["count"])
+
+    async def register_metric(self, action: str, guild_id: str) -> bool:
+        """Register an action occurring to the metrics table.
+
+        Args:
+            action: The name of the action, naming convention is camel_case
+            guild_id: The ID of the guild the action occurred in
+
+        Returns:
+            A bool indicating if the channel was added or not.
+
+        """
+        sql = """
+        insert into metrics
+            (action, guild_id, time)
+        values
+            ($1, $2, now());"""
+        async with self.db_pool.acquire() as conn:
+            response = await conn.execute(
+                sql,
+                action,
+                guild_id,
+            )
+            if response == "INSERT 0 1":
+                return True
+        return False

@@ -124,10 +124,12 @@ class SpaceXLaunchBotClient(discord.Client):
     async def on_guild_join(self, guild: discord.guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
         await self.update_website_metrics()
+        await self.ds.register_metric("guild_join", str(guild.id))
 
     async def on_guild_remove(self, guild: discord.guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
+        await self.ds.register_metric("guild_remove", str(guild.id))
         # Any subscribed channels from this guild will be removed later by
         # send_notification.
 
@@ -149,6 +151,9 @@ class SpaceXLaunchBotClient(discord.Client):
             run_command = commands.COMMAND_LOOKUP[command_used]
             to_send = await run_command(
                 client=self, message=message, operands=message_parts[2:]
+            )
+            await self.ds.register_metric(
+                f"command_{command_used}", str(message.guild.id)
             )
 
         except (KeyError, IndexError):
