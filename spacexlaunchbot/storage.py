@@ -168,9 +168,9 @@ class DataStore:
         """
         sql = """
         insert into metrics
-            (action, guild_id, time)
+            (action, guild_id)
         values
-            ($1, $2, now());"""
+            ($1, $2);"""
         async with self.db_pool.acquire() as conn:
             response = await conn.execute(
                 sql,
@@ -195,9 +195,9 @@ class DataStore:
 
         sql = """
         insert into counts
-            (guild_count, subscribed_count, time)
+            (guild_count, subscribed_count)
         values
-            ($1, $2, now());"""
+            ($1, $2);"""
         async with self.db_pool.acquire() as conn:
             response = await conn.execute(
                 sql,
