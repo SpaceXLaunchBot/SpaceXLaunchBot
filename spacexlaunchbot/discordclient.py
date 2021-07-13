@@ -267,16 +267,14 @@ class SpaceXLaunchBotClient(discord.Client):
     #
 
     async def start_db_counts_loop(self) -> None:
-        """A loop that at midday sends the guild and subscribed counts to the db."""
+        """A loop that every hour sends the guild and subscribed counts to the db."""
         logging.info("Waiting for client ready")
         await self.wait_until_ready()
         logging.info("Starting")
 
         while not self.is_closed():
             try:
-                # Simple and precise.
-                if datetime.now().hour in [0, 12]:
-                    await self.ds.update_counts(len(self.guilds))
+                await self.ds.update_counts(len(self.guilds))
                 await asyncio.sleep(ONE_MINUTE * 60)
             except asyncio.CancelledError:
                 logging.info("Cancelled, stopping")
