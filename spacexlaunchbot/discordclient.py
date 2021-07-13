@@ -2,7 +2,6 @@ import asyncio
 import logging
 import platform
 import signal
-from datetime import datetime
 from typing import Union
 
 import discord
