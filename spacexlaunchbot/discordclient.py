@@ -273,10 +273,6 @@ class SpaceXLaunchBotClient(discord.Client):
 
         while not self.is_closed():
             try:
-                # TODO: Remove this logging line. Currently using it to track down a
-                #  possible bug where we just randomly stopped seeing inserts in counts
-                #  table in the db.
-                logging.info("Calling update_counts")
                 await self.ds.update_counts(len(self.guilds))
                 await asyncio.sleep(ONE_MINUTE * 60)
             except asyncio.CancelledError:
