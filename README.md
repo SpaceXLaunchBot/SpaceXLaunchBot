@@ -11,11 +11,15 @@
         <img src="https://top.gg/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
-    <a href="https://github.com/r-spacex/SpaceXLaunchBot/actions">
-        <img src="https://github.com/r-spacex/SpaceXLaunchBot/workflows/CI/badge.svg" alt="Github CI Build Status"/>
-    </a>
     <a href="https://discord.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
+    </a>
+    <a href="https://discord.gg/j6vbHkYSES">
+        <img src="https://img.shields.io/badge/Discord-Support%20Server%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Support Server Invite"/>
+    </a>
+    <br/>
+    <a href="https://github.com/r-spacex/SpaceXLaunchBot/actions">
+        <img src="https://github.com/r-spacex/SpaceXLaunchBot/workflows/CI/badge.svg" alt="Github CI Build Status"/>
     </a>
     <a href="https://www.buymeacoffee.com/psidex">
         <img src="https://img.shields.io/badge/Donate-Beer-FFDD00.svg?style=flat&colorA=35383d" alt="buymeacoffee donate link"/>
@@ -27,13 +31,15 @@
 
 A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
 
+https://spacexlaunchbot.dev/
+
 ## Commands
 
 Command|Description|Permissions needed
 ---|---|---
 `slb nextlaunch`|Send the latest launch schedule message to the current channel|None
 `slb launch [launch number]`|Send the launch schedule message for the given launch number to the current channel|None
-`slb add [type] #channel, @user, @role, etc.`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
+`slb add [type] [mentions]`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
 `slb remove`|Remove the current channel from the notification service|Admin
 `slb info`|Send information about the bot to the current channel|None
 `slb help`|List these commands|None
