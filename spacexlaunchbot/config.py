@@ -5,12 +5,15 @@ import os
 # Meta
 #
 
+INDEV = True if os.name == 'nt' else False
+
 BOT_OWNER_NAME = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "slb"
 BOT_GAME_NAME = "with rockets"
 BOT_GITHUB_URL = "https://github.com/r-spacex/SpaceXLaunchBot"
-BOT_CLIENT_ID = 411618411169447950
+BOT_CLIENT_ID = 412281000140472323 if INDEV else 411618411169447950
+BOT_MENTION_STR = f"<@!{BOT_CLIENT_ID}>"
 BOT_INVITE_PERMISSIONS = "19456"
 BOT_INVITE_URL = (
     "https://discord.com/oauth2/authorize?scope=bot"
