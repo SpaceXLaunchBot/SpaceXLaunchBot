@@ -119,7 +119,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 command_used = "help"
             else:
                 command_used = message_parts[1]
-            
+
             run_command = commands.COMMAND_LOOKUP[command_used]
             to_send = await run_command(
                 client=self, message=message, operands=message_parts[2:]

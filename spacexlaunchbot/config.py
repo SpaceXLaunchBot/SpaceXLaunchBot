@@ -5,7 +5,7 @@ import os
 # Meta
 #
 
-INDEV = True if os.name == 'nt' else False
+INDEV = os.name == 'nt'
 
 BOT_OWNER_NAME = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
