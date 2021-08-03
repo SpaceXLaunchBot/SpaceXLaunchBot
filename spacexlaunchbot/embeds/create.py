@@ -171,7 +171,7 @@ def create_info_embed(
             ["Latency to Discord", f"{latency_ms}ms"],
             [
                 "Links",
-                f'{md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}',
+                f'{md_link("Website", config.WEBSITE_URL)}, {md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}, {md_link("Support Server", config.BOT_SUPPORT_SERVER_INVITE)}',
             ],
             ["Contact", f"{config.BOT_OWNER_NAME}"],
             [

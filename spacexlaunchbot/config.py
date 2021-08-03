@@ -7,6 +7,8 @@ import os
 
 INDEV = os.name == "nt"
 
+WEBSITE_URL = "https://spacexlaunchbot.dev/"
+
 BOT_OWNER_NAME = "Dragon#0571"
 BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "slb"
@@ -19,6 +21,7 @@ BOT_INVITE_URL = (
     "https://discord.com/oauth2/authorize?scope=bot"
     f"&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
 )
+BOT_SUPPORT_SERVER_INVITE = "https://discord.gg/j6vbHkYSES"
 
 #
 # Docker
