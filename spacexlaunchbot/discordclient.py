@@ -109,14 +109,13 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         message_parts = message.content.lower().split(" ")
-        if message_parts[0] != config.BOT_COMMAND_PREFIX:
-            return
-
         to_send = None
 
         try:
             if message_parts[0] == config.BOT_MENTION_STR:
                 command_used = "help"
+            elif message_parts[0] != config.BOT_COMMAND_PREFIX:
+                return
             else:
                 command_used = message_parts[1]
 
