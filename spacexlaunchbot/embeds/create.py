@@ -2,11 +2,10 @@ import random
 
 import discord
 
+from .. import config, version
+from ..utils import md_link, utc_from_ts
 from . import colours
 from .better_embed import BetterEmbed
-from .. import config
-from .. import version
-from ..utils import utc_from_ts, md_link
 
 # Pylint doesn't like `:=` apparently.
 # pylint: disable=superfluous-parens
@@ -131,7 +130,7 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
         embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
     launch_embed = BetterEmbed(
-        title="{} is launching soon!".format(launch_info["name"]),
+        title=f"{launch_info['name']} is launching soon!",
         description=embed_desc,
         color=colours.RED_FALCON,
         fields=[["Launch date (UTC)", launch_date_str]],

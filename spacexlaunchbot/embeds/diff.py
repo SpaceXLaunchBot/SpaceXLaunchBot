@@ -24,9 +24,9 @@ def diff_schedule_embed_dicts(old_embed: dict, new_embed: dict) -> str:
 
     # FIXME: Quick hack to get launch vehicle.
     launch_vehicle = ""
-    for f in new_embed_fields:
-        if f["name"] == "Launch Vehicle":
-            launch_vehicle = f["value"]
+    for field in new_embed_fields:
+        if field["name"] == "Launch Vehicle":
+            launch_vehicle = field["value"]
 
     # This detects all field changes except if old_embed has a field that new_embed
     # does not (e.g. a payload was removed). Not going to worry about this for now as
