@@ -1,12 +1,12 @@
+from .. import config
 from . import colours
 from .better_embed import BetterEmbed
-from .. import config
 
 # pylint: disable=line-too-long
 
 HELP_EMBED = BetterEmbed(
     title="SpaceXLaunchBot Commands",
-    description=f"Command prefix: `{config.BOT_COMMAND_PREFIX}`",
+    description="",
     color=colours.RED_FALCON,
     inline_fields=False,
     fields=[
@@ -34,5 +34,11 @@ HELP_EMBED = BetterEmbed(
 API_ERROR_EMBED = BetterEmbed(
     title="Error",
     description=f"An API error occurred, contact {config.BOT_OWNER_NAME}",
+    color=colours.RED_ERROR,
+)
+
+ADMIN_PERMISSION_REQUIRED = BetterEmbed(
+    title="Administrator Permission Required",
+    description="",
     color=colours.RED_ERROR,
 )

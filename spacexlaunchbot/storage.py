@@ -33,13 +33,9 @@ class DataStore:
      - https://stackoverflow.com/a/986145/6396652
     """
 
-    def __init__(
-        self, loop: asyncio.AbstractEventLoop, pickle_file_path: str, **kwargs
-    ):
+    def __init__(self, db_pool, pickle_file_path: str):
         self._pickle_file_path = pickle_file_path
-        logging.info("Creating a connection pool for DB")
-        self.db_pool = loop.run_until_complete(asyncpg.create_pool(**kwargs))
-        logging.info("Pooled")
+        self.db_pool = db_pool
 
         # Boolean indicating if a launch notification has been sent for the current
         # schedule.

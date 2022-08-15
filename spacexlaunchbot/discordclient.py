@@ -4,15 +4,12 @@ import platform
 import signal
 from typing import Union
 
+import asyncpg
 import discord
-import discordhealthcheck
+from discord import app_commands
 
-from . import apis
-from . import commands
-from . import config
-from . import embeds
-from . import storage
-from .notifications import check_and_send_notifications, NotificationType
+from . import apis, commands, config, embeds, storage
+from .notifications import NotificationType, check_and_send_notifications
 from .utils import sys_info
 
 ONE_MINUTE = 60
@@ -24,9 +21,11 @@ class SpaceXLaunchBotClient(discord.Client):
     # pylint: disable=no-member
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs, intents=discord.Intents.default())
         logging.info("Client initialised")
         logging.info(sys_info())
+        self.tree = app_commands.CommandTree(self)
+        self.tree_synced = False
 
         if platform.system() != "Windows":
             signals = (
@@ -41,20 +40,26 @@ class SpaceXLaunchBotClient(discord.Client):
                     s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
                 )
 
-        self.ds = storage.DataStore(
-            self.loop,
-            config.PICKLE_DUMP_LOCATION,
+    async def setup_hook(self):
+        logging.info("Creating a connection pool for DB")
+        self.db_pool = await asyncpg.create_pool(
             user=config.DB_USER,
             password=config.DB_PASS,
             host=config.DB_HOST,
             port=config.DB_PORT,
             database=config.DB_NAME,
         )
+        logging.info("pooled")
+
+        self.ds = storage.DataStore(
+            self.db_pool,
+            config.PICKLE_DUMP_LOCATION,
+        )
         logging.info("Data storage initialised")
 
         self.notification_task = self.loop.create_task(self.start_notification_loop())
         self.counts_task = self.loop.create_task(self.start_db_counts_loop())
-        self.healthcheck_server = discordhealthcheck.start(self)
+        # self.healthcheck_server = discordhealthcheck.start(self)
 
         self.dc_logger: Union[asyncio.Task, None] = None
 
@@ -89,6 +94,50 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_ready(self) -> None:
         logging.info("Client ready")
+
+        self.tree.command(
+            name="nextlaunch",
+            description="Send the latest launch schedule message to the current channel",
+        )(self.command_next_launch)
+
+        self.tree.command(
+            name="launch",
+            description="Send the launch schedule message for the given launch number to the current channel",
+        )(self.command_launch)
+
+        self.tree.command(
+            name="add",
+            description="Add the current channel to the notification service with the type; all, schedule, or launch",
+        )(self.command_add)
+
+        self.tree.command(
+            name="remove",
+            description="Remove the current channel from the notification service",
+        )(self.command_remove)
+
+        self.tree.command(
+            name="info",
+            description="Send information about the bot to the current channel",
+        )(self.command_info)
+
+        self.tree.command(name="help", description="List these commands")(
+            self.command_help
+        )
+
+        # self.tree.command(name="debug_launch_embed", description="")(
+        #     self.command_debug_launch_embed
+        # )
+        # self.tree.command(name="reset_notification_task_store", description="")(
+        #     self.command_reset_notification_task_store
+        # )
+        # self.tree.command(name="shutdown", description="")(self.command_shutdown)
+
+        if not self.tree_synced:
+            logging.info("Syncing command tree")
+            await self.tree.sync()
+            self.tree_synced = True
+            logging.info("Synced command tree")
+
         await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 
@@ -300,3 +349,150 @@ class SpaceXLaunchBotClient(discord.Client):
 
         logging.info("Loop finished, saving data")
         self.ds.save_state()
+
+    #
+    # Slash command helpers
+    #
+
+    def interaction_from_owner(self, interaction: discord.Interaction):
+        return interaction.user.id == config.BOT_OWNER_ID
+
+    def interaction_from_admin(self, interaction: discord.Interaction):
+        return interaction.user.resolved_permissions.administrator
+
+    #
+    # Slash commands
+    #
+
+    async def command_next_launch(self, interaction: discord.Interaction):
+        response: discord.Embed
+        next_launch_dict = await apis.spacex.get_launch_dict()
+        if next_launch_dict == {}:
+            response = embeds.API_ERROR_EMBED
+        else:
+            response = embeds.create_schedule_embed(next_launch_dict)
+        await interaction.response.send_message(embed=response)
+
+    async def command_launch(
+        self, interaction: discord.Interaction, launch_number: int
+    ):
+        response: discord.Embed
+        launch_dict = await apis.spacex.get_launch_dict(launch_number)
+        if launch_dict == {}:
+            response = embeds.API_ERROR_EMBED
+        else:
+            response = embeds.create_schedule_embed(launch_dict)
+        await interaction.response.send_message(embed=response)
+
+    async def command_add(
+        self,
+        interaction: discord.Interaction,
+        notification_type: str,
+        notification_mentions: str,
+    ):
+        if self.interaction_from_admin(interaction) == False:
+            await interaction.response.send_message(
+                embed=embeds.ADMIN_PERMISSION_REQUIRED
+            )
+            return
+
+        response: discord.Embed
+
+        try:
+            notification_type = NotificationType[notification_type]
+        except KeyError:
+            await interaction.response.send_message(
+                embed=embeds.create_interaction_embed(
+                    "Invalid notification type", success=False
+                )
+            )
+            return
+
+        notif_mentions_str = " ".join(notification_mentions)
+
+        added = await self.ds.add_subbed_channel(
+            str(interaction.channel_id),
+            interaction.channel.name,
+            str(interaction.guild_id),
+            notification_type,
+            notif_mentions_str,
+        )
+        if added is False:
+            response = embeds.create_interaction_embed(
+                "This channel is already subscribed to the notification service",
+                success=False,
+            )
+        else:
+            logging.info(f"{interaction.channel_id} subscribed to {notification_type}")
+            response = embeds.create_interaction_embed(
+                "This channel has been added to the notification service"
+            )
+        await interaction.response.send_message(embed=response)
+
+    async def command_remove(self, interaction: discord.Interaction):
+        if self.interaction_from_admin(interaction) == False:
+            await interaction.response.send_message(
+                embed=embeds.ADMIN_PERMISSION_REQUIRED
+            )
+            return
+
+        response: discord.Embed
+
+        cid = str(interaction.channel_id)
+        if await self.ds.remove_subbed_channel(cid) is False:
+            response = embeds.create_interaction_embed(
+                "This channel was not previously subscribed to the notification service",
+                success=False,
+            )
+        else:
+            logging.info(f"{interaction.channel_id} unsubscribed")
+            response = embeds.create_interaction_embed(
+                "This channel has been removed from the notification service"
+            )
+        await interaction.response.send_message(embed=response)
+
+    async def command_info(self, interaction: discord.Interaction):
+        guild_count = len(self.guilds)
+        channel_count = await self.ds.subbed_channels_count()
+        await interaction.response.send_message(
+            embed=embeds.create_info_embed(guild_count, channel_count, self.latency_ms)
+        )
+
+    async def command_help(self, interaction: discord.Interaction):
+        await interaction.response.send_message(embed=embeds.HELP_EMBED)
+
+    # async def command_debug_launch_embed(
+    #     self, interaction: discord.Interaction, launch_number: int
+    # ):
+    #     """Send a launch notification embed for the given launch."""
+    #     if self.interaction_from_owner(interaction) == False:
+    #         return
+
+    #     response: discord.Embed
+
+    #     launch_dict = await apis.spacex.get_launch_dict(launch_number)
+    #     if launch_dict == {}:
+    #         await interaction.response.send_message("API returned `{}`")
+    #     else:
+    #         await interaction.response.send_message(
+    #             embed=embeds.create_launch_embed(launch_dict)
+    #         )
+
+    # async def command_reset_notification_task_store(
+    #     self, interaction: discord.Interaction
+    # ):
+    #     """Reset notification_task_store to default (will trigger new notifications)."""
+    #     if self.interaction_from_owner(interaction) == False:
+    #         return
+    #     logging.warning("reset notification task store command called")
+    #     self.ds.set_notification_task_vars(False, {})
+    #     await interaction.response.send_message(
+    #         "Reset using `set_notification_task_vars(False, {})`"
+    #     )
+
+    # async def command_shutdown(self, interaction: discord.Interaction):
+    #     if self.interaction_from_owner(interaction) == False:
+    #         return
+    #     logging.info("shutdown command called")
+    #     await interaction.response.send_message("cya bitch")
+    #     await self.shutdown()
