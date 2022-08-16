@@ -31,18 +31,20 @@
 
 A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
 
-https://spacexlaunchbot.dev/
+Now supporting [slash commands](https://discord.com/blog/slash-commands-are-here)!
+
+<https://spacexlaunchbot.dev/>
 
 ## Commands
 
 Command|Description|Permissions needed
 ---|---|---
-`slb nextlaunch`|Send the latest launch schedule message to the current channel|None
-`slb launch [launch number]`|Send the launch schedule message for the given launch number to the current channel|None
-`slb add [type] [mentions]`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
-`slb remove`|Remove the current channel from the notification service|Admin
-`slb info`|Send information about the bot to the current channel|None
-`slb help`|List these commands|None
+`nextlaunch`|Send the latest launch schedule message to the current channel|None
+`launch [launch number]`|Send the launch schedule message for the given launch number to the current channel|None
+`add [type] [mentions]`|Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent|Admin
+`remove`|Remove the current channel from the notification service|Admin
+`info`|Send information about the bot to the current channel|None
+`help`|List these commands|None
 
 ## Notifications
 
@@ -58,15 +60,15 @@ The `add` command allows admins to subscribe text channels to the bots notificat
 
 If you want to receive both types of notification you can use **all**.
 
-Currently there is no way to update the type and/or mentions you have set for a channel. If you need to change these just call `slb remove` and then `slb add` with your new options.
+Currently there is no way to update the type and/or mentions you have set for a channel. If you need to change these just call `remove` and then `add` with your new options.
 
 ## Example Command Usage
 
-`slb add all @me @elon`
+`add all @me @elon`
 
-`slb add schedule`
+`add schedule`
 
-`slb add launch @everyone`
+`add launch @everyone`
 
 ## New Features
 

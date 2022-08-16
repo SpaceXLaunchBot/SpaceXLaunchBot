@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import pickle
 from copy import deepcopy

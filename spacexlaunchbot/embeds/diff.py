@@ -1,4 +1,7 @@
-def diff_schedule_embed_dicts(old_embed: dict, new_embed: dict) -> str:
+from discord.types.embed import Embed as EmbedData
+
+
+def diff_schedule_embed_dicts(old_embed: dict, new_embed: EmbedData) -> str:
     """Takes 2 schedule embed dicts and returns a string containing the differences"""
     diffs = []
 

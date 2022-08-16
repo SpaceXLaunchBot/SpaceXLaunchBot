@@ -1,5 +1,3 @@
-import asyncio
-
 from . import config, discordclient, utils
 
 

@@ -38,7 +38,7 @@ jobs:
         run: mypy ./spacexlaunchbot
 
       - name: Unused code detection (Vulture)
-        run: vulture --ignore-names on_* ./spacexlaunchbot
+        run: vulture --ignore-names setup_hook,on_* ./spacexlaunchbot
 
       - name: Tests
         run: pytest

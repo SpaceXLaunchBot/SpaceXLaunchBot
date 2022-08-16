@@ -92,7 +92,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
     )
 
     if (reddit_url := launch_info["links"]["reddit"]["campaign"]) is not None:
-        schedule_embed.description += "\n" + (
+        schedule_embed.description += "\n" + (  # type: ignore
             f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
         )
 
@@ -186,7 +186,7 @@ def create_info_embed(
 def create_interaction_embed(
     desc: str, success: bool = True, colour: discord.Colour = colours.ORANGE_INFO
 ) -> BetterEmbed:
-    """Creates an embed to be sent in response to a command, e.g. `slb add`.
+    """Creates an embed to be sent in response to a command, e.g. `add`.
 
     Args:
         desc: What happened?

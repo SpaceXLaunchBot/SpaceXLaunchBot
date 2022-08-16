@@ -1,11 +1,13 @@
+from typing import Union
+
 import discord
 
 
 class BetterEmbed(discord.Embed):
     def __init__(
         self,
-        fields: list[list[str]] = None,
-        footer: str = None,
+        fields: Union[None, list[list[str]]] = None,
+        footer: Union[None, str] = None,
         inline_fields: bool = True,
         **kwargs,
     ):
@@ -37,12 +39,19 @@ class BetterEmbed(discord.Embed):
             return False
 
         total_len = 0
-        comparisons = [
-            [len(self.title), 256],
-            [len(self.description), 2048],
-            [len(self.footer), 2048],
-            [len(self.author.name), 256],
-        ]
+        comparisons = []
+
+        if self.title is not None:
+            comparisons.append([len(self.title), 256])  # type: ignore
+
+        if self.description is not None:
+            comparisons.append([len(self.description), 2048])  # type: ignore
+
+        if self.author.name is not None:
+            comparisons.append([len(self.author.name), 256])  # type: ignore
+
+        if self.footer is not None:
+            comparisons.append([len(self.footer), 2048])  # type: ignore
 
         for length, limit in comparisons:
             if length > limit:
@@ -50,7 +59,8 @@ class BetterEmbed(discord.Embed):
             total_len += length
 
         for field in self.fields:
-            name_length, value_length = len(field.name), len(field.value)
+            name_length = len(field.name)  # type: ignore
+            value_length = len(field.value)  # type: ignore
             if name_length > 256 or value_length > 1024:
                 return False
 

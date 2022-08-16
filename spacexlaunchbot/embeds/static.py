@@ -19,7 +19,7 @@ HELP_EMBED = BetterEmbed(
             "Send the launch schedule message for the given launch number to the current channel",
         ],
         [
-            "add [type] #channel, @user, @role, etc.",
+            "add [type] [mentions]",
             "Add the current channel to the notification service with the given notification type (`all`, `schedule`, or `launch`). If you chose `all` or `launch`, the second part can be a list of roles / channels / users to ping when a launch notification is sent\n*Only admins can use this command*",
         ],
         [

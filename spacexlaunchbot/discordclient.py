@@ -16,9 +16,10 @@ ONE_MINUTE = 60
 
 
 class SpaceXLaunchBotClient(discord.Client):
-    # The signals package is a bit iffy when it comes to pylint.
-    # See https://github.com/PyCQA/pylint/issues/2804
-    # pylint: disable=no-member
+    # - The signals package is a bit iffy when it comes to pylint.
+    #   See https://github.com/PyCQA/pylint/issues/2804
+    # - Disable line-too-long because I'm lazy
+    # pylint: disable=no-member,line-too-long,too-many-public-methods
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, intents=discord.Intents.default())
@@ -41,6 +42,8 @@ class SpaceXLaunchBotClient(discord.Client):
                 )
 
     async def setup_hook(self):
+        # pylint: disable=attribute-defined-outside-init
+
         logging.info("Creating a connection pool for DB")
         self.db_pool = await asyncpg.create_pool(
             user=config.DB_USER,
@@ -77,6 +80,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def on_disconnect(self) -> None:
         # Wait 2 seconds, if we don't reconnect, log it.
+        # pylint: disable=attribute-defined-outside-init
         self.dc_logger = self.loop.create_task(self.disconnected_logger())
 
     async def on_resumed(self) -> None:
@@ -141,12 +145,12 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.set_playing(config.BOT_GAME_NAME)
         await self.update_website_metrics()
 
-    async def on_guild_join(self, guild: discord.guild) -> None:
+    async def on_guild_join(self, guild) -> None:
         logging.info(f"Joined guild, ID: {guild.id}")
         await self.update_website_metrics()
         await self.ds.register_metric("guild_join", str(guild.id))
 
-    async def on_guild_remove(self, guild: discord.guild) -> None:
+    async def on_guild_remove(self, guild) -> None:
         logging.info(f"Removed from guild, ID: {guild.id}")
         await self.update_website_metrics()
         await self.ds.register_metric("guild_remove", str(guild.id))
@@ -212,7 +216,7 @@ class SpaceXLaunchBotClient(discord.Client):
     # State change
     #
 
-    async def shutdown(self, sig: signal.Signals = None) -> None:
+    async def shutdown(self, sig: Union[None, signal.Signals] = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
         logging.info("Shutdown called")
 
@@ -227,9 +231,9 @@ class SpaceXLaunchBotClient(discord.Client):
         self.counts_task.cancel()
         await self.counts_task
 
-        logging.info("Closing healthcheck server")
-        self.healthcheck_server.close()
-        await self.healthcheck_server.wait_closed()
+        # logging.info("Closing healthcheck server")
+        # self.healthcheck_server.close()
+        # await self.healthcheck_server.wait_closed()
 
         logging.info("Goodbye")
         await self.close()
@@ -243,7 +247,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     @staticmethod
     async def _send_s(
-        channel: discord.TextChannel,
+        channel,
         to_send: Union[str, discord.Embed],
     ) -> None:
         """Safely send a text / embed message to a channel. Logs any errors that occur.
@@ -354,11 +358,13 @@ class SpaceXLaunchBotClient(discord.Client):
     # Slash command helpers
     #
 
-    def interaction_from_owner(self, interaction: discord.Interaction):
-        return interaction.user.id == config.BOT_OWNER_ID
+    # @staticmethod
+    # def interaction_from_owner(interaction: discord.Interaction):
+    #     return interaction.user.id == config.BOT_OWNER_ID
 
-    def interaction_from_admin(self, interaction: discord.Interaction):
-        return interaction.user.resolved_permissions.administrator
+    @staticmethod
+    def interaction_from_admin(interaction: discord.Interaction):
+        return interaction.user.resolved_permissions.administrator  # type: ignore
 
     #
     # Slash commands
@@ -390,7 +396,7 @@ class SpaceXLaunchBotClient(discord.Client):
         notification_type: str,
         notification_mentions: str,
     ):
-        if self.interaction_from_admin(interaction) == False:
+        if self.interaction_from_admin(interaction) is False:
             await interaction.response.send_message(
                 embed=embeds.ADMIN_PERMISSION_REQUIRED
             )
@@ -399,11 +405,12 @@ class SpaceXLaunchBotClient(discord.Client):
         response: discord.Embed
 
         try:
-            notification_type = NotificationType[notification_type]
+            notification_type = NotificationType[notification_type]  # type: ignore
         except KeyError:
             await interaction.response.send_message(
                 embed=embeds.create_interaction_embed(
-                    "Invalid notification type", success=False
+                    'Invalid notification type, try "all", "schedule", or "launch"',
+                    success=False,
                 )
             )
             return
@@ -412,7 +419,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
         added = await self.ds.add_subbed_channel(
             str(interaction.channel_id),
-            interaction.channel.name,
+            interaction.channel.name,  # type: ignore
             str(interaction.guild_id),
             notification_type,
             notif_mentions_str,
@@ -430,7 +437,7 @@ class SpaceXLaunchBotClient(discord.Client):
         await interaction.response.send_message(embed=response)
 
     async def command_remove(self, interaction: discord.Interaction):
-        if self.interaction_from_admin(interaction) == False:
+        if self.interaction_from_admin(interaction) is False:
             await interaction.response.send_message(
                 embed=embeds.ADMIN_PERMISSION_REQUIRED
             )
