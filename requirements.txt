@@ -1,3 +1,3 @@
-discord.py @ git+https://github.com/Rapptz/discord.py@master
+# discord.py
 aiohttp<3.8.0,>=3.6.0
 asyncpg>=0.23.0
