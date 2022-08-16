@@ -7,6 +7,7 @@ RUN printf "HASH = \"$(cat ./.git/refs/heads/master)\"\nSHORT_HASH = \"$(head -c
 
 ENV INSIDE_DOCKER "True"
 # nasty hack while we wait for discord.py 2.0 release
+RUN apt-get update && apt-get install -y git
 RUN pip install git+https://github.com/Rapptz/discord.py@master && python setup.py install
 
 # HEALTHCHECK CMD discordhealthcheck || exit 1
