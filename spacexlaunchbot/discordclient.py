@@ -28,6 +28,9 @@ class SpaceXLaunchBotClient(discord.Client):
         self.tree = app_commands.CommandTree(self)
         self.tree_synced = False
 
+    async def setup_hook(self):
+        # pylint: disable=attribute-defined-outside-init
+
         if platform.system() != "Windows":
             signals = (
                 signal.SIGHUP,
@@ -40,9 +43,6 @@ class SpaceXLaunchBotClient(discord.Client):
                 self.loop.add_signal_handler(
                     s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
                 )
-
-    async def setup_hook(self):
-        # pylint: disable=attribute-defined-outside-init
 
         logging.info("Creating a connection pool for DB")
         self.db_pool = await asyncpg.create_pool(
