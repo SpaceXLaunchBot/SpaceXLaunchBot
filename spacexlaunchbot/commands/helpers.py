@@ -32,7 +32,7 @@ def _req_perm_admin(func: Callable) -> Callable:
 
     def wrapper(**kwargs):
         message = kwargs["message"]
-        perms = message.author.permissions_in(message.channel)
+        perms = message.author.guild_permissions
         if getattr(perms, "administrator", False):
             return func(**kwargs)
         return _return_none()

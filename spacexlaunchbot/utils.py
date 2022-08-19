@@ -5,8 +5,9 @@ import platform
 import sys
 from typing import Union
 
-from . import config
-from . import version
+from discord import version_info
+
+from . import config, version
 
 
 def utc_from_ts(timestamp: Union[int, None]) -> str:
@@ -27,8 +28,6 @@ def utc_from_ts(timestamp: Union[int, None]) -> str:
 def setup_logging() -> None:
     """Setup logging."""
     logging.basicConfig(level=config.LOG_LEVEL, format=config.LOG_FORMAT)
-    # Change discord to only log ERROR level and above
-    logging.getLogger("discord").setLevel(logging.ERROR)
 
 
 def md_link(name: str, url: str) -> str:
@@ -45,6 +44,7 @@ def sys_info() -> str:
             "platform-release": platform.release(),
             "platform-version": platform.version(),
             "architecture": platform.machine(),
+            "discord.version_info": version_info,
             "commit-hash": version.HASH,
         }
     )

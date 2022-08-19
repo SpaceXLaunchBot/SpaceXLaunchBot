@@ -1,14 +1,14 @@
 <h1 align="center" style="font-weight: bold">SpaceX Launch Bot</h1>
 
 <p align="center">
-    <a href="https://discordbots.org/bot/411618411169447950" >
+    <a href="https://top.gg/bot/411618411169447950" >
         <img src="https://top.gg/api/widget/status/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot status" />
     </a>
     <a href="https://top.gg/bot/411618411169447950" >
         <img src="https://top.gg/api/widget/servers/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot server count" />
     </a>
-    <a href="https://top.gg/bot/411618411169447950" >
-        <img src="https://top.gg/api/widget/owner/411618411169447950.svg?noavatar=truee" alt="SpaceXLaunchBot owner id" />
+    <a href="https://top.gg/user/3204220773157502976" >
+        <img src="https://top.gg/api/widget/owner/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
     <a href="https://discord.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=19456">
@@ -21,21 +21,20 @@
     <a href="https://github.com/r-spacex/SpaceXLaunchBot/actions">
         <img src="https://github.com/r-spacex/SpaceXLaunchBot/workflows/CI/badge.svg" alt="Github CI Build Status"/>
     </a>
-    <a href="https://www.buymeacoffee.com/psidex">
-        <img src="https://img.shields.io/badge/Donate-Beer-FFDD00.svg?style=flat&colorA=35383d" alt="buymeacoffee donate link"/>
-    </a>
     <a href="https://github.com/psf/black">
         <img src="https://img.shields.io/badge/Code%20Style-Black-000000.svg?colorA=35383d" alt="Black code formatter"/>
     </a>
 </p>
 
-A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. The notification service updates you with the latest launch information and reminders for launches that will be happening soon.
+A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. Get update notifications with the latest launch information and reminders for launches that will be happening soon.
 
-Now supporting [slash commands](https://discord.com/blog/slash-commands-are-here)!
+Now supporting [slash commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ)!
 
-<https://spacexlaunchbot.dev/>
+See the [official SpaceXLaunchBot website](https://spacexlaunchbot.dev/)
 
 ## Commands
+
+Available as message commands using the prefix `slb` (until September 1st), as well as slash commands
 
 Command|Description|Permissions needed
 ---|---|---
@@ -48,7 +47,7 @@ Command|Description|Permissions needed
 
 ## Notifications
 
-The `add` command allows admins to subscribe text channels to the bots notification service. This will send the subscribed channel different types of messages, which are explained below.
+The `add` command allows admins to subscribe text channels to the bots notification service. This will send the subscribed channel different types of messages:
 
 - A **schedule** notification shows detailed information about the next upcoming launch. This message is sent every time the next upcoming launch has changed, e.g. if a launch date is changed or if a launch just happened so now the next upcoming launch is different. Currently changes are checked for every 60 seconds.
 
@@ -64,11 +63,11 @@ Currently there is no way to update the type and/or mentions you have set for a 
 
 ## Example Command Usage
 
-`add all @me @elon`
+`slb add all @me @elon`
 
-`add schedule`
+`slb add schedule`
 
-`add launch @everyone`
+`slb add launch @everyone`
 
 ## New Features
 
