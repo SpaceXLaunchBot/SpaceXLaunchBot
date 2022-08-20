@@ -7,9 +7,6 @@ from ..utils import md_link, utc_from_ts
 from . import colours
 from .better_embed import BetterEmbed
 
-# Pylint doesn't like `:=` apparently.
-# pylint: disable=superfluous-parens
-
 _IMAGE_BASE_URL = (
     "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 )

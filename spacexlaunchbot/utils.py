@@ -44,7 +44,9 @@ def sys_info() -> str:
             "platform-release": platform.release(),
             "platform-version": platform.version(),
             "architecture": platform.machine(),
-            "discord.version_info": version_info,
+            "discord-version_info": version_info,
+            "indev": config.INDEV,
+            "inside_docker": config.INSIDE_DOCKER,
             "commit-hash": version.HASH,
         }
     )

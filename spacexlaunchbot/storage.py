@@ -19,10 +19,10 @@ class SubscriptionOptions:
 class DataStore:
     """A class to handle storing bot data.
 
-    Must supply arguments for asyncpg.create_pool such as user, host, port, database.
+    Must a database connection pool from asyncpg.create_pool.
 
-    Stateful data is stored by serializing and loading from a file, subscribed channels
-    data is stored in a postgres database.
+    In-memory stateful data is stored by serializing and loading from a file,
+        subscribed channels data is stored in a postgres database.
 
     All methods that either return or take mutable objects as parameters make a deep
         copy of said object(s) so that changes cannot be made outside the instance.
@@ -39,7 +39,7 @@ class DataStore:
         # Boolean indicating if a launch notification has been sent for the current
         # schedule.
         self._launch_embed_for_current_schedule_sent: bool = False
-        # A dict of the most previously sent schedule embed (for comparison).
+        # A dict of the most previously sent schedule embed (for diffing).
         self._previous_schedule_embed_dict: dict = {}
 
         try:

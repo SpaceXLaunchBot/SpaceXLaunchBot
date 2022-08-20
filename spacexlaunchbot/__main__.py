@@ -3,9 +3,9 @@ from . import config, discordclient, utils
 
 def main() -> None:
     utils.setup_logging()
-    # TODO: Custom formatter for discord logging
     client = discordclient.SpaceXLaunchBotClient()
-    client.run(config.API_TOKEN_DISCORD, log_level=config.LOG_LEVEL)
+    # no log handler as we set up our own in setup_logging
+    client.run(config.API_TOKEN_DISCORD, log_handler=None)
 
 
 if __name__ == "__main__":

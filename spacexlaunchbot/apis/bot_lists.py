@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 import aiohttp
@@ -18,5 +19,8 @@ async def _post_count_to_bot_list(bl_data: Dict[str, str], guild_count: int) -> 
 
 
 async def post_all_bot_lists(guild_count: int) -> None:
+    if config.INDEV:
+        logging.info("Skipping as we are in dev environment")
+        return
     for data in config.BOT_LIST_DATA:
         await _post_count_to_bot_list(data, guild_count)
