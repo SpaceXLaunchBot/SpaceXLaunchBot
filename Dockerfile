@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bullseye
 
-RUN apt install gcc -y
+RUN apt-get update && apt-get install gcc -y
 
 WORKDIR /SpaceXLaunchBot
 COPY . .
