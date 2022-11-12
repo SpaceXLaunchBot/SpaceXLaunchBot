@@ -1,5 +1,7 @@
 FROM python:3.11-slim-bullseye
 
+RUN apt install gcc -y
+
 WORKDIR /SpaceXLaunchBot
 COPY . .
 
