@@ -160,6 +160,10 @@ class SpaceXLaunchBotClient(discord.Client):
         # send_notification.
 
     async def on_message(self, message: discord.Message) -> None:
+        # NOTE: Will keep this method for now, but since SLB doesn't ask for the
+        #   message content intent, I don't think this gets run anymore (or the
+        #   commands from the command module).
+
         if message.author.bot or not message.guild:
             return
 

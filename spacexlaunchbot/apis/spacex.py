@@ -54,9 +54,17 @@ async def get_launch_dict(launch_number: int = 0) -> Dict:
                 if response.status != 200:
                     logging.error(f"Failed with response status: {response.status}")
                     return {}
+
                 # Query endpoints return Mongo query responses.
                 # Limit is set to 1 and it's pretty much guaranteed there will be data.
-                return (await response.json())["docs"][0]
+                decoded = await response.json()
+                if len(decoded.get("docs", [])) == 0:
+                    logging.warning(
+                        f"No data returned for launch number {launch_number}"
+                    )
+                    return {}
+
+                return decoded["docs"][0]
 
     except aiohttp.ClientConnectorError:
         logging.error("Cannot connect to api.spacexdata.com")
