@@ -18,7 +18,6 @@ _DOMAIN = (
     f"https://{_SUBDOMAIN}.thespacedevs.com/2.2.0/launch/upcoming?limit=1&lsp__id=121"
 )
 
-
 # Cache all requests to launch library.
 # Will help with a potential fix for the /launch command.
 # We use NOTIF_TASK_API_INTERVAL as we set that to lowest possible for rate limit.
