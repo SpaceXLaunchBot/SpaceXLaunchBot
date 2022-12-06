@@ -2,10 +2,8 @@ import datetime
 import logging
 from enum import Enum
 
-from . import config
-from . import embeds
-from .apis import spacex
-
+from . import config, embeds
+from .apis import ll2
 
 _LAUNCHING_SOON_DELTA = datetime.timedelta(minutes=config.NOTIF_TASK_LAUNCH_DELTA)
 
@@ -30,7 +28,7 @@ async def check_and_send_notifications(client) -> None:
         client: The Discord client to use to send messages.
 
     """
-    next_launch_dict = await spacex.get_launch_dict()
+    next_launch_dict = await ll2.get_launch_dict()
     if next_launch_dict == {}:
         return
 
@@ -59,7 +57,11 @@ async def check_and_send_notifications(client) -> None:
     #
 
     try:
-        launch_timestamp = int(next_launch_dict["date_unix"])
+        # launch_timestamp = int(next_launch_dict["date_unix"])
+        launch_timestamp = int(
+            datetime.datetime.fromisoformat(next_launch_dict["net"]).timestamp()
+        )
+
     except ValueError:
         # Doesn't have a date, don't trigger notifications
         launch_timestamp = 0

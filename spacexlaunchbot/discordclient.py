@@ -8,7 +8,7 @@ import asyncpg
 import discord
 from discord import app_commands
 
-from . import apis, commands, config, embeds, storage
+from . import apis, config, embeds, storage
 from .notifications import NotificationType, check_and_send_notifications
 from .utils import sys_info
 
@@ -106,10 +106,11 @@ class SpaceXLaunchBotClient(discord.Client):
             description="Send the latest launch schedule message to the current channel",
         )(self.command_next_launch)
 
-        self.tree.command(
-            name="launch",
-            description="Send the launch schedule message for the given launch number to the current channel",
-        )(self.command_launch)
+        # FIXME: Can't really support this with the current rate limiting?
+        # self.tree.command(
+        #     name="launch",
+        #     description="Send the launch schedule message for the given launch number to the current channel",
+        # )(self.command_launch)
 
         self.tree.command(
             name="add",
@@ -129,14 +130,6 @@ class SpaceXLaunchBotClient(discord.Client):
         self.tree.command(name="help", description="List these commands")(
             self.command_help
         )
-
-        # self.tree.command(name="debug_launch_embed", description="")(
-        #     self.command_debug_launch_embed
-        # )
-        # self.tree.command(name="reset_notification_task_store", description="")(
-        #     self.command_reset_notification_task_store
-        # )
-        # self.tree.command(name="shutdown", description="")(self.command_shutdown)
 
         if not self.tree_synced:
             logging.info("Syncing command tree")
@@ -158,43 +151,6 @@ class SpaceXLaunchBotClient(discord.Client):
         await self.ds.register_metric("guild_remove", str(guild.id))
         # Any subscribed channels from this guild will be removed later by
         # send_notification.
-
-    async def on_message(self, message: discord.Message) -> None:
-        # NOTE: Will keep this method for now, but since SLB doesn't ask for the
-        #   message content intent, I don't think this gets run anymore (or the
-        #   commands from the command module).
-
-        if message.author.bot or not message.guild:
-            return
-
-        message_parts = message.content.lower().split(" ")
-        to_send = None
-
-        try:
-            if message_parts[0] == config.BOT_MENTION_STR:
-                command_used = "help"
-            elif message_parts[0] != config.BOT_COMMAND_PREFIX:
-                return
-            else:
-                command_used = message_parts[1]
-
-            run_command = commands.COMMAND_LOOKUP[command_used]
-            to_send = await run_command(
-                client=self, message=message, operands=message_parts[2:]
-            )
-            await self.ds.register_metric(
-                f"command_{command_used}", str(message.guild.id)
-            )
-
-        except (KeyError, IndexError):
-            pass  # Message contained wrong or no command
-        except TypeError:
-            logging.exception(f"run_command TypeError: {message.content=}")
-
-        if to_send is None:
-            return
-
-        await self._send_s(message.channel, to_send)
 
     #
     # Helpers
@@ -378,23 +334,24 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def command_next_launch(self, interaction: discord.Interaction):
         response: discord.Embed
-        next_launch_dict = await apis.spacex.get_launch_dict()
+        next_launch_dict = await apis.ll2.get_launch_dict()
         if next_launch_dict == {}:
             response = embeds.API_ERROR_EMBED
         else:
             response = embeds.create_schedule_embed(next_launch_dict)
         await interaction.response.send_message(embed=response)
 
-    async def command_launch(
-        self, interaction: discord.Interaction, launch_number: int
-    ):
-        response: discord.Embed
-        launch_dict = await apis.spacex.get_launch_dict(launch_number)
-        if launch_dict == {}:
-            response = embeds.API_ERROR_EMBED
-        else:
-            response = embeds.create_schedule_embed(launch_dict)
-        await interaction.response.send_message(embed=response)
+    # FIXME: This will cause us to rate limit I imagine...
+    # async def command_launch(
+    #     self, interaction: discord.Interaction, launch_number: int
+    # ):
+    #     response: discord.Embed
+    #     launch_dict = await apis.ll2.get_launch_dict(launch_number)
+    #     if launch_dict == {}:
+    #         response = embeds.API_ERROR_EMBED
+    #     else:
+    #         response = embeds.create_schedule_embed(launch_dict)
+    #     await interaction.response.send_message(embed=response)
 
     async def command_add(
         self,
@@ -473,39 +430,3 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def command_help(self, interaction: discord.Interaction):
         await interaction.response.send_message(embed=embeds.HELP_EMBED)
-
-    # async def command_debug_launch_embed(
-    #     self, interaction: discord.Interaction, launch_number: int
-    # ):
-    #     """Send a launch notification embed for the given launch."""
-    #     if self.interaction_from_owner(interaction) == False:
-    #         return
-
-    #     response: discord.Embed
-
-    #     launch_dict = await apis.spacex.get_launch_dict(launch_number)
-    #     if launch_dict == {}:
-    #         await interaction.response.send_message("API returned `{}`")
-    #     else:
-    #         await interaction.response.send_message(
-    #             embed=embeds.create_launch_embed(launch_dict)
-    #         )
-
-    # async def command_reset_notification_task_store(
-    #     self, interaction: discord.Interaction
-    # ):
-    #     """Reset notification_task_store to default (will trigger new notifications)."""
-    #     if self.interaction_from_owner(interaction) == False:
-    #         return
-    #     logging.warning("reset notification task store command called")
-    #     self.ds.set_notification_task_vars(False, {})
-    #     await interaction.response.send_message(
-    #         "Reset using `set_notification_task_vars(False, {})`"
-    #     )
-
-    # async def command_shutdown(self, interaction: discord.Interaction):
-    #     if self.interaction_from_owner(interaction) == False:
-    #         return
-    #     logging.info("shutdown command called")
-    #     await interaction.response.send_message("cya bitch")
-    #     await self.shutdown()

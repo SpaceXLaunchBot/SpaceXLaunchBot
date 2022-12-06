@@ -1,9 +1,7 @@
-import random
-
 import discord
 
 from .. import config, version
-from ..utils import md_link, utc_from_ts
+from ..utils import md_link, utc_from_time
 from . import colours
 from .better_embed import BetterEmbed
 
@@ -29,77 +27,76 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
         A BetterEmbed object.
 
     """
+    # pylint: disable=line-too-long
+
     # TODO: The "launch" command can request a launch that won't have all the data and
     #  currently will cause errors (e.g. NoneType TypeError as data does not exist).
-    launch_date_str = utc_from_ts(launch_info["date_unix"])
+    launch_date_str = utc_from_time(launch_info["net"])
 
     fields = [
         [
             "Launch Vehicle",
-            f'{launch_info["rocket"]["name"]} {launch_info["rocket"]["type"]}',
+            f'{launch_info["rocket"]["configuration"]["full_name"]}',
         ],
         [
             "Launch Date (UTC)",
-            f'{launch_date_str}\nPrecision: {launch_info["date_precision"]}',
+            f'{launch_date_str}\nStatus: {launch_info["status"]["name"]}',
         ],
-        ["Launch Site", launch_info["launchpad"]["full_name"]],
+        ["Launch Site", launch_info["pad"]["name"]],
     ]
 
-    for core_dict in launch_info["cores"]:
-        core_info = ""
+    # for core_dict in launch_info["cores"]:
+    #     core_info = ""
 
-        if core_dict["core"] is not None:
-            core_info += f'Serial: {core_dict["core"]["serial"]}\n'
+    #     if core_dict["core"] is not None:
+    #         core_info += f'Serial: {core_dict["core"]["serial"]}\n'
 
-        core_info += f'Flight: {core_dict["flight"]}'
+    #     core_info += f'Flight: {core_dict["flight"]}'
 
-        if core_dict["landing_attempt"] is False:
-            core_info += "\nLanding: No"
-        else:
-            core_info += f'\nLanding: Yes\nLanding Type: {core_dict["landing_type"]}'
+    #     if core_dict["landing_attempt"] is False:
+    #         core_info += "\nLanding: No"
+    #     else:
+    #         core_info += f'\nLanding: Yes\nLanding Type: {core_dict["landing_type"]}'
 
-        if core_dict["landpad"] is not None:
-            core_info += f'\nLanding Location: {core_dict["landpad"]["name"]}'
+    #     if core_dict["landpad"] is not None:
+    #         core_info += f'\nLanding Location: {core_dict["landpad"]["name"]}'
 
-        fields.append(["Core Info", core_info])
+    #     fields.append(["Core Info", core_info])
 
-    # Add a field for each payload, with basic information
-    payload_info = "Type: {}\nOrbit: {}\nMass: {}kg\nManufacturer{}: {}\nCustomer{}: {}"
-    for payload in launch_info["payloads"]:
-        fields.append(
-            [
-                f'Payload: {payload["name"]}',
-                payload_info.format(
-                    payload["type"],
-                    payload["orbit"],
-                    payload["mass_kg"],
-                    "s" if len(payload["manufacturers"]) > 1 else "",
-                    ", ".join(payload["manufacturers"]),
-                    "s" if len(payload["customers"]) > 1 else "",
-                    ", ".join(payload["customers"]),
-                ),
-            ]
-        )
+    # Add a field for the payload
+    payload_info = "Name: {}\nType: {}\nOrbit: {}"
+    fields.append(
+        [
+            "Payload",
+            payload_info.format(
+                launch_info["mission"]["name"],
+                launch_info["mission"]["type"],
+                launch_info["mission"]["orbit"]["name"],
+            ),
+        ]
+    )
 
     schedule_embed = BetterEmbed(
         color=colours.RED_FALCON,
-        description=launch_info["details"] or "",
-        title=f'Launch #{launch_info["flight_number"]} - {launch_info["name"]}',
+        description=launch_info["mission"]["description"] or "",
+        title=f'Launch #{launch_info["agency_launch_attempt_count"]} - {launch_info["mission"]["name"]}',
         fields=fields,
     )
 
-    if (reddit_url := launch_info["links"]["reddit"]["campaign"]) is not None:
-        schedule_embed.description += "\n" + (  # type: ignore
-            f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
-        )
+    # if (reddit_url := launch_info["links"]["reddit"]["campaign"]) is not None:
+    #     schedule_embed.description += "\n" + (  # type: ignore
+    #         f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
+    #     )
 
-    if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
-        schedule_embed.set_thumbnail(url=patch_url)
-    elif (rocket_id := launch_info["rocket"]["name"]) in _ROCKET_NAME_IMAGES:
+    # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
+    #     schedule_embed.set_thumbnail(url=patch_url)
+    if (
+        rocket_id := launch_info["rocket"]["configuration"]["name"]
+    ) in _ROCKET_NAME_IMAGES:
         schedule_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
-    if flickr_urls := launch_info["links"]["flickr"]["original"]:
-        schedule_embed.set_image(url=random.choice(flickr_urls))
+    # if flickr_urls := launch_info["links"]["flickr"]["original"]:
+    #     schedule_embed.set_image(url=random.choice(flickr_urls))
 
     return schedule_embed
 
@@ -115,16 +112,16 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
 
     """
     embed_desc = ""
-    launch_date_str = utc_from_ts(launch_info["date_unix"])
+    launch_date_str = utc_from_time(launch_info["net"])
 
-    if (video_url := launch_info["links"]["webcast"]) is not None:
-        embed_desc += md_link("Livestream", video_url) + "\n"
+    # if (video_url := launch_info["links"]["webcast"]) is not None:
+    #     embed_desc += md_link("Livestream", video_url) + "\n"
 
-    if (reddit_url := launch_info["links"]["reddit"]["launch"]) is not None:
-        embed_desc += md_link("r/SpaceX Launch Thread", reddit_url) + "\n"
+    # if (reddit_url := launch_info["links"]["reddit"]["launch"]) is not None:
+    #     embed_desc += md_link("r/SpaceX Launch Thread", reddit_url) + "\n"
 
-    if (press_kit_url := launch_info["links"]["presskit"]) is not None:
-        embed_desc += md_link("Press kit", press_kit_url) + "\n"
+    # if (press_kit_url := launch_info["links"]["presskit"]) is not None:
+    #     embed_desc += md_link("Press kit", press_kit_url) + "\n"
 
     launch_embed = BetterEmbed(
         title=f"{launch_info['name']} is launching soon!",
@@ -133,9 +130,11 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
         fields=[["Launch date (UTC)", launch_date_str]],
     )
 
-    if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
-        launch_embed.set_thumbnail(url=patch_url)
-    elif (rocket_id := launch_info["rocket"]["name"]) in _ROCKET_NAME_IMAGES:
+    # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
+    #     launch_embed.set_thumbnail(url=patch_url)
+    if (
+        rocket_id := launch_info["rocket"]["configuration"]["name"]
+    ) in _ROCKET_NAME_IMAGES:
         launch_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
     return launch_embed

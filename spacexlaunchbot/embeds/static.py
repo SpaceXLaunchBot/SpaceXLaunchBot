@@ -16,7 +16,8 @@ HELP_EMBED = BetterEmbed(
         ],
         [
             "launch [launch number]",
-            "Send the launch schedule message for the given launch number to the current channel",
+            "Currently disabled due to new API rate limits",
+            # "Send the launch schedule message for the gi,ven launch number to the current channel",
         ],
         [
             "add [type] [mentions]",
