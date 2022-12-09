@@ -28,13 +28,9 @@
 
 A Discord bot for getting news, information, and notifications about upcoming SpaceX launches. Get update notifications with the latest launch information and reminders for launches that will be happening soon.
 
-Now supporting [slash commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ)!
-
-See the [official SpaceXLaunchBot website](https://spacexlaunchbot.dev/)
+See the [official SpaceXLaunchBot website](https://spacexlaunchbot.dev/)!
 
 ## Commands
-
-Available as message commands using the prefix `slb` (until September 1st), as well as slash commands
 
 Command|Description|Permissions needed
 ---|---|---
@@ -60,14 +56,6 @@ The `add` command allows admins to subscribe text channels to the bots notificat
 If you want to receive both types of notification you can use **all**.
 
 Currently there is no way to update the type and/or mentions you have set for a channel. If you need to change these just call `remove` and then `add` with your new options.
-
-## Example Command Usage
-
-`slb add all @me @elon`
-
-`slb add schedule`
-
-`slb add launch @everyone`
 
 ## New Features
 

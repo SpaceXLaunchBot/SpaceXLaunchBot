@@ -6,7 +6,7 @@ from .better_embed import BetterEmbed
 
 HELP_EMBED = BetterEmbed(
     title="SpaceXLaunchBot Commands",
-    description="SpaceXLaunchbot now supports [slash commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ)!\nSupport for message commands will end September 1st",
+    description="SpaceXLaunchbot now supports [slash commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ)!",
     color=colours.RED_FALCON,
     inline_fields=False,
     fields=[
