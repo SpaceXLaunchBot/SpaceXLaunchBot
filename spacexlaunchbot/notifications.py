@@ -69,6 +69,9 @@ async def check_and_send_notifications(client) -> None:
     current_time = datetime.datetime.utcnow()
     current_time_plus_delta = (current_time + _LAUNCHING_SOON_DELTA).timestamp()
 
+    # TODO: date_precision doesn't exist anymore, not in the same location anyway
+    # TODO: Don't notify (above notif) for Status: Launch in Flight?
+
     # If the launch time is within the next NOTIF_TASK_LAUNCH_DELTA, and if the
     # launch_timestamp is not in the past, and we haven't already sent the notif,
     # and the launch time precision is at the best.
