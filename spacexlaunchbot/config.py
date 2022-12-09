@@ -67,7 +67,7 @@ BOT_LIST_DATA = [
         "guild_count_parameter": "guildCount",
     },
     {
-        "url": f"https://botsfordiscord.com/api/bot/{BOT_CLIENT_ID}",
+        "url": f"https://discords.com/bots/api/bot/{BOT_CLIENT_ID}",
         "token": os.environ.get("SLB_API_TOKEN_BOT_LIST_BFD", BOT_LIST_DEFAULT_TOKEN),
         "guild_count_parameter": "server_count",
     },
