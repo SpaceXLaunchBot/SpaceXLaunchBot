@@ -10,7 +10,7 @@ from discord import app_commands
 
 from . import apis, config, embeds, storage
 from .notifications import NotificationType, check_and_send_notifications
-from .utils import sys_info
+from .utils import PostgresLogger, sys_info
 
 ONE_MINUTE = 60
 
@@ -55,6 +55,11 @@ class SpaceXLaunchBotClient(discord.Client):
         logging.info(
             f"Pooled with {self.db_pool.get_size()}/{self.db_pool.get_max_size()} connections"
         )
+
+        logging.getLogger().addHandler(
+            PostgresLogger(config.LOG_FORMAT, self.loop, self.db_pool)
+        )
+        logging.info("Initialised Postgres logger")
 
         self.ds = storage.DataStore(
             self.db_pool,

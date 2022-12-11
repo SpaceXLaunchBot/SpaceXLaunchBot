@@ -7,7 +7,7 @@ from typing import Union
 
 from discord import version_info
 
-from . import config, version
+from .. import config, version
 
 
 def utc_from_time(date_string: Union[str, None]) -> str:

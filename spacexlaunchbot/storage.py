@@ -32,7 +32,7 @@ class DataStore:
      - https://stackoverflow.com/a/986145/6396652
     """
 
-    def __init__(self, db_pool, pickle_file_path: str):
+    def __init__(self, db_pool: asyncpg.Pool, pickle_file_path: str):
         self._pickle_file_path = pickle_file_path
         self.db_pool = db_pool
 
