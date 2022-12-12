@@ -51,6 +51,8 @@ class SpaceXLaunchBotClient(discord.Client):
             host=config.DB_HOST,
             port=config.DB_PORT,
             database=config.DB_NAME,
+            min_size=config.DB_POOL_MIN_CONNECTIONS,
+            max_size=config.DB_POOL_MAX_CONNECTIONS,
         )
         logging.info(
             f"Pooled with {self.db_pool.get_size()}/{self.db_pool.get_max_size()} connections"

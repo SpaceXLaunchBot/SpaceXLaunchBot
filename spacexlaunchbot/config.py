@@ -43,6 +43,10 @@ DB_USER = os.environ.get("POSTGRES_USER", "slb")
 DB_PASS = os.environ["POSTGRES_PASSWORD"]
 DB_NAME = os.environ.get("POSTGRES_DB", "spacexlaunchbot")
 
+# Seem like sensible defaults, may need tuning if DB is used by other applications.
+DB_POOL_MIN_CONNECTIONS = 10
+DB_POOL_MAX_CONNECTIONS = 50
+
 #
 # API
 #
