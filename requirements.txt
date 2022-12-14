@@ -3,3 +3,4 @@ aiohttp<4.0,>=3.8
 asyncpg>=0.27.0
 aiohttp-client-cache==0.7.3
 aiosqlite==0.17.0
+discordhealthcheck==0.1.1

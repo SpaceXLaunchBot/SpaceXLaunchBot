@@ -6,6 +6,7 @@ from typing import Union
 
 import asyncpg
 import discord
+import discordhealthcheck
 from discord import app_commands
 
 from . import apis, config, embeds, storage
@@ -69,9 +70,11 @@ class SpaceXLaunchBotClient(discord.Client):
         )
         logging.info("Data storage initialised")
 
+        self.healthcheck_server = await discordhealthcheck.start(self)
+        logging.info("Started healthcheck server")
+
         self.notification_task = self.loop.create_task(self.start_notification_loop())
         self.counts_task = self.loop.create_task(self.start_db_counts_loop())
-        # self.healthcheck_server = discordhealthcheck.start(self)
 
         self.dc_logger: Union[asyncio.Task, None] = None
 
