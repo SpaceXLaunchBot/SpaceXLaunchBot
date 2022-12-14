@@ -20,7 +20,7 @@ class SpaceXLaunchBotClient(discord.Client):
     # - The signals package is a bit iffy when it comes to pylint.
     #   See https://github.com/PyCQA/pylint/issues/2804
     # - Disable line-too-long because I'm lazy
-    # pylint: disable=no-member,line-too-long,too-many-public-methods
+    # pylint: disable=no-member,line-too-long,too-many-public-methods,too-many-instance-attributes
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, intents=discord.Intents.default())
@@ -203,9 +203,9 @@ class SpaceXLaunchBotClient(discord.Client):
         self.counts_task.cancel()
         await self.counts_task
 
-        # logging.info("Closing healthcheck server")
-        # self.healthcheck_server.close()
-        # await self.healthcheck_server.wait_closed()
+        logging.info("Closing healthcheck server")
+        self.healthcheck_server.close()
+        await self.healthcheck_server.wait_closed()
 
         logging.info("Goodbye")
         await self.close()
