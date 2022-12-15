@@ -48,7 +48,7 @@ DB_POOL_MIN_CONNECTIONS = 10
 DB_POOL_MAX_CONNECTIONS = 50
 
 #
-# API
+# Discord & Related APIs
 #
 
 API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
@@ -85,13 +85,26 @@ LOG_FORMAT = "%(asctime)s | %(levelname)s | %(module)s | %(funcName)s | %(messag
 LOG_LEVEL = logging.INFO
 
 #
+# Rate Limits (in minutes)
+#
+
+# Currently just used to validate NOTIF_TASK_INTERVAL
+API_RATELIMIT_MIN_WAIT_LL2 = 5
+
+#
 # Notifications
 #
 
-# How many minutes to wait in-between checking the SpaceX API for updates
+# How many minutes to wait in-between checking for notifications to send
 # This does not take into account time taken to process the data and to send out notifs
-NOTIF_TASK_API_INTERVAL = 5
+NOTIF_TASK_INTERVAL = 5
 
 # How many minutes to look into the future for an upcoming launch time
-# Must be > NOTIF_TASK_API_INTERVAL else you risk skipping a launch
+# Must be > NOTIF_TASK_INTERVAL else you risk skipping a launch
 NOTIF_TASK_LAUNCH_DELTA = 30
+
+
+def validate():
+    assert DB_POOL_MAX_CONNECTIONS >= DB_POOL_MIN_CONNECTIONS
+    assert NOTIF_TASK_INTERVAL >= API_RATELIMIT_MIN_WAIT_LL2
+    assert NOTIF_TASK_LAUNCH_DELTA > NOTIF_TASK_INTERVAL

@@ -20,9 +20,9 @@ _DOMAIN = (
 
 # Cache all requests to launch library.
 # Will help with a potential fix for the /launch command.
-# We use NOTIF_TASK_API_INTERVAL as we set that to lowest possible for rate limit.
+# We use NOTIF_TASK_INTERVAL as we set that to lowest possible for rate limit.
 _REQUEST_CACHE = SQLiteBackend(
-    cache_name="./ll2.cache.sqlite", expire_after=60 * config.NOTIF_TASK_API_INTERVAL
+    cache_name="./ll2.cache.sqlite", expire_after=60 * config.NOTIF_TASK_INTERVAL
 )
 
 

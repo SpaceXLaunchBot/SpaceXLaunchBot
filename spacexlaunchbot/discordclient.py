@@ -318,7 +318,7 @@ class SpaceXLaunchBotClient(discord.Client):
         while not self.is_closed():
             try:
                 await check_and_send_notifications(self)
-                await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_API_INTERVAL)
+                await asyncio.sleep(ONE_MINUTE * config.NOTIF_TASK_INTERVAL)
             except asyncio.CancelledError:
                 logging.info("Cancelled, stopping")
                 break
