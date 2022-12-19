@@ -203,7 +203,7 @@ class DataStore:
                 return True
         return False
 
-    async def week_old_counts(self) -> list[int, int]:
+    async def week_old_counts(self) -> tuple[int, int]:
         """Get guild and subsribed count from 1 week ago.
 
         Returns:
