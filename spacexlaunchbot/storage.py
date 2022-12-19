@@ -202,3 +202,29 @@ class DataStore:
             if response == "INSERT 0 1":
                 return True
         return False
+
+    async def week_old_counts(self) -> list[int, int]:
+        """Get guild and subsribed count from 1 week ago.
+
+        Returns:
+            guild count, subscribed channel count
+        """
+        sql = """
+        select
+            guild_count,
+            subscribed_count
+        from
+            counts
+        where
+            time between now() - interval '7 days' and now()
+        order by
+            time asc
+        limit
+            1;"""
+        async with self.db_pool.acquire() as conn:
+            records = await conn.fetch(sql)
+        try:
+            record = records[0]
+            return int(record["guild_count"]), int(record["subscribed_count"])
+        except (IndexError, ValueError, KeyError):
+            return 0, 0

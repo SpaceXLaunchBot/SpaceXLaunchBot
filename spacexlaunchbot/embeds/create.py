@@ -145,13 +145,22 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
 
 
 def create_info_embed(
-    guild_count: int, subbed_channel_count: int, latency_ms: float
+    guild_count: int,
+    guild_count_diff: int,
+    subbed_channel_count: int,
+    subbed_channel_count_diff: int,
+    latency_ms: float,
 ) -> BetterEmbed:
     """Creates an info embed.
 
     Args:
         guild_count: The number of guilds the bot is currently a member of.
+        guild_count_diff:
+            The difference in the number of guilds compared to 1 week ago.
         subbed_channel_count: The number of currently subscribed channels.
+        subbed_channel_count_diff:
+            The difference in the number of currently subscribed channels compared to
+            1 week ago.
         latency_ms: The latency to Discord in ms.
 
     Returns:
@@ -165,8 +174,14 @@ def create_info_embed(
         description="A Discord bot for getting news, information, and notifications "
         "about upcoming SpaceX launches",
         fields=[
-            ["Guild Count", f"{guild_count}"],
-            ["Subscribed Channel Count", f"{subbed_channel_count}"],
+            [
+                "Guild Count",
+                f"{guild_count} ({guild_count_diff:+})",
+            ],  # :+ always shows the integers sign
+            [
+                "Subscribed Channel Count",
+                f"{subbed_channel_count} ({subbed_channel_count_diff:+})",
+            ],
             ["Latency to Discord", f"{latency_ms}ms"],
             [
                 "Links",

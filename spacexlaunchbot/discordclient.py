@@ -434,8 +434,19 @@ class SpaceXLaunchBotClient(discord.Client):
     async def command_info(self, interaction: discord.Interaction):
         guild_count = len(self.guilds)
         channel_count = await self.ds.subbed_channels_count()
+
+        old_guild_count, old_channel_count = await self.ds.week_old_counts()
+        guild_count_diff = guild_count - old_guild_count
+        channel_cout_diff = channel_count - old_channel_count
+
         await interaction.response.send_message(
-            embed=embeds.create_info_embed(guild_count, channel_count, self.latency_ms)
+            embed=embeds.create_info_embed(
+                guild_count,
+                guild_count_diff,
+                channel_count,
+                channel_cout_diff,
+                self.latency_ms,
+            )
         )
 
     async def command_help(self, interaction: discord.Interaction):
