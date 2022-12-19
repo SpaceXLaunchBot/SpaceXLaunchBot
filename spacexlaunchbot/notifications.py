@@ -46,7 +46,12 @@ async def check_and_send_notifications(client) -> None:
         previous_schedule_embed_dict, schedule_embed.to_dict()
     )
 
-    if diff_str != "":
+    before_flight = not next_launch_dict["status"]["name"] in [
+        "Launch in Flight",
+        "Launch Successful",
+    ]
+
+    if before_flight and diff_str != "":
         logging.info(f"Sending notifications for launch schedule, diff: {diff_str}")
         schedule_embed.set_footer(text=diff_str)
         await client.send_notification(schedule_embed, NotificationType.schedule)
@@ -69,16 +74,13 @@ async def check_and_send_notifications(client) -> None:
     current_time = datetime.datetime.utcnow()
     current_time_plus_delta = (current_time + _LAUNCHING_SOON_DELTA).timestamp()
 
-    # TODO: date_precision doesn't exist anymore, not in the same location anyway
-    # TODO: Don't notify (above notif) for Status: Launch in Flight?
-
     # If the launch time is within the next NOTIF_TASK_LAUNCH_DELTA, and if the
     # launch_timestamp is not in the past, and we haven't already sent the notif,
     # and the launch time precision is at the best.
     if (
         current_time_plus_delta >= launch_timestamp >= current_time.timestamp()
         and launch_embed_for_current_schedule_sent is False
-        and next_launch_dict.get("date_precision", "") == "hour"
+        and next_launch_dict["status"]["id"] == 1  # 1 is "Go for Launch"
     ):
         logging.info(f"Sending notifications for launch @ timestamp {launch_timestamp}")
         launch_embed_for_current_schedule_sent = True

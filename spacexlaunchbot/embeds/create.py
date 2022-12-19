@@ -40,7 +40,11 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
         ],
         [
             "Launch Date (UTC)",
-            f'{launch_date_str}\nStatus: {launch_info["status"]["name"]}',
+            f"{launch_date_str}",
+        ],
+        [
+            "Launch Status",
+            f'{launch_info["status"]["name"]}',
         ],
         ["Launch Site", launch_info["pad"]["name"]],
     ]
