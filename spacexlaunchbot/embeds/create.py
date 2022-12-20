@@ -156,11 +156,11 @@ def create_info_embed(
     Args:
         guild_count: The number of guilds the bot is currently a member of.
         guild_count_diff:
-            The difference in the number of guilds compared to 1 week ago.
+            The difference in the number of guilds compared to 1 day ago.
         subbed_channel_count: The number of currently subscribed channels.
         subbed_channel_count_diff:
             The difference in the number of currently subscribed channels compared to
-            1 week ago.
+            1 day ago.
         latency_ms: The latency to Discord in ms.
 
     Returns:

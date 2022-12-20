@@ -435,7 +435,7 @@ class SpaceXLaunchBotClient(discord.Client):
         guild_count = len(self.guilds)
         channel_count = await self.ds.subbed_channels_count()
 
-        old_guild_count, old_channel_count = await self.ds.week_old_counts()
+        old_guild_count, old_channel_count = await self.ds.day_old_counts()
         guild_count_diff = guild_count - old_guild_count
         channel_cout_diff = channel_count - old_channel_count
 

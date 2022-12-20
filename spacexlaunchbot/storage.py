@@ -203,8 +203,8 @@ class DataStore:
                 return True
         return False
 
-    async def week_old_counts(self) -> tuple[int, int]:
-        """Get guild and subsribed count from 1 week ago.
+    async def day_old_counts(self) -> tuple[int, int]:
+        """Get guild and subsribed count from 24 hours ago.
 
         Returns:
             guild count, subscribed channel count
@@ -216,7 +216,7 @@ class DataStore:
         from
             counts
         where
-            time between now() - interval '7 days' and now()
+            time between now() - interval '1 day' and now()
         order by
             time asc
         limit
