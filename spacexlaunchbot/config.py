@@ -16,7 +16,7 @@ BOT_GAME_NAME = "with rockets"
 BOT_GITHUB_URL = "https://github.com/r-spacex/SpaceXLaunchBot"
 BOT_CLIENT_ID = 412281000140472323 if INDEV else 411618411169447950
 # BOT_MENTION_STR = f"<@!{BOT_CLIENT_ID}>"
-BOT_INVITE_PERMISSIONS = "2147633152"
+BOT_INVITE_PERMISSIONS = "2147614720"
 BOT_INVITE_URL = (
     "https://discord.com/oauth2/authorize?scope=bot"
     f"&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
