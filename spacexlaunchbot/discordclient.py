@@ -343,7 +343,7 @@ class SpaceXLaunchBotClient(discord.Client):
     #
 
     async def command_next_launch(self, interaction: discord.Interaction):
-        self.ds.register_metric("command_next_launch", str(interaction.guild_id))
+        await self.ds.register_metric("command_next_launch", str(interaction.guild_id))
         response: discord.Embed
         next_launch_dict = await apis.ll2.get_launch_dict()
         if next_launch_dict == {}:
@@ -356,7 +356,7 @@ class SpaceXLaunchBotClient(discord.Client):
     # async def command_launch(
     #     self, interaction: discord.Interaction, launch_number: int
     # ):
-    #     self.ds.register_metric("command_launch", str(interaction.guild_id))
+    #     await self.ds.register_metric("command_launch", str(interaction.guild_id))
     #     response: discord.Embed
     #     launch_dict = await apis.ll2.get_launch_dict(launch_number)
     #     if launch_dict == {}:
@@ -377,7 +377,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             return
 
-        self.ds.register_metric("command_add", str(interaction.guild_id))
+        await self.ds.register_metric("command_add", str(interaction.guild_id))
 
         response: discord.Embed
 
@@ -420,7 +420,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             return
 
-        self.ds.register_metric("command_remove", str(interaction.guild_id))
+        await self.ds.register_metric("command_remove", str(interaction.guild_id))
 
         response: discord.Embed
 
@@ -438,7 +438,7 @@ class SpaceXLaunchBotClient(discord.Client):
         await interaction.response.send_message(embed=response)
 
     async def command_info(self, interaction: discord.Interaction):
-        self.ds.register_metric("command_info", str(interaction.guild_id))
+        await self.ds.register_metric("command_info", str(interaction.guild_id))
 
         guild_count = len(self.guilds)
         channel_count = await self.ds.subbed_channels_count()
@@ -458,5 +458,5 @@ class SpaceXLaunchBotClient(discord.Client):
         )
 
     async def command_help(self, interaction: discord.Interaction):
-        self.ds.register_metric("command_help", str(interaction.guild_id))
+        await self.ds.register_metric("command_help", str(interaction.guild_id))
         await interaction.response.send_message(embed=embeds.HELP_EMBED)
