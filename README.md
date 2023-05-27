@@ -11,7 +11,7 @@
         <img src="https://top.gg/api/widget/owner/411618411169447950.svg?noavatar=true" alt="SpaceXLaunchBot owner id" />
     </a>
     <br/>
-    <a href="https://discord.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=2147614720">
+    <a href="https://discord.com/oauth2/authorize?client_id=411618411169447950&scope=bot&permissions=2147633152">
         <img src="https://img.shields.io/badge/Discord-Bot%20Invite-blue.svg?style=flat&colorA=35383d" alt="Discord Invite"/>
     </a>
     <a href="https://discord.gg/j6vbHkYSES">
