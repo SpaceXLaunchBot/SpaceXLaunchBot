@@ -10,7 +10,7 @@ INDEV = os.name == "nt"
 WEBSITE_URL = "https://spacexlaunchbot.dev/"
 
 BOT_OWNER_NAME = "Dragon#0571"
-# BOT_OWNER_ID = 263412940869206027
+BOT_OWNER_ID = 263412940869206027
 BOT_COMMAND_PREFIX = "slb"
 BOT_GAME_NAME = "with rockets"
 BOT_GITHUB_URL = "https://github.com/r-spacex/SpaceXLaunchBot"

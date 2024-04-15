@@ -369,7 +369,7 @@ class SpaceXLaunchBotClient(discord.Client):
         self,
         interaction: discord.Interaction,
         notification_type: str,
-        notification_mentions: str,
+        notification_mentions: str | None = None,
     ):
         if self.interaction_from_admin(interaction) is False:
             await interaction.response.send_message(
@@ -378,8 +378,6 @@ class SpaceXLaunchBotClient(discord.Client):
             return
 
         await self.ds.register_metric("command_add", str(interaction.guild_id))
-
-        response: discord.Embed
 
         try:
             notification_type = NotificationType[notification_type]  # type: ignore
@@ -392,15 +390,15 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             return
 
-        notif_mentions_str = " ".join(notification_mentions)
-
+        response: discord.Embed
         added = await self.ds.add_subbed_channel(
             str(interaction.channel_id),
             interaction.channel.name,  # type: ignore
             str(interaction.guild_id),
             notification_type,
-            notif_mentions_str,
+            notification_mentions,
         )
+
         if added is False:
             response = embeds.create_interaction_embed(
                 "This channel is already subscribed to the notification service",
@@ -411,6 +409,7 @@ class SpaceXLaunchBotClient(discord.Client):
             response = embeds.create_interaction_embed(
                 "This channel has been added to the notification service"
             )
+
         await interaction.response.send_message(embed=response)
 
     async def command_remove(self, interaction: discord.Interaction):

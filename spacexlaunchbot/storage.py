@@ -83,7 +83,7 @@ class DataStore:
         channel_name: str,
         guild_id: str,
         notif_type: NotificationType,
-        launch_mentions: str,
+        launch_mentions: str | None,
     ) -> bool:
         """Add a channel to subscribed channels.
 
