@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye
+FROM python:3.12-slim-bookworm
 
 RUN apt-get update && apt-get install gcc -y
 
@@ -7,8 +7,9 @@ COPY . .
 
 RUN printf "HASH = \"$(cat ./.git/refs/heads/master)\"\nSHORT_HASH = \"$(head -c 7 ./.git/refs/heads/master)\"\n" > ./spacexlaunchbot/version.py
 
-ENV INSIDE_DOCKER "True"
+ENV INSIDE_DOCKER="True"
 
+RUN pip install setuptools
 RUN python setup.py install
 
 HEALTHCHECK --interval=5m --timeout=10s \
