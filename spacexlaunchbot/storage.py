@@ -77,6 +77,7 @@ class DataStore:
         self._previous_schedule_embed_dict = deepcopy(previous_schedule_embed_dict)
         self.save_state()
 
+    # pylint: disable=too-many-positional-arguments
     async def add_subbed_channel(
         self,
         channel_id: str,

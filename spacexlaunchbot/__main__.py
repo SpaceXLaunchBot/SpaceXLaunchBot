@@ -8,7 +8,7 @@ def main() -> None:
     client: discordclient.SpaceXLaunchBotClient | adminclient.AdminSpaceXLaunchBotClient
 
     if config.INDEV and not config.INSIDE_DOCKER:
-        print(f"\n\n{'!'*10}\n\nADMIN MODE ACTIVE\n\n{'!'*10}\n\n")
+        print(f"\n\n{'!' * 10}\n\nADMIN MODE ACTIVE\n\n{'!' * 10}\n\n")
         if input("Type 'ok' to continue\n") != "ok":
             return
         client = adminclient.AdminSpaceXLaunchBotClient()

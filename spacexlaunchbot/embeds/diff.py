@@ -53,4 +53,4 @@ def diff_schedule_embed_dicts(old_embed: dict, new_embed: EmbedData) -> str:
         return ""
     if len(diffs) == 1:
         return f"Changed: {diffs[0]}"
-    return f"Changed: {diffs[0]} + {len(diffs)-1} more"
+    return f"Changed: {diffs[0]} + {len(diffs) - 1} more"
