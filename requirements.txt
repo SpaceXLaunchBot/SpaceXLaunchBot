@@ -1,6 +1,6 @@
-discord.py==2.4.0
+discord.py==2.5.2
 aiohttp<4.0,>=3.8
 asyncpg==0.30.0
-aiohttp-client-cache==0.12.4
+aiohttp-client-cache==0.13.0
 aiosqlite==0.21.0
 discordhealthcheck==0.1.1
