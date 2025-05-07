@@ -9,7 +9,9 @@ RUN printf "HASH = \"$(cat ./.git/refs/heads/master)\"\nSHORT_HASH = \"$(head -c
 
 ENV INSIDE_DOCKER="True"
 
+# TODO: Migrate to modern Python tooling
 RUN pip install setuptools
+RUN pip install -r requirements.txt
 RUN python setup.py install
 
 HEALTHCHECK --interval=5m --timeout=10s \
