@@ -16,6 +16,21 @@ def utc_from_time(date_string: Union[str, None]) -> str:
     return datetime.datetime.fromisoformat(date_string).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def discord_timestamp_from_time(date_string: Union[str, None]) -> str:
+    """Converts a date string to Discord timestamp format.
+    
+    Args:
+        date_string: An ISO format date string or None.
+    
+    Returns:
+        A Discord timestamp string (<t:UNIX_TIMESTAMP:F>) or "To Be Announced".
+    """
+    if date_string is None:
+        return "To Be Announced"
+    timestamp = int(datetime.datetime.fromisoformat(date_string).timestamp())
+    return f"<t:{timestamp}:F>"
+
+
 def setup_logging() -> None:
     """Setup logging."""
     logging.basicConfig(level=config.LOG_LEVEL, format=config.LOG_FORMAT)
