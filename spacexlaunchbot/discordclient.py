@@ -11,14 +11,14 @@ from discord import app_commands
 
 from . import apis, config, embeds, storage
 from .notifications import NotificationType, check_and_send_notifications
-from .utils import PostgresLogger, sys_info
+from .utils import PostgresLogger, sys_info, convert_time_to_timezone
 
 ONE_MINUTE = 60
 
 
 class SpaceXLaunchBotClient(discord.Client):
     # - The signals package is a bit iffy when it comes to pylint.
-    #   See https://github.com/PyCQA/pylint/issues/2804
+    # See https://github.com/PyCQA/pylint/issues/2804
     # - Disable line-too-long because I'm lazy
     # pylint: disable=no-member,line-too-long,too-many-public-methods,too-many-instance-attributes
 
@@ -140,6 +140,11 @@ class SpaceXLaunchBotClient(discord.Client):
         self.tree.command(name="help", description="List these commands")(
             self.command_help
         )
+
+        self.tree.command(
+            name="settimezone",
+            description="Set the timezone for launch times in this channel",
+        )(self.command_settimezone)
 
         if not self.tree_synced:
             logging.info("Syncing command tree")
@@ -349,7 +354,9 @@ class SpaceXLaunchBotClient(discord.Client):
         if next_launch_dict == {}:
             response = embeds.API_ERROR_EMBED
         else:
-            response = embeds.create_schedule_embed(next_launch_dict)
+            # Get the channel's timezone
+            timezone = await self.ds.get_channel_timezone(str(interaction.channel_id))
+            response = embeds.create_schedule_embed(next_launch_dict, timezone)
         await interaction.response.send_message(embed=response)
 
     # FIXME: This will cause us to rate limit I imagine...
@@ -362,7 +369,8 @@ class SpaceXLaunchBotClient(discord.Client):
     #     if launch_dict == {}:
     #         response = embeds.API_ERROR_EMBED
     #     else:
-    #         response = embeds.create_schedule_embed(launch_dict)
+    #         timezone = await self.ds.get_channel_timezone(str(interaction.channel_id))
+    #         response = embeds.create_schedule_embed(launch_dict, timezone)
     #     await interaction.response.send_message(embed=response)
 
     async def command_add(
@@ -459,3 +467,45 @@ class SpaceXLaunchBotClient(discord.Client):
     async def command_help(self, interaction: discord.Interaction):
         await self.ds.register_metric("command_help", str(interaction.guild_id))
         await interaction.response.send_message(embed=embeds.HELP_EMBED)
+
+    async def command_settimezone(self, interaction: discord.Interaction, timezone: str):
+        """Set the timezone for launch times in this channel."""
+        if self.interaction_from_admin(interaction) is False:
+            await interaction.response.send_message(
+                embed=embeds.ADMIN_PERMISSION_REQUIRED
+            )
+            return
+
+        await self.ds.register_metric("command_settimezone", str(interaction.guild_id))
+
+        # Validate timezone
+        try:
+            import pytz
+            pytz.timezone(timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            await interaction.response.send_message(
+                embed=embeds.create_interaction_embed(
+                    f"Invalid timezone: {timezone}. Use formats like 'America/New_York', 'Europe/London', or 'Asia/Tokyo'.",
+                    success=False,
+                )
+            )
+            return
+
+        # Update the timezone for this channel
+        updated = await self.ds.update_channel_timezone(str(interaction.channel_id), timezone)
+        
+        if updated:
+            logging.info(f"{interaction.channel_id} timezone set to {timezone}")
+            await interaction.response.send_message(
+                embed=embeds.create_interaction_embed(
+                    f"Timezone for this channel has been set to {timezone}"
+                )
+            )
+        else:
+            # Channel not subscribed yet
+            await interaction.response.send_message(
+                embed=embeds.create_interaction_embed(
+                    "This channel is not subscribed to notifications. Use /add first.",
+                    success=False,
+                )
+            )
