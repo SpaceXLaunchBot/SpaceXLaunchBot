@@ -4,3 +4,4 @@ asyncpg==0.30.0
 aiohttp-client-cache==0.13.0
 aiosqlite==0.21.0
 discordhealthcheck==0.1.1
+pytz==2025.2
