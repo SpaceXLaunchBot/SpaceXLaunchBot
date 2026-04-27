@@ -1,7 +1,7 @@
 import discord
 
 from .. import config, version
-from ..utils import md_link, utc_from_time
+from ..utils import md_link, utc_from_time, convert_time_to_timezone
 from . import colours
 from .better_embed import BetterEmbed
 
@@ -17,11 +17,12 @@ _ROCKET_NAME_IMAGES = {
 }
 
 
-def create_schedule_embed(launch_info: dict) -> BetterEmbed:
+def create_schedule_embed(launch_info: dict, timezone: str = "UTC") -> BetterEmbed:
     """Creates an informational (schedule) embed from a dict of launch information.
 
     Args:
         launch_info: A dictionary of launch information from apis.spacex.
+        timezone: The timezone to display times in.
 
     Returns:
         A BetterEmbed object.
@@ -30,8 +31,8 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
     # pylint: disable=line-too-long
 
     # TODO: The "launch" command can request a launch that won't have all the data and
-    #  currently will cause errors (e.g. NoneType TypeError as data does not exist).
-    launch_date_str = utc_from_time(launch_info["net"])
+    # currently will cause errors (e.g. NoneType TypeError as data does not exist).
+    launch_date_str = convert_time_to_timezone(launch_info["net"], timezone)
 
     fields = [
         [
@@ -39,7 +40,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
             f'{launch_info["rocket"]["configuration"]["full_name"]}',
         ],
         [
-            "Launch Date (UTC)",
+            f"Launch Date ({timezone if timezone != 'UTC' else 'UTC'})",
             f"{launch_date_str}",
         ],
         [
@@ -88,7 +89,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
     )
 
     # if (reddit_url := launch_info["links"]["reddit"]["campaign"]) is not None:
-    #     schedule_embed.description += "\n" + (  # type: ignore
+    #     schedule_embed.description += "\n" + ( # type: ignore
     #         f' {md_link("Click for r/SpaceX Thread", reddit_url)}.'
     #     )
 
@@ -105,18 +106,19 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
     return schedule_embed
 
 
-def create_launch_embed(launch_info: dict) -> BetterEmbed:
+def create_launch_embed(launch_info: dict, timezone: str = "UTC") -> BetterEmbed:
     """Create a launch embed from a dict of launch information.
 
     Args:
         launch_info: A dictionary of launch information from apis.spacex.
+        timezone: The timezone to display times in.
 
     Returns:
         A BetterEmbed object.
 
     """
     embed_desc = ""
-    launch_date_str = utc_from_time(launch_info["net"])
+    launch_date_str = convert_time_to_timezone(launch_info["net"], timezone)
 
     # if (video_url := launch_info["links"]["webcast"]) is not None:
     #     embed_desc += md_link("Livestream", video_url) + "\n"
@@ -131,7 +133,7 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
         title=f"{launch_info['name']} is launching soon!",
         description=embed_desc,
         color=colours.RED_FALCON,
-        fields=[["Launch date (UTC)", launch_date_str]],
+        fields=[[f"Launch date ({timezone if timezone != 'UTC' else 'UTC'})", launch_date_str]],
     )
 
     # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
