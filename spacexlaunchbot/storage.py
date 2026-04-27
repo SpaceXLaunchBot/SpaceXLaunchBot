@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 
 import asyncpg
+import pytz
 
 from .notifications import NotificationType
 
@@ -14,6 +15,7 @@ class SubscriptionOptions:
 
     notification_type: NotificationType
     launch_mentions: str
+    timezone: str
 
 
 class DataStore:
@@ -22,14 +24,14 @@ class DataStore:
     Must a database connection pool from asyncpg.create_pool.
 
     In-memory stateful data is stored by serializing and loading from a file,
-        subscribed channels data is stored in a postgres database.
+    subscribed channels data is stored in a postgres database.
 
     All methods that either return or take mutable objects as parameters make a deep
-        copy of said object(s) so that changes cannot be made outside the instance.
+    copy of said object(s) so that changes cannot be made outside the instance.
 
     Immutable object references:
-     - https://stackoverflow.com/a/23715872/6396652
-     - https://stackoverflow.com/a/986145/6396652
+    - https://stackoverflow.com/a/23715872/6396652
+    - https://stackoverflow.com/a/986145/6396652
     """
 
     def __init__(self, db_pool: asyncpg.Pool, pickle_file_path: str):
@@ -45,7 +47,7 @@ class DataStore:
         try:
             with open(self._pickle_file_path, "rb") as f_in:
                 tmp = pickle.load(f_in)
-            self.__dict__.update(tmp)
+                self.__dict__.update(tmp)
             logging.info(f"Updated self.__dict__ from {self._pickle_file_path}")
         except FileNotFoundError:
             logging.info(f"Could not find file at location: {self._pickle_file_path}")
@@ -85,6 +87,7 @@ class DataStore:
         guild_id: str,
         notif_type: NotificationType,
         launch_mentions: str | None,
+        timezone: str | None = None,
     ) -> bool:
         """Add a channel to subscribed channels.
 
@@ -94,6 +97,7 @@ class DataStore:
             guild_id: The guild the channel is in.
             notif_type: The type of subscription.
             launch_mentions: The mentions for launch notifications.
+            timezone: The timezone to use for launch times.
 
         Returns:
             A bool indicating if the channel was added or not.
@@ -101,10 +105,10 @@ class DataStore:
         """
         notification_type = notif_type.name
         sql = """
-        insert into subscribed_channels
-            (channel_id, guild_id, channel_name, notification_type, launch_mentions)
-        values
-            ($1, $2, $3, $4, $5);"""
+            insert into subscribed_channels
+            (channel_id, guild_id, channel_name, notification_type, launch_mentions, timezone)
+            values
+            ($1, $2, $3, $4, $5, $6);"""
         async with self.db_pool.acquire() as conn:
             try:
                 response = await conn.execute(
@@ -114,6 +118,7 @@ class DataStore:
                     channel_name,
                     notification_type,
                     launch_mentions,
+                    timezone or "UTC",
                 )
                 # Not great practice but it works.
                 if response == "INSERT 0 1":
@@ -128,13 +133,14 @@ class DataStore:
         sql = "select * from subscribed_channels;"
         async with self.db_pool.acquire() as conn:
             records = await conn.fetch(sql)
-        for rec in records:
-            cid = int(rec["channel_id"])
-            notif_type = rec["notification_type"]
-            mentions = (
-                rec["launch_mentions"] if rec["launch_mentions"] is not None else ""
-            )
-            channels[cid] = SubscriptionOptions(NotificationType[notif_type], mentions)
+            for rec in records:
+                cid = int(rec["channel_id"])
+                notif_type = rec["notification_type"]
+                mentions = (
+                    rec["launch_mentions"] if rec["launch_mentions"] is not None else ""
+                )
+                timezone = rec.get("timezone", "UTC") if rec.get("timezone") else "UTC"
+                channels[cid] = SubscriptionOptions(NotificationType[notif_type], mentions, timezone)
         return channels
 
     async def remove_subbed_channel(self, channel_id: str) -> bool:
@@ -145,11 +151,44 @@ class DataStore:
                 return True
         return False
 
+    async def update_channel_timezone(self, channel_id: str, timezone: str) -> bool:
+        """Update the timezone for a subscribed channel.
+
+        Args:
+            channel_id: The channel to update.
+            timezone: The timezone to set.
+
+        Returns:
+            A bool indicating if the channel was updated.
+        """
+        sql = "update subscribed_channels set timezone = $1 where channel_id = $2;"
+        async with self.db_pool.acquire() as conn:
+            response = await conn.execute(sql, timezone, channel_id)
+            if response == "UPDATE 1":
+                return True
+        return False
+
+    async def get_channel_timezone(self, channel_id: str) -> str:
+        """Get the timezone for a channel.
+
+        Args:
+            channel_id: The channel to get timezone for.
+
+        Returns:
+            The timezone string, defaults to UTC if not set.
+        """
+        sql = "select timezone from subscribed_channels where channel_id = $1;"
+        async with self.db_pool.acquire() as conn:
+            record = await conn.fetchrow(sql, channel_id)
+            if record and record.get("timezone"):
+                return record["timezone"]
+            return "UTC"
+
     async def subbed_channels_count(self) -> int:
         sql = "select count(*) from subscribed_channels;"
         async with self.db_pool.acquire() as conn:
             records = await conn.fetch(sql)
-        return int(records[0]["count"])
+            return int(records[0]["count"])
 
     async def register_metric(self, action: str, guild_id: str) -> bool:
         """Register an action occurring to the metrics table.
@@ -163,9 +202,9 @@ class DataStore:
 
         """
         sql = """
-        insert into metrics
+            insert into metrics
             (action, guild_id)
-        values
+            values
             ($1, $2);"""
         async with self.db_pool.acquire() as conn:
             response = await conn.execute(
@@ -190,9 +229,9 @@ class DataStore:
         subbed_count = await self.subbed_channels_count()
 
         sql = """
-        insert into counts
+            insert into counts
             (guild_count, subscribed_count)
-        values
+            values
             ($1, $2);"""
         async with self.db_pool.acquire() as conn:
             response = await conn.execute(
@@ -211,21 +250,51 @@ class DataStore:
             guild count, subscribed channel count
         """
         sql = """
-        select
-            guild_count,
-            subscribed_count
-        from
-            counts
-        where
-            time between now() - interval '1 day' and now()
-        order by
-            time asc
-        limit
-            1;"""
+            select
+                guild_count,
+                subscribed_count
+            from
+                counts
+            where
+                time between now() - interval '1 day' and now()
+            order by
+                time asc
+            limit
+                1;"""
         async with self.db_pool.acquire() as conn:
             records = await conn.fetch(sql)
-        try:
-            record = records[0]
-            return int(record["guild_count"]), int(record["subscribed_count"])
-        except (IndexError, ValueError, KeyError):
-            return 0, 0
+            try:
+                record = records[0]
+                return int(record["guild_count"]), int(record["subscribed_count"])
+            except (IndexError, ValueError, KeyError):
+                return 0, 0
+
+
+def convert_time_to_timezone(date_string: str, timezone_str: str) -> str:
+    """Convert a UTC datetime string to a specified timezone.
+
+    Args:
+        date_string: ISO format datetime string in UTC.
+        timezone_str: Target timezone name (e.g., 'America/New_York').
+
+    Returns:
+        Formatted datetime string in the target timezone.
+    """
+    if date_string is None:
+        return "To Be Announced"
+    
+    try:
+        # Parse the UTC datetime
+        utc_dt = datetime.datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+        
+        # Convert to target timezone
+        if timezone_str and timezone_str != "UTC":
+            target_tz = pytz.timezone(timezone_str)
+            local_dt = utc_dt.astimezone(target_tz)
+            return local_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+        else:
+            return utc_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+    except (ValueError, pytz.exceptions.UnknownTimeZoneError):
+        # Fallback to UTC if timezone is invalid
+        utc_dt = datetime.datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+        return utc_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
