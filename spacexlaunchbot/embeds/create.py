@@ -1,7 +1,7 @@
 import discord
 
 from .. import config, version
-from ..utils import md_link, utc_from_time
+from ..utils import discord_timestamp_from_time, md_link, utc_from_time
 from . import colours
 from .better_embed import BetterEmbed
 
@@ -31,7 +31,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
 
     # TODO: The "launch" command can request a launch that won't have all the data and
     #  currently will cause errors (e.g. NoneType TypeError as data does not exist).
-    launch_date_str = utc_from_time(launch_info["net"])
+    launch_date_str = discord_timestamp_from_time(launch_info["net"])
 
     fields = [
         [
@@ -39,7 +39,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
             f'{launch_info["rocket"]["configuration"]["full_name"]}',
         ],
         [
-            "Launch Date (UTC)",
+            "Launch Date",
             f"{launch_date_str}",
         ],
         [
@@ -116,7 +116,7 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
 
     """
     embed_desc = ""
-    launch_date_str = utc_from_time(launch_info["net"])
+    launch_date_str = discord_timestamp_from_time(launch_info["net"])
 
     # if (video_url := launch_info["links"]["webcast"]) is not None:
     #     embed_desc += md_link("Livestream", video_url) + "\n"
@@ -131,7 +131,7 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
         title=f"{launch_info['name']} is launching soon!",
         description=embed_desc,
         color=colours.RED_FALCON,
-        fields=[["Launch date (UTC)", launch_date_str]],
+        fields=[["Launch Date", launch_date_str]],
     )
 
     # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
