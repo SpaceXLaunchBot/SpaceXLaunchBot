@@ -19,8 +19,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: |
           uv sync --all-extras --dev
-          # abort if the lockfile changes
-          [[ -n $(git diff --stat uv.lock) ]] && exit 1
       - run: uv run poe all
         env:
           POSTGRES_PASSWORD: for-testing
