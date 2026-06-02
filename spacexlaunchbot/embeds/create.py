@@ -1,7 +1,7 @@
 import discord
 
 from .. import config, version
-from ..utils import discord_timestamp_from_time, md_link, utc_from_time
+from ..utils import discord_timestamp_from_time, md_link
 from . import colours
 from .better_embed import BetterEmbed
 

@@ -9,18 +9,12 @@ from discord import version_info
 from .. import config, version
 
 
-def utc_from_time(date_string: str | None) -> str:
-    if date_string is None:
-        return "To Be Announced"
-    return datetime.datetime.fromisoformat(date_string).strftime("%Y-%m-%d %H:%M:%S")
-
-
-def discord_timestamp_from_time(date_string: Union[str, None]) -> str:
+def discord_timestamp_from_time(date_string: str | None) -> str:
     """Converts a date string to Discord timestamp format.
-    
+
     Args:
         date_string: An ISO format date string or None.
-    
+
     Returns:
         A Discord timestamp string (<t:UNIX_TIMESTAMP:F>) or "To Be Announced".
     """
