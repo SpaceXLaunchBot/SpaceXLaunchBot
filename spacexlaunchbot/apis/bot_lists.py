@@ -1,12 +1,11 @@
 import logging
-from typing import Dict
 
 import aiohttp
 
 from .. import config
 
 
-async def _post_count_to_bot_list(bl_data: Dict[str, str], guild_count: int) -> None:
+async def _post_count_to_bot_list(bl_data: dict[str, str], guild_count: int) -> None:
     async with aiohttp.ClientSession() as session:
         await session.post(
             bl_data["url"],

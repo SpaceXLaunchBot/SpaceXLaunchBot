@@ -5,9 +5,7 @@ import asyncpg
 
 
 class PostgresLogger(logging.StreamHandler):
-    def __init__(
-        self, fmt: str, loop: asyncio.AbstractEventLoop, db_pool: asyncpg.Pool
-    ):
+    def __init__(self, fmt: str, loop: asyncio.AbstractEventLoop, db_pool: asyncpg.Pool):
         logging.StreamHandler.__init__(self)
         self.formatter = logging.Formatter(fmt=fmt)
         self.loop = loop
@@ -36,12 +34,11 @@ class PostgresLogger(logging.StreamHandler):
             pass
 
     def emit(self, record):
-        # Bare except just seems to be the done thing for custom loggers.
-        # pylint: disable=bare-except
         try:
             msg = self.format(record)
             self.loop.create_task(self.fire(msg))
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except:  # noqa: E722
+            # Bare except just seems to be the done thing for custom loggers.
             self.handleError(record)

@@ -3,14 +3,13 @@ import json
 import logging
 import platform
 import sys
-from typing import Union
 
 from discord import version_info
 
 from .. import config, version
 
 
-def utc_from_time(date_string: Union[str, None]) -> str:
+def utc_from_time(date_string: str | None) -> str:
     if date_string is None:
         return "To Be Announced"
     return datetime.datetime.fromisoformat(date_string).strftime("%Y-%m-%d %H:%M:%S")
@@ -54,5 +53,5 @@ def sys_info() -> str:
             "indev": config.INDEV,
             "inside_docker": config.INSIDE_DOCKER,
             "commit-hash": version.HASH,
-        }
+        },
     )

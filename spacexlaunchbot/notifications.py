@@ -42,11 +42,9 @@ async def check_and_send_notifications(client) -> None:
     #
 
     schedule_embed = embeds.create_schedule_embed(next_launch_dict)
-    diff_str = embeds.diff_schedule_embed_dicts(
-        previous_schedule_embed_dict, schedule_embed.to_dict()
-    )
+    diff_str = embeds.diff_schedule_embed_dicts(previous_schedule_embed_dict, schedule_embed.to_dict())
 
-    before_flight = not next_launch_dict["status"]["name"] in [
+    before_flight = next_launch_dict["status"]["name"] not in [
         "Launch in Flight",
         "Launch Successful",
     ]
@@ -63,9 +61,7 @@ async def check_and_send_notifications(client) -> None:
 
     try:
         # launch_timestamp = int(next_launch_dict["date_unix"])
-        launch_timestamp = int(
-            datetime.datetime.fromisoformat(next_launch_dict["net"]).timestamp()
-        )
+        launch_timestamp = int(datetime.datetime.fromisoformat(next_launch_dict["net"]).timestamp())
 
     except ValueError:
         # Doesn't have a date, don't trigger notifications
@@ -91,6 +87,4 @@ async def check_and_send_notifications(client) -> None:
     # Save data
     #
 
-    client.ds.set_notification_task_vars(
-        launch_embed_for_current_schedule_sent, schedule_embed.to_dict()
-    )
+    client.ds.set_notification_task_vars(launch_embed_for_current_schedule_sent, schedule_embed.to_dict())

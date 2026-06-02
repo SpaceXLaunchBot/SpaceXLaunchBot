@@ -5,7 +5,7 @@ import os
 # Meta
 #
 
-INDEV = os.name == "nt"
+INDEV = os.environ.get("SLB_INDEV", False)
 
 WEBSITE_URL = "https://spacexlaunchbot.dev/"
 
@@ -18,8 +18,7 @@ BOT_CLIENT_ID = 412281000140472323 if INDEV else 411618411169447950
 # BOT_MENTION_STR = f"<@!{BOT_CLIENT_ID}>"
 BOT_INVITE_PERMISSIONS = "2147633152"
 BOT_INVITE_URL = (
-    "https://discord.com/oauth2/authorize?scope=bot"
-    f"&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
+    f"https://discord.com/oauth2/authorize?scope=bot&client_id={BOT_CLIENT_ID}&permissions={BOT_INVITE_PERMISSIONS}"
 )
 BOT_SUPPORT_SERVER_INVITE = "https://discord.gg/j6vbHkYSES"
 
@@ -40,7 +39,7 @@ DB_HOST = os.environ.get("SLB_DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("SLB_DB_PORT", 5432))
 
 DB_USER = os.environ.get("POSTGRES_USER", "slb")
-DB_PASS = os.environ["POSTGRES_PASSWORD"]
+DB_PASS = os.environ.get("POSTGRES_PASSWORD", "")
 DB_NAME = os.environ.get("POSTGRES_DB", "spacexlaunchbot")
 
 # Seem like sensible defaults, may need tuning if DB is used by other applications.
@@ -51,7 +50,7 @@ DB_POOL_MAX_CONNECTIONS = 50
 # Discord & Related APIs
 #
 
-API_TOKEN_DISCORD = os.environ["SLB_API_TOKEN_DISCORD"]
+API_TOKEN_DISCORD = os.environ.get("SLB_API_TOKEN_DISCORD", "TEST_TOKEN")
 
 BOT_LIST_DEFAULT_TOKEN = "test-token-pls-ignore"
 BOT_LIST_DATA = [

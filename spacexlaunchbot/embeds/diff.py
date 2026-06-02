@@ -12,16 +12,14 @@ def diff_schedule_embed_dicts(old_embed: dict, new_embed: EmbedData) -> str:
     if old_embed.get("description", "") != new_embed.get("description", ""):
         diffs += ["description"]
 
-    if old_embed.get("thumbnail", None) != new_embed.get("thumbnail", None):
+    if old_embed.get("thumbnail") != new_embed.get("thumbnail", None):
         diffs += ["thumbnail"]
 
-    if old_embed.get("image", None) != new_embed.get("image", None):
+    if old_embed.get("image") != new_embed.get("image", None):
         diffs += ["image"]
 
     # Dict of name:value for old_embed fields.
-    old_embed_fields = {
-        field["name"]: field["value"] for field in old_embed.get("fields", [])
-    }
+    old_embed_fields = {field["name"]: field["value"] for field in old_embed.get("fields", [])}
 
     new_embed_fields = new_embed.get("fields", [])
 

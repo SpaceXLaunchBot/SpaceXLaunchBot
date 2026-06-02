@@ -1,13 +1,11 @@
-from typing import Union
-
 import discord
 
 
 class BetterEmbed(discord.Embed):
     def __init__(
         self,
-        fields: Union[None, list[list[str]]] = None,
-        footer: Union[None, str] = None,
+        fields: None | list[list[str]] = None,
+        footer: None | str = None,
         inline_fields: bool = True,
         **kwargs,
     ):

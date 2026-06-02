@@ -1,0 +1,75 @@
+[project]
+name = "spacexlaunchbot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp-client-cache>=0.14.3",
+    "aiosqlite>=0.22.1",
+    "asyncpg>=0.31.0",
+    "discord-py>=2.7.1",
+    "discordhealthcheck>=0.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.20.1",
+    "poethepoet>=0.44.0",
+    "pytest>=9.0.3",
+    "ruff>=0.15.11",
+    "vulture>=2.16",
+]
+
+[uv.tool]
+package = true
+
+[project.scripts]
+spacexlaunchbot = "spacexlaunchbot.__main__:main"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/rules/
+select = [
+	"A",    # warn about shadowing built-ins
+	"E",    # style stuff, whitespaces
+	"F",    # important pyflakes lints
+	"I",    # import sorting
+	"N",    # naming
+	"T100", # breakpoints (probably don't want these in prod!)
+]
+
+# if you're feeling confident you can do:
+# select = ["ALL"]
+
+ignore = [
+	"F401", # ignore init.py reexport correctness
+]
+
+[tool.ruff.lint.isort]
+# so it knows to group first-party stuff last
+known-first-party = ["spacexlaunchbot"]
+
+[tool.mypy]
+files = ["spacexlaunchbot"]
+
+[[tool.mypy.overrides]]
+module = ["discord", "discord.ext.commands", "asyncpg", "discordhealthcheck"]
+ignore_missing_imports = true
+
+[tool.vulture]
+ignore_names = ["setup_hook", "formatter", "on_*"]
+paths = ["./spacexlaunchbot"]
+
+[tool.poe.tasks]
+# run with eg `uv run poe fmt`
+fmt = "ruff format"
+lint = "ruff check --fix"
+check = "mypy"
+test = "pytest"
+vulture = "vulture"
+# run all the above
+all = [ {ref="fmt"}, {ref="lint"}, {ref="check"}, {ref="vulture"}, {ref="test"} ]

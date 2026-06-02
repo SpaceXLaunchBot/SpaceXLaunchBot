@@ -1,0 +1,45 @@
+services:
+
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    networks:
+      - slbnetwork
+    env_file:
+      - .env
+    volumes:
+      - ./db/pg-create.sh:/docker-entrypoint-initdb.d/pg-create.sh
+      - postgresdata:/var/lib/postgresql
+
+  spacexlaunchbot:
+    # docker build -t psidex/spacexlaunchbot:test .
+    image: psidex/spacexlaunchbot:test
+    restart: unless-stopped
+    networks:
+      - slbnetwork
+    env_file:
+      - .env
+    volumes:
+      - slbdata:/docker-volume
+    depends_on:
+      - postgres
+
+  stats-server:
+    image: psidex/spacexlaunchbot-stats-server:latest
+    restart: unless-stopped
+    networks:
+      - slbnetwork
+    env_file:
+      - .env
+    ports:
+      - 127.0.0.1:8080:8080
+    depends_on:
+      - postgres
+
+networks:
+  slbnetwork:
+
+
+volumes:
+  slbdata:
+  postgresdata:

@@ -2,7 +2,6 @@ import asyncio
 import logging
 import platform
 import signal
-from typing import Union
 
 import asyncpg
 import discord
@@ -41,9 +40,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
             logging.info("Not on Windows, registering signal handlers")
             for s in signals:
-                self.loop.add_signal_handler(
-                    s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig))
-                )
+                self.loop.add_signal_handler(s, lambda sig=s: self.loop.create_task(self.shutdown(sig=sig)))
 
         logging.info("Creating a connection pool for DB")
         self.db_pool = await asyncpg.create_pool(
@@ -55,13 +52,9 @@ class SpaceXLaunchBotClient(discord.Client):
             min_size=config.DB_POOL_MIN_CONNECTIONS,
             max_size=config.DB_POOL_MAX_CONNECTIONS,
         )
-        logging.info(
-            f"Pooled with {self.db_pool.get_size()}/{self.db_pool.get_max_size()} connections"
-        )
+        logging.info(f"Pooled with {self.db_pool.get_size()}/{self.db_pool.get_max_size()} connections")
 
-        logging.getLogger().addHandler(
-            PostgresLogger(config.LOG_FORMAT, self.loop, self.db_pool)
-        )
+        logging.getLogger().addHandler(PostgresLogger(config.LOG_FORMAT, self.loop, self.db_pool))
         logging.info("Initialised Postgres logger")
 
         self.ds = storage.DataStore(
@@ -76,7 +69,7 @@ class SpaceXLaunchBotClient(discord.Client):
         self.notification_task = self.loop.create_task(self.start_notification_loop())
         self.counts_task = self.loop.create_task(self.start_db_counts_loop())
 
-        self.dc_logger: Union[asyncio.Task, None] = None
+        self.dc_logger: asyncio.Task | None = None
 
     @property
     def latency_ms(self) -> int:
@@ -104,9 +97,7 @@ class SpaceXLaunchBotClient(discord.Client):
             self.dc_logger.cancel()
             return
 
-        logging.info(
-            f"Resumed connection to Discord API with a latency of {self.latency_ms}ms"
-        )
+        logging.info(f"Resumed connection to Discord API with a latency of {self.latency_ms}ms")
 
     async def on_ready(self) -> None:
         logging.info("Client ready")
@@ -137,9 +128,7 @@ class SpaceXLaunchBotClient(discord.Client):
             description="Send information about the bot to the current channel",
         )(self.command_info)
 
-        self.tree.command(name="help", description="List these commands")(
-            self.command_help
-        )
+        self.tree.command(name="help", description="List these commands")(self.command_help)
 
         if not self.tree_synced:
             logging.info("Syncing command tree")
@@ -188,7 +177,7 @@ class SpaceXLaunchBotClient(discord.Client):
     # State change
     #
 
-    async def shutdown(self, sig: Union[None, signal.Signals] = None) -> None:
+    async def shutdown(self, sig: None | signal.Signals = None) -> None:
         """Disconnects from Discord and cancels asyncio tasks"""
         logging.info("Shutdown called")
 
@@ -220,7 +209,7 @@ class SpaceXLaunchBotClient(discord.Client):
     @staticmethod
     async def _send_s(
         channel,
-        to_send: Union[str, discord.Embed],
+        to_send: str | discord.Embed,
     ) -> None:
         """Safely send a text / embed message to a channel. Logs any errors that occur.
 
@@ -251,7 +240,7 @@ class SpaceXLaunchBotClient(discord.Client):
 
     async def send_notification(
         self,
-        to_send: Union[str, discord.Embed],
+        to_send: str | discord.Embed,
         notification_type: NotificationType,
     ) -> None:
         """Send a notification message to all channels subscribed to the given type.
@@ -372,9 +361,7 @@ class SpaceXLaunchBotClient(discord.Client):
         notification_mentions: str | None = None,
     ):
         if self.interaction_from_admin(interaction) is False:
-            await interaction.response.send_message(
-                embed=embeds.ADMIN_PERMISSION_REQUIRED
-            )
+            await interaction.response.send_message(embed=embeds.ADMIN_PERMISSION_REQUIRED)
             return
 
         await self.ds.register_metric("command_add", str(interaction.guild_id))
@@ -386,7 +373,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 embed=embeds.create_interaction_embed(
                     'Invalid notification type, try "all", "schedule", or "launch"',
                     success=False,
-                )
+                ),
             )
             return
 
@@ -406,17 +393,13 @@ class SpaceXLaunchBotClient(discord.Client):
             )
         else:
             logging.info(f"{interaction.channel_id} subscribed to {notification_type}")
-            response = embeds.create_interaction_embed(
-                "This channel has been added to the notification service"
-            )
+            response = embeds.create_interaction_embed("This channel has been added to the notification service")
 
         await interaction.response.send_message(embed=response)
 
     async def command_remove(self, interaction: discord.Interaction):
         if self.interaction_from_admin(interaction) is False:
-            await interaction.response.send_message(
-                embed=embeds.ADMIN_PERMISSION_REQUIRED
-            )
+            await interaction.response.send_message(embed=embeds.ADMIN_PERMISSION_REQUIRED)
             return
 
         await self.ds.register_metric("command_remove", str(interaction.guild_id))
@@ -431,9 +414,7 @@ class SpaceXLaunchBotClient(discord.Client):
             )
         else:
             logging.info(f"{interaction.channel_id} unsubscribed")
-            response = embeds.create_interaction_embed(
-                "This channel has been removed from the notification service"
-            )
+            response = embeds.create_interaction_embed("This channel has been removed from the notification service")
         await interaction.response.send_message(embed=response)
 
     async def command_info(self, interaction: discord.Interaction):
@@ -453,7 +434,7 @@ class SpaceXLaunchBotClient(discord.Client):
                 channel_count,
                 channel_cout_diff,
                 self.latency_ms,
-            )
+            ),
         )
 
     async def command_help(self, interaction: discord.Interaction):

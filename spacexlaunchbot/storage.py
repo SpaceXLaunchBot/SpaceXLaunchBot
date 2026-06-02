@@ -71,9 +71,7 @@ class DataStore:
         launch_embed_for_current_schedule_sent: bool,
         previous_schedule_embed_dict: dict,
     ) -> None:
-        self._launch_embed_for_current_schedule_sent = (
-            launch_embed_for_current_schedule_sent
-        )
+        self._launch_embed_for_current_schedule_sent = launch_embed_for_current_schedule_sent
         self._previous_schedule_embed_dict = deepcopy(previous_schedule_embed_dict)
         self.save_state()
 
@@ -131,9 +129,7 @@ class DataStore:
         for rec in records:
             cid = int(rec["channel_id"])
             notif_type = rec["notification_type"]
-            mentions = (
-                rec["launch_mentions"] if rec["launch_mentions"] is not None else ""
-            )
+            mentions = rec["launch_mentions"] if rec["launch_mentions"] is not None else ""
             channels[cid] = SubscriptionOptions(NotificationType[notif_type], mentions)
         return channels
 
@@ -209,6 +205,7 @@ class DataStore:
 
         Returns:
             guild count, subscribed channel count
+
         """
         sql = """
         select

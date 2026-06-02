@@ -5,9 +5,7 @@ from ..utils import discord_timestamp_from_time, md_link, utc_from_time
 from . import colours
 from .better_embed import BetterEmbed
 
-_IMAGE_BASE_URL = (
-    "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
-)
+_IMAGE_BASE_URL = "https://raw.githubusercontent.com/r-spacex/SpaceXLaunchBot/master/images/logos"
 
 # A map of rocket id (in the API) to the image to represent it
 _ROCKET_NAME_IMAGES = {
@@ -36,7 +34,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
     fields = [
         [
             "Launch Vehicle",
-            f'{launch_info["rocket"]["configuration"]["full_name"]}',
+            f"{launch_info['rocket']['configuration']['full_name']}",
         ],
         [
             "Launch Date",
@@ -44,7 +42,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
         ],
         [
             "Launch Status",
-            f'{launch_info["status"]["name"]}',
+            f"{launch_info['status']['name']}",
         ],
         ["Launch Site", launch_info["pad"]["name"]],
     ]
@@ -77,13 +75,13 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
                 launch_info["mission"]["type"],
                 launch_info["mission"]["orbit"]["name"],
             ),
-        ]
+        ],
     )
 
     schedule_embed = BetterEmbed(
         color=colours.RED_FALCON,
         description=launch_info["mission"]["description"] or "",
-        title=f'Launch #{launch_info["agency_launch_attempt_count"]} - {launch_info["mission"]["name"]}',
+        title=f"Launch #{launch_info['agency_launch_attempt_count']} - {launch_info['mission']['name']}",
         fields=fields,
     )
 
@@ -94,9 +92,7 @@ def create_schedule_embed(launch_info: dict) -> BetterEmbed:
 
     # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
     #     schedule_embed.set_thumbnail(url=patch_url)
-    if (
-        rocket_id := launch_info["rocket"]["configuration"]["name"]
-    ) in _ROCKET_NAME_IMAGES:
+    if (rocket_id := launch_info["rocket"]["configuration"]["name"]) in _ROCKET_NAME_IMAGES:
         schedule_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
     # if flickr_urls := launch_info["links"]["flickr"]["original"]:
@@ -136,9 +132,7 @@ def create_launch_embed(launch_info: dict) -> BetterEmbed:
 
     # if (patch_url := launch_info["links"]["patch"]["small"]) is not None:
     #     launch_embed.set_thumbnail(url=patch_url)
-    if (
-        rocket_id := launch_info["rocket"]["configuration"]["name"]
-    ) in _ROCKET_NAME_IMAGES:
+    if (rocket_id := launch_info["rocket"]["configuration"]["name"]) in _ROCKET_NAME_IMAGES:
         launch_embed.set_thumbnail(url=_ROCKET_NAME_IMAGES[rocket_id])
 
     return launch_embed
@@ -171,8 +165,7 @@ def create_info_embed(
     embed = BetterEmbed(
         title="SpaceXLaunchBot Information",
         color=colours.RED_FALCON,
-        description="A Discord bot for getting news, information, and notifications "
-        "about upcoming SpaceX launches",
+        description="A Discord bot for getting news, information, and notifications about upcoming SpaceX launches",
         fields=[
             [
                 "Guild Count",
@@ -185,7 +178,7 @@ def create_info_embed(
             ["Latency to Discord", f"{latency_ms}ms"],
             [
                 "Links",
-                f'{md_link("Website", config.WEBSITE_URL)}, {md_link("Github", config.BOT_GITHUB_URL)}, {md_link("Bot Invite", config.BOT_INVITE_URL)}, {md_link("Support Server", config.BOT_SUPPORT_SERVER_INVITE)}',
+                f"{md_link('Website', config.WEBSITE_URL)}, {md_link('Github', config.BOT_GITHUB_URL)}, {md_link('Bot Invite', config.BOT_INVITE_URL)}, {md_link('Support Server', config.BOT_SUPPORT_SERVER_INVITE)}",  # noqa: E501
             ],
             ["Contact", f"{config.BOT_OWNER_NAME}"],
             [
@@ -199,7 +192,9 @@ def create_info_embed(
 
 
 def create_interaction_embed(
-    desc: str, success: bool = True, colour: discord.Colour = colours.ORANGE_INFO
+    desc: str,
+    success: bool = True,
+    colour: discord.Colour = colours.ORANGE_INFO,
 ) -> BetterEmbed:
     """Creates an embed to be sent in response to a command, e.g. `add`.
 

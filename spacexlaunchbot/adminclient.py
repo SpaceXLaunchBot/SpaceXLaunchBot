@@ -31,21 +31,15 @@ class AdminSpaceXLaunchBotClient(SpaceXLaunchBotClient):
 
         await super().on_ready()
 
-    async def command_reset_notification_task_store(
-        self, interaction: discord.Interaction
-    ):
+    async def command_reset_notification_task_store(self, interaction: discord.Interaction):
         """Reset notification_task_store to default (will trigger new notifications)."""
         if interaction.user.id != config.BOT_OWNER_ID:
             logging.warning("command called by non owner, doing nothing")
             return
         self.ds.set_notification_task_vars(False, {})
-        await interaction.response.send_message(
-            "Reset using `set_notification_task_vars(False, {})`"
-        )
+        await interaction.response.send_message("Reset using `set_notification_task_vars(False, {})`")
 
-    async def command_debug_launch_embed(
-        self, interaction: discord.Interaction, launch: int = 0
-    ):
+    async def command_debug_launch_embed(self, interaction: discord.Interaction, launch: int = 0):
         """Send a launch notification embed for the given launch."""
         if interaction.user.id != config.BOT_OWNER_ID:
             logging.warning("command called by non owner, doing nothing")
@@ -54,9 +48,7 @@ class AdminSpaceXLaunchBotClient(SpaceXLaunchBotClient):
         launch_embed = embeds.create_launch_embed(next_launch_dict)
         await interaction.response.send_message(embed=launch_embed)
 
-    async def command_trigger_launch_notification(
-        self, interaction: discord.Interaction, launch: int = 0
-    ):
+    async def command_trigger_launch_notification(self, interaction: discord.Interaction, launch: int = 0):
         """Trigger a standard launch notification."""
         if interaction.user.id != config.BOT_OWNER_ID:
             logging.warning("command called by non owner, doing nothing")
