@@ -20,7 +20,7 @@ jobs:
       - run: |
           uv sync --all-extras --dev
           # abort if the lockfile changes
-          [[ -n $(git diff --stat requirements.lock) ]] && exit 1
+          [[ -n $(git diff --stat uv.lock) ]] && exit 1
       - run: uv run poe all
         env:
           POSTGRES_PASSWORD: for-testing
