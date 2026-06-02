@@ -9,7 +9,7 @@ on:
       - 'Dockerfile'
       - '.dockerignore'
       - 'setup.cfg'
-      - '.github/workflows/*.yml'
+      - '.github/workflows/*.yaml'
 
 jobs:
  build:
